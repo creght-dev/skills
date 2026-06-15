@@ -1,6 +1,6 @@
-# Cregh CSS And Tailwind
+# Creght CSS And Tailwind
 
-Cregh uses Tailwind CSS v4.
+Creght uses Tailwind CSS v4.
 
 ## Component Styling
 

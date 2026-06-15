@@ -1,6 +1,6 @@
-# Cregh Sitemap
+# Creght Sitemap
 
-Cregh supports a root-level `/sitemap.ts` file for generating XML sitemap
+Creght supports a root-level `/sitemap.ts` file for generating XML sitemap
 entries. Its authoring rules follow Next.js `sitemap.ts`: export a default
 function that returns an array of sitemap entries, or a promise resolving to
 that array.

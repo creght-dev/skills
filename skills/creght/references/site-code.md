@@ -1,12 +1,12 @@
-# Cregh Site Code
+# Creght Site Code
 
-Cregh apps are React-based websites with file-based routes under `/page`, a
+Creght apps are React-based websites with file-based routes under `/page`, a
 root `talizen.config.ts`, Tailwind v4 styling, generated project types, and
 platform APIs for CMS, forms, metadata, import maps, previews, and publishing.
 
 ## Routing
 
-Routing is derived from `/page` file names by Cregh conventions:
+Routing is derived from `/page` file names by Creght conventions:
 
 - `/page/Index.tsx` -> `/`
 - `/page/About.tsx` -> `/about`
@@ -58,12 +58,12 @@ render as a site page by itself.
 
 ## Local Imports
 
-Use relative paths for local project imports. The Cregh platform does not
+Use relative paths for local project imports. The Creght platform does not
 support alias imports such as `@/lib/utils`; write them as relative imports from
 the importing file, for example `../lib/utils`, `../../lib/utils`, or
 `./lib/utils`.
 
-Package imports and Cregh platform imports still use their normal specifiers,
+Package imports and Creght platform imports still use their normal specifiers,
 such as `react`, `talizen/cms`, and import-map keys configured in
 `talizen.config.ts`.
 
@@ -87,7 +87,7 @@ Rules:
 - For React-dependent esm.sh packages, use `?external=react` so they use the
   host React copy.
 - Keep the import specifier exactly the same as the `imports` key.
-- Cregh's compiler supports Vite-style local asset queries for relative imports:
+- Creght's compiler supports Vite-style local asset queries for relative imports:
   `import assetUrl from "./asset.ext?url"` returns a browser-accessible Blob URL,
   and `import source from "./file.ext?raw"` returns the original file contents as
   a string. Use these for worker source, WASM/worker helper scripts, and other
@@ -123,7 +123,7 @@ the field fits.
 
 ## Package Types
 
-When the current environment provides a Cregh module-type lookup tool, use it
+When the current environment provides a Creght module-type lookup tool, use it
 only when exact package signatures are needed, an uncommon package or subpath is
 involved, the effective URL/version changed, the user explicitly asks to verify
 the API, or lint/typecheck suggests quick reference examples are stale.
