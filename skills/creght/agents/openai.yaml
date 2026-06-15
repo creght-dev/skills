@@ -1,0 +1,3 @@
+interface:
+  display_name: "Cregh"
+  short_description: "Build, push, sync, preview, and publish Cregh sites"
