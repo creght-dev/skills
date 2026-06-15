@@ -1,21 +1,21 @@
 ---
 name: creght
 description: >
-  Use when working with Cregh sites or the Cregh CLI, including pulling site
+  Use when working with Creght sites or the Creght CLI, including pulling site
   code locally, pushing local changes, running watch-mode sync, writing
-  Cregh-compatible React page/component code, CMS and form integration,
+  Creght-compatible React page/component code, CMS and form integration,
   routing, styling, metadata, previewing, publishing, or debugging
   local-to-platform workflows.
 ---
 
-# Cregh
+# Creght
 
-Cregh sites are React-based websites rendered by the Cregh platform. Local
-agents usually work by using the Cregh CLI to pull site files, editing those
-files locally, then pushing, syncing, or previewing through Cregh.
+Creght sites are React-based websites rendered by the Creght platform. Local
+agents usually work by using the Creght CLI to pull site files, editing those
+files locally, then pushing, syncing, or previewing through Creght.
 
-This skill is for general-purpose agents. Do not assume Cregh-system-only
-tools are available. If the current environment exposes Cregh tools such as
+This skill is for general-purpose agents. Do not assume Creght-system-only
+tools are available. If the current environment exposes Creght tools such as
 linting, schema creation, module type fetching, versioning, or patch helpers,
 use them when appropriate; otherwise inspect local files and use the CLI.
 
@@ -24,18 +24,18 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - The CLI handles login, project creation and discovery, pull, push, sync,
   preview, and publish workflows, plus platform data and asset operations.
 - `pull` downloads remote site files into a local directory.
-- `push` uploads the current local directory snapshot to Cregh and exits.
+- `push` uploads the current local directory snapshot to Creght and exits.
 - `sync` is watch mode: it pushes the current local snapshot, then keeps
   listening for local file changes and pushes them in realtime.
 - The CLI does not render sites locally.
 - Rendering, CMS, assets, realtime preview, and publication are handled by the
-  Cregh backend and web app.
-- Site code must follow Cregh platform rules; do not treat a Cregh site as a
+  Creght backend and web app.
+- Site code must follow Creght platform rules; do not treat a Creght site as a
   generic Vite, Next.js, or browser SPA project.
 - If the user's message does not contain an actionable requirement, such as only
   attaching an image without instructions, do not create or modify a website.
   Ask the user what they want to build or change.
-- The Cregh platform does not yet support authenticated backend data
+- The Creght platform does not yet support authenticated backend data
   operations, such as user login and registration. This capability is still
   under development. If users need similar functionality, implement only the
   frontend portion and clearly remind them that authenticated backend behavior is
@@ -50,7 +50,7 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 4. Inspect the relevant `/page`, `/component`, `/types`, and root config files
    before editing.
 5. Apply focused changes that match existing project conventions.
-6. Validate with available local checks or Cregh platform checks. If no local
+6. Validate with available local checks or Creght platform checks. If no local
    renderer exists, use `creght push`, `creght sync`, or `creght preview` as
    the verification path. Use `creght push` for a one-time upload and
    `creght sync` when you want watch mode.
@@ -69,13 +69,13 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   explicitly asks.
 - Use Tailwind v4 utility classes for component styling. Avoid inline `style`
   props and ad-hoc `<style>` tags in page components.
-- Use relative paths for local project imports. The Cregh platform does not
+- Use relative paths for local project imports. The Creght platform does not
   support alias imports such as `@/lib/utils`; write them as relative imports
   like `../lib/utils` or `./lib/utils` from the importing file.
 - Use structured `metadata` for SEO instead of custom `seo` fields or raw
   `<title>` / `<meta name="description">` tags.
 - Do not implement authenticated backend data operations such as user login or
-  registration yet; the Cregh platform does not support them. If users need
+  registration yet; the Creght platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
 

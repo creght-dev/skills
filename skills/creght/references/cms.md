@@ -1,4 +1,4 @@
-# Cregh CMS Usage
+# Creght CMS Usage
 
 Use CMS APIs exported by `talizen/cms` from server-side data-loading code.
 Use the project's generated `/types/cms.d.ts` as the schema source of truth.
@@ -21,7 +21,7 @@ Example generated shape:
 export declare const CmsList: readonly [
   {
     key: "blogs"
-    name: "Cregh's blogs"
+    name: "Creght's blogs"
     Item: Blogs
   },
 ]

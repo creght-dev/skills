@@ -1,6 +1,6 @@
-# Cregh Form Usage
+# Creght Form Usage
 
-Use `submitForm` from `talizen/form` to submit Cregh platform forms. Use the
+Use `submitForm` from `talizen/form` to submit Creght platform forms. Use the
 generated `/types/form.d.ts` file as the payload schema source of truth.
 
 ## Generated Types

@@ -1,4 +1,4 @@
-# Cregh Carousel Usage
+# Creght Carousel Usage
 
 Use `embla-carousel` as the default carousel/slideshow engine. For React
 projects, use `embla-carousel-react`.

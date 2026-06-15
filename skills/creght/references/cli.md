@@ -1,11 +1,11 @@
-# Cregh CLI
+# Creght CLI
 
-The Cregh CLI is a local bridge for Cregh site code. It handles auth,
+The Creght CLI is a local bridge for Creght site code. It handles auth,
 project creation and discovery, file pull/push/sync, remote preview, publishing,
 platform data operations, and asset uploads.
 
 The CLI does not render sites locally. Rendering, CMS, assets, realtime preview,
-and publication are handled by the Cregh backend and web app.
+and publication are handled by the Creght backend and web app.
 
 ## Basics
 
@@ -17,7 +17,7 @@ creght version
 ```
 
 Use the production endpoint by default. Omit `--web` unless the user explicitly
-provides another Cregh environment. For a non-default API host, use
+provides another Creght environment. For a non-default API host, use
 `CREGHT_API_HOST`.
 
 ```text
@@ -83,7 +83,7 @@ Run `creght publish --help` if you need to confirm current publish flags.
 ## Platform Data
 
 For CMS, content, forms, and generated types, prefer CLI commands in
-general-purpose agent environments. Do not assume Cregh-system-only tools such
+general-purpose agent environments. Do not assume Creght-system-only tools such
 as `create_collection`, `create_form`, or internal patch helpers exist.
 
 Common entry points:
@@ -126,7 +126,7 @@ Or wrap business fields under `body`:
 ## Asset Upload
 
 Use `creght upload` when site code needs a local file to become a
-Cregh-hosted asset.
+Creght-hosted asset.
 
 ```bash
 creght upload --site_id=<project_id>/<site_id> --file=./image.png

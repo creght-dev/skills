@@ -1,12 +1,12 @@
-# Cregh SEO And Metadata
+# Creght SEO And Metadata
 
-Cregh uses a structured `metadata` model inspired by Next.js `Metadata`.
+Creght uses a structured `metadata` model inspired by Next.js `Metadata`.
 Prefer structured metadata over ad-hoc `seo` objects or raw `<title>` and
 `<meta>` tags.
 
 ## Two-Level Metadata Model
 
-Cregh combines:
+Creght combines:
 
 - Site-level `metadata` in `talizen.config.ts`.
 - Page-level `export const metadata` or `export async function generateMetadata`
@@ -26,7 +26,7 @@ Common fields include:
 - `openGraph`
 - `icons`
 
-Cregh converts structured fields into rendered HTML tags.
+Creght converts structured fields into rendered HTML tags.
 
 ## Site-Level Metadata
 
