@@ -23,6 +23,9 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 - The CLI handles login, project creation and discovery, pull, push, sync,
   preview, and publish workflows, plus platform data and asset operations.
+- Rendered Creght site URLs can expose site discovery metadata at
+  `/.well-known/creght.json`. Use this when the user provides a public page URL
+  instead of an editor URL, local directory, or explicit project/site IDs.
 - `pull` downloads remote site files into a local directory.
 - `push` uploads the current local directory snapshot to Creght and exits.
 - `sync` is watch mode: it pushes the current local snapshot, then keeps
@@ -43,7 +46,10 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Default Workflow
 
-1. Locate the site directory. If it is not local yet, use the CLI pull workflow.
+1. Locate the site directory. If the user provided a rendered page URL, first
+   fetch that URL's origin plus `/.well-known/creght.json` to discover the
+   `project_id` and `site_id`, then use the CLI pull workflow if the site is
+   not local yet.
 2. Read local project guidance such as `AGENTS.md` if present.
 3. Read `talizen.config.ts` when imports, metadata, custom code, or site-level
    styling may be involved.
@@ -82,7 +88,7 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 ## Reference Map
 
 - `references/cli.md`: CLI install/use, endpoint defaults, platform data
-  commands, and asset upload commands.
+  commands, rendered URL site discovery, and asset upload commands.
 - `references/site-code.md`: routing, page/component structure, import maps,
   and config rules.
 - `references/cms.md`: CMS data fetching and generated schema usage.

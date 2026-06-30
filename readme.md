@@ -5,6 +5,7 @@ This repository provides Codex/agent skills for Creght. They help agents underst
 ## What This Skill Does
 
 - Guides agents through Creght CLI workflows for creating projects, pulling, pushing, syncing, previewing, and publishing sites.
+- Discovers project and site IDs from rendered Creght page URLs through `/.well-known/creght.json`.
 - Enforces Creght page development conventions, such as `/page` routes, the `/component` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
 - Helps write React + Tailwind v4 pages and components that follow Creght platform requirements.
 - Provides implementation references for common platform capabilities such as CMS, form submissions, SEO metadata, sitemaps, and carousel components.
@@ -22,6 +23,10 @@ Connect the homepage to Creght CMS data, using the schema and types that already
 
 ```text
 Optimize the project's SEO configuration, including title, description, keywords, Open Graph, and related metadata. {YOUR_CREGHT_PROJECT_EDIT_URL like https://creght.cn/editor/project/pveao61akhoy/site/pveao646es1u}
+```
+
+```text
+https://www.creght.cn/docs/ai/ai-edit-content-guide 新增一个文章，内容是关于 ai 积分的价格
 ```
 
 ## Installation
