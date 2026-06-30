@@ -28,6 +28,50 @@ Web: https://creght.cn
 Use `creght <command> --help` for exact flags. Prefer this over memorizing
 rare subcommands because the CLI surface can change.
 
+## Discovering a Site From a Rendered URL
+
+When the user provides a rendered page URL, such as
+`https://www.creght.cn/docs/ai/ai-edit-content-guide`, discover the Creght site
+before using CLI commands. Fetch the URL's origin with
+`/.well-known/creght.json`:
+
+```bash
+curl -fsSL https://www.creght.cn/.well-known/creght.json
+```
+
+A successful response is JSON like:
+
+```json
+{
+  "schema_version": 1,
+  "type": "site",
+  "site_id": "site-1",
+  "project_id": "project-1",
+  "provider": {
+    "name": "Creght",
+    "url": "https://creght.cn"
+  },
+  "canonical_host": "example.com"
+}
+```
+
+Use the returned IDs as the CLI site identifier:
+
+```bash
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite
+creght content create --site_id=<project_id>/<site_id> --collection=<key> --data=./content.json
+```
+
+Discovery details:
+
+- `site_id` comes from the site resolved from the request host.
+- `project_id` comes from that site's project.
+- `canonical_host` is the cleaned request host.
+- Unknown domains return `404`; treat that as "not a Creght site" or ask for an
+  editor URL / explicit IDs.
+- Successful responses use `Content-Type: application/json; charset=utf-8` and
+  may be cached for 300 seconds.
+
 ## Core Workflow
 
 ```bash
