@@ -216,6 +216,37 @@ Known limitation: prev/next neighbours are resolved against the default
 list is ordered by a body field will show neighbours that do not match that
 list.
 
+## Writing Content Bodies (Rich Text Is HTML, Not Markdown)
+
+Rich-text fields in a CMS content body (for example a docs or blog article
+`body`) are stored and rendered as **HTML, not Markdown**. The platform's
+rich-text editor (TipTap / ProseMirror) produces HTML, and site code renders it
+directly, typically via `dangerouslySetInnerHTML`. Table-of-contents and heading
+anchors are usually derived by scanning that HTML for `<h2>` / `<h3>` tags.
+
+If you put Markdown into such a field (`## Heading`, `**bold**`, ` ``` ` code
+fences, `|` tables), it renders as literal text — broken output — and no TOC is
+generated. This is a common mistake; do not write Markdown into these fields.
+
+When creating or updating content via `creght content create` / `creght content
+update`, author rich-text fields as HTML:
+
+- Headings: `<h2>…</h2>`, `<h3>…</h3>` — no `<h1>` (the title is its own field).
+- Paragraphs: `<p>…</p>`.
+- Bold / emphasis: `<strong>…</strong>`, `<em>…</em>`.
+- Lists: `<ul><li><p>…</p></li></ul>`, `<ol><li><p>…</p></li></ol>`.
+- Links: `<a target="_blank" rel="noopener noreferrer nofollow" href="…">…</a>`.
+- Quotes: `<blockquote><p>…</p></blockquote>`.
+- Code: inline `<code>…</code>`; blocks `<pre><code>…</code></pre>`
+  (HTML-escape `<`, `>`, `&` inside code).
+- Tables:
+  `<table><thead><tr><th>…</th></tr></thead><tbody><tr><td>…</td></tr></tbody></table>`.
+
+Not every field is rich text. Plain string fields (title, description, slug,
+url, …) are plain text. Only fields shown/edited as rich text in the editor
+(usually `body` / `content`) take HTML. When unsure, fetch an existing entry
+with `creght content list` / `creght content get` and match its `body` format.
+
 ## General CMS Guidelines
 
 - Use optional chaining for nested fields, especially `body`.
@@ -228,4 +259,5 @@ list.
 - Do not rely on old helper names from legacy docs.
 - When creating or updating content through platform APIs or tools, follow the
   collection JSON Schema.
+- Rich-text body fields are HTML, not Markdown (see the section above).
 - For Markdown body fields, prefer `type: "string"` with `contentMediaType: "text/markdown"` because Creght's visual editor can recognize it and render the proper Markdown editing control; it also recognizes `text/html` as rich text HTML, `image/*` as image URL/upload fields, `video/*` as video URL/upload fields, and other `contentMediaType` values as generic file fields.

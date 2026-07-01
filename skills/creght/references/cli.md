@@ -267,6 +267,11 @@ calling `talizen/func`.
 `content update` treats "no field changed" as a non-zero error — see
 `creght content -h` for the format and semantics before building payloads.
 
+Rich-text body fields (such as an article `body`) must be **HTML, not
+Markdown** — they render via `dangerouslySetInnerHTML`. Writing Markdown into
+them produces broken, literal-text output. See `references/cms.md` for the
+exact HTML conventions, and match an existing entry's `body` when unsure.
+
 ## Asset Upload
 
 Use `creght upload` (see its `-h`) when site code needs an existing local file
