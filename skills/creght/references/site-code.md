@@ -117,9 +117,44 @@ Do not use `defineConfig` from `talizen/config`.
 - `metadata` for global SEO.
 - `customCode.head` and `customCode.body` for small analytics, verification, or
   script snippets not covered by structured metadata.
+- `redirects` for site-level URL redirects (see below).
 
 Do not duplicate metadata in `customCode`; prefer structured `metadata` whenever
 the field fits.
+
+## Redirects
+
+Configure site-level redirects with the `redirects` array in `talizen.config.ts`.
+This is the Creght equivalent of Next.js `redirects()`. Because the config must
+be a plain object, `redirects` is an array literal, not an `async` function.
+
+Each rule has:
+
+- `source`: path to match. Supports exact matches (`/old-page`) and a trailing
+  wildcard segment (`/blog/*`).
+- `destination`: target path. May be an internal path (`/new-page`), a wildcard
+  backreference (`/posts/*`), an absolute URL, or a protocol-relative URL.
+- `permanent`: `true` for a 308 permanent redirect (best for SEO), `false` for a
+  307 temporary redirect.
+
+Rules match in order; the first matching rule wins. A rule whose target would
+match itself (an obvious loop) is skipped. Redirects are evaluated before page
+routing, so they take precedence over pages and `/public` files, and the
+original query string is preserved for internal targets.
+
+```ts
+import type { Redirect } from "talizen";
+
+export default {
+  redirects: [
+    { source: "/old-page", destination: "/new-page", permanent: true },
+    { source: "/blog/*", destination: "/posts/*", permanent: false },
+  ] satisfies Redirect[],
+};
+```
+
+For per-request or conditional redirects that depend on data, return `redirect`
+from `getServerSideProps` instead of using `redirects`.
 
 ## Package Types
 
