@@ -83,6 +83,10 @@ use them if exposed, otherwise inspect files and use the CLI.
   identity, passwords, sessions, OAuth callbacks, login, or registration with
   Func or JSON tables.
 - When exact SDK signatures matter, read installed `talizen` type definitions.
+- CMS rich-text body fields (e.g. a docs/blog article `body`) store and render
+  **HTML, not Markdown**. Author them as HTML (`<h2>`, `<p>`, `<ul><li><p>`,
+  `<strong>`, `<pre><code>`, `<table>`). Markdown put in these fields renders as
+  literal text. See `references/cms.md`.
 
 ## Reference Routing
 
