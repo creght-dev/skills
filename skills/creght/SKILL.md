@@ -67,7 +67,12 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - Keep reusable UI in `/component` or another shared components directory.
 - Do not introduce `react-router-dom`, `next/link`, `next/router`,
   `next/navigation`, `getStaticProps`, or `getStaticPaths`.
-- Use native anchors such as `<a href="/about">...</a>` for navigation.
+- Use native anchors such as `<a href="/about">...</a>` for navigation. On a
+  multilingual site, use talizen's locale-aware `<Link>`
+  (`import { Link } from "talizen"`, v0.2.0+) for internal links — it
+  auto-prefixes the current locale (a plain `<a>` drops the visitor out of their
+  language). talizen's own `<Link>` is allowed; do not use `next/link`,
+  `next/router`, `next/navigation`, or other router libraries.
 - Prefer `getServerSideProps(context)` for route params and first-render data.
 - Read route params from `context.params` when SSR params are available.
 - Do not proactively create `*.canvas.ts` or `*.canvas.tsx` files. They are
