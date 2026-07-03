@@ -44,3 +44,19 @@ bunx skills add creght-dev/skills -g -y
 ```
 
 After installation, supported Codex/agent environments will automatically load the corresponding skill guidance when working with Creght projects.
+
+## Update
+
+Update to the latest version with `npx`:
+
+```bash
+npx skills update creght
+```
+
+Or use `bunx`:
+
+```bash
+bunx skills update creght
+```
+
+Re-running the add command above also works — it is idempotent and pulls the latest.
