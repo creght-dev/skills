@@ -1,0 +1,3 @@
+interface:
+  display_name: "Site Replica"
+  short_description: "Replicate any website onto Creght: probe, audit motion, rebuild, verify to parity"
