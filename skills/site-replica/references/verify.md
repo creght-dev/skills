@@ -63,6 +63,19 @@ classic one — upload it and wire `metadata.icons`). A blank page with a
 React error usually means an SSR/hydration issue (dates, random values) or a
 duplicate-React import-map problem (`?external=react` missing).
 
+## Coverage gate — run before calling anything "done"
+
+1. Open the route inventory from recon. Every row must be built AND
+   verified. Detail-template rows count per representative entry.
+2. Crawl the **replica** preview the same way you crawled the source
+   (collect same-origin `a[href]` from every page, recurse). Diff against
+   the inventory:
+   - Replica link → no matching page (404 / falls back to home): missing
+     page, go build it.
+   - Inventory route → no replica link reaching it: navigation is
+     incomplete, wire it up.
+3. Only when the diff is empty does the run proceed to the checklist.
+
 ## Finish
 
 - Walk the completion checklist in `SKILL.md` item by item.

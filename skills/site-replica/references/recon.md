@@ -1,8 +1,32 @@
 # Phase 1 — Recon: measure the source site
 
-Everything here happens in a real browser (Playwright MCP or equivalent).
-Output of this phase: a written spec — page list, layout numbers, design
-tokens, breakpoint behavior — plus reference screenshots for later diffing.
+Everything here happens in a real browser. Output of this phase: a written
+spec — page list, layout numbers, design tokens, breakpoint behavior — plus
+reference screenshots for later diffing.
+
+## Browser tooling — get a browser before anything else
+
+Check whether the environment already exposes browser-automation tools
+(commonly a Playwright MCP server: tool names like `browser_navigate`,
+`browser_snapshot`, `browser_take_screenshot`, `browser_evaluate`,
+`browser_run_code`). If yes, use those.
+
+If not, set one up:
+
+- Claude Code: `claude mcp add playwright -- npx @playwright/mcp@latest`
+  (then restart the session so the tools load).
+- Codex / other MCP clients: register `npx @playwright/mcp@latest` as an MCP
+  server in the client's MCP config.
+- No MCP support at all: fall back to a local Playwright script loop —
+  `npm i playwright && npx playwright install chromium`, then write small
+  Node scripts per probe (navigate → act → screenshot → print JSON) and run
+  them with the shell tool. Slower, but every probe in this skill works the
+  same way.
+
+Capability sanity check before starting recon: navigate to the source URL,
+resize to 1440×900, take one screenshot, and run one `evaluate` snippet. If
+any of these fail, fix tooling first — do not fall back to guessing from
+fetched HTML.
 
 ## Browser hygiene (read first, saves 20 minutes)
 
@@ -22,14 +46,32 @@ tokens, breakpoint behavior — plus reference screenshots for later diffing.
   ~15px. Measure layout via `getBoundingClientRect` in the page, never by
   reading pixel positions off screenshots alone.
 
-## 1. Page discovery
+## 1. Page discovery — produce the route inventory FIRST
 
-- Collect `document.querySelectorAll('a[href]')` on every page you visit;
-  keep same-origin paths. This finds detail routes (e.g. `/works/<slug>`)
-  that never appear in the nav.
-- Crawl each discovered page: full capture + note its distinct sections.
-- Collection pages (blog/work lists) imply detail templates — open at least
-  two different entries to see what varies.
+Do this before measuring anything else. The inventory is the delivery
+contract (see SKILL.md); an incomplete crawl here silently shrinks the whole
+task to "just the homepage".
+
+- Breadth-first crawl: start from `/`, collect
+  `document.querySelectorAll('a[href]')`, keep same-origin paths, visit every
+  new route, repeat until no new routes appear. Nav links alone are NOT
+  enough — detail routes (e.g. `/works/<slug>`) usually appear only on card
+  grids, "View Work" buttons, or footer links.
+- Also check: footer nav (often has routes the header lacks), logo link,
+  CTA buttons, and `/sitemap.xml` if it exists.
+- Collection pages (work/blog lists) imply detail templates — open at least
+  two different entries to learn what varies between them (that difference
+  is your template's data model).
+- Write the inventory as a table and register one task per route:
+
+  | route | type | recon | built | verified |
+  | --- | --- | --- | --- | --- |
+  | `/` | page | | | |
+  | `/works` | list page | | | |
+  | `/works/<slug>` ×4 | detail template | | | |
+  | … | | | | |
+
+- Only mark the crawl done when a full pass adds zero new routes.
 
 ## 2. Design tokens
 

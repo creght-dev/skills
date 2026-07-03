@@ -21,6 +21,15 @@ This skill assumes the base `creght` skill is available. Read it before the
 build phase; it owns the platform rules (routing, import map, metadata,
 forms, CLI). This skill adds the replication pipeline on top.
 
+## Prerequisite: a driveable browser
+
+The whole pipeline depends on probing pages in a real browser (navigate,
+scroll, hover, drag, screenshot, run JS). Before phase 1, confirm you have
+one and set it up if not — see "Browser tooling" in `references/recon.md`.
+Static HTTP fetches are NOT a substitute: they miss rendered layout,
+animations, hover states, and anything client-rendered. If no browser can be
+made available, stop and tell the user replication cannot be verified.
+
 ## Operating Contract (autonomous mode)
 
 - Work end-to-end without pausing for confirmation. The task is done only when
@@ -52,6 +61,24 @@ protected content is not:
 3. **All code is written from scratch.** Never lift generated code
    (Framer/Webflow output, bundled JS) from the source.
 4. Note the source URL in the project README/description as a design study.
+
+## Page coverage is the contract
+
+The most common autonomous-run failure is replicating only the homepage.
+Guard against it structurally:
+
+- Recon **must** produce a complete **route inventory** before any building:
+  every same-origin route reachable from any nav, footer, card, button, or
+  in-content link, crawled recursively until no new routes appear. List
+  pages AND the detail templates behind them (`/works/<slug>`, blog posts…).
+- The inventory is the delivery contract. Maintain it as a coverage table
+  (route → recon'd? → built? → verified?) and keep it in your task list —
+  one task per route. "首页做完了" is not a milestone; "inventory 全绿" is.
+- A card grid or "View Work" button that links somewhere is a page you owe.
+  If a linked route 404s on the source, note it as out of scope explicitly.
+- The completion checklist fails if any inventory row is unbuilt or
+  unverified — including detail pages, even when the user never mentioned
+  them by name.
 
 ## Pipeline
 
@@ -86,6 +113,10 @@ feature: re-measure the source first, then fix.
 
 The task is complete when all of these hold on the Creght **preview URL**:
 
+- [ ] The route inventory from recon is fully green: every route (including
+      collection detail pages) is built and verified. Re-crawl the *replica*
+      and diff its link graph against the inventory — a link on the replica
+      that leads to a missing page fails this item.
 - [ ] Every in-scope page renders with no console errors and no missing
       resources (favicon included).
 - [ ] Desktop 1440/1920 and mobile 390 screenshots structurally match the
