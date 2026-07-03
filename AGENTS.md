@@ -31,8 +31,11 @@ Do **not** blind-copy. When porting guidance from `talizen-system`:
    no equivalent; never delete them during a sync.
 3. **Filter platform-only content** — strip or rewrite anything that assumes the
    in-platform agent: the `lint` / `create_version` / `diff_patch_file` /
-   `fetch_module_types` / import-map tools, the `BROWSER_ERROR_RENDER` signal, and
-   preview-runtime specifics. Re-express as CLI / general guidance, or drop it.
+   `fetch_module_types` / `create_collection` / import-map tools, and the
+   `LINT_ERROR` / `BROWSER_ERROR_RENDER` events plus preview-runtime specifics.
+   Those events are delivered **only** to the in-platform agent — a local CLI
+   agent never receives them, so external docs must not wait for or trigger on
+   them. Re-express as CLI / general guidance, or drop it.
 4. **`error-handling` is intentionally its own document** — `talizen-system`
    keeps a platform/preview version (`BROWSER_ERROR_RENDER`, preview-runtime, the
    built-in React runtime). This skill carries a **CLI-oriented** version. Keep
