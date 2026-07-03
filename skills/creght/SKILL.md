@@ -84,6 +84,10 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   registration yet; the Creght platform does not support them. If users need
   similar functionality, implement only the frontend portion and clearly remind
   them that authenticated backend behavior is not available yet.
+- When a typecheck, build, lint/validate, or user-reported runtime or browser
+  error occurs, the first response must be to read and follow
+  `references/error-handling.md`. Do not make speculative code changes before
+  checking that guidance.
 
 ## Reference Map
 
@@ -99,6 +103,8 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - `references/css.md`: Tailwind v4 and `index.css` conventions.
 - `references/sitemap.md`: root-level sitemap generation.
 - `references/carousel.md`: carousel/slideshow default approach.
+- `references/error-handling.md`: bounded handling for typecheck, build,
+  lint/validate, and user-reported runtime or browser errors.
 
 For most site-authoring tasks, read `references/site-code.md` first, then load
 the specific topic reference only if the task touches that area.
