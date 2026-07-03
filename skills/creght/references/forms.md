@@ -3,6 +3,11 @@
 Use `submitForm` from `talizen/form` to submit Creght platform forms. Use the
 generated `/types/form.d.ts` file as the payload schema source of truth.
 
+There are two complementary type sources:
+
+- `talizen/form` provides SDK helpers such as `submitForm`.
+- `/types/form.d.ts` provides the generated form payload types and field shapes.
+
 ## Generated Types
 
 All form payload definitions are available in `/types/form.d.ts`.
@@ -41,7 +46,10 @@ export interface ContactForm {
 - Use the stable form `key`, not the display name.
 - Show explicit success and error UI states after submission.
 - If a field is typed as `File` in `/types/form.d.ts`, pass a raw `File` or
-  `Blob` to `submitForm`.
+  `Blob` to `submitForm`. (The function uploads file values automatically.)
+- For image, video, or generic file fields, use the corresponding form input
+  components (for example, Image Input, Video Input, and File Input). See
+  `JSON Schema Conventions` for the underlying field shapes.
 
 Example:
 
@@ -101,7 +109,31 @@ String field extensions should use `type: "string"` and express semantics with
 - URL: `{ "type": "string", "format": "uri" }`
 - Image: `{ "type": "string", "format": "uri", "contentMediaType": "image/*", "accept": "image/*" }`
 - Video: `{ "type": "string", "format": "uri", "contentMediaType": "video/*", "accept": "video/*" }`
-- File: `{ "type": "string", "format": "uri", "contentMediaType": "application/octet-stream" }`
+- File: `{ "type": "string", "format": "uri", "contentMediaType": "application/octet-stream" }` (can be narrowed to a specific MIME type, for example `application/pdf`)
 - Rich text: `{ "type": "string", "contentMediaType": "text/html" }`
 
 Do not add `format: "uri"` to rich text fields.
+
+Example:
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "title": { "type": "string", "title": "Title" },
+    "avatar": {
+      "type": "string",
+      "format": "uri",
+      "title": "Avatar",
+      "contentMediaType": "image/*",
+      "accept": "image/*"
+    },
+    "intro": {
+      "type": "string",
+      "title": "Intro",
+      "contentMediaType": "text/html"
+    }
+  },
+  "required": ["title"]
+}
+```

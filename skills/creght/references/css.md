@@ -17,7 +17,9 @@ child color with a single hover or `group-hover` rule.
 ## Site-Level `index.css`
 
 Use `/index.css` for site-level Tailwind source such as `@theme`, `@utility`,
-and base layers.
+and base layers. A dedicated site file lets you define theme tokens and custom
+utilities without inline styles on every component. This file supports both
+plain CSS and Tailwind directives.
 
 Minimal example:
 

@@ -9,6 +9,7 @@ Configure third-party libraries in `talizen.config.ts`, then import by specifier
 in components.
 
 ```ts
+// talizen.config.ts
 export default {
   importMap: {
     imports: {
@@ -21,7 +22,8 @@ export default {
 
 ## React Example
 
-Prefer utility classes instead of writing separate carousel CSS files.
+Prefer utility classes (for example Tailwind) instead of writing separate
+carousel CSS files.
 
 ```tsx
 import useEmblaCarousel from "embla-carousel-react"
@@ -64,11 +66,17 @@ export function HeroCarousel() {
 - `loop: true` for seamless cyclical navigation.
 - `containScroll: "trimSnaps"` to prevent over-scrolling at edges.
 - `Autoplay({ delay, stopOnInteraction })` for optional auto-advance behavior.
-- Keep slide basis explicit, such as `flex-[0_0_100%]`.
+- Keep slide basis explicit (`flex-[0_0_100%]`, `flex-[0_0_50%]`, etc.).
+
+## Import rules
+
+- Do not import Embla from full CDN URL directly inside pages/components.
+- Always register external libs in `talizen.config.ts` under `importMap.imports` first.
+- Keep the `import` specifier exactly the same as the `imports` key.
 
 ## Accessibility
 
-- Provide a clear region label.
+- Provide a clear region label (for example `aria-label="Featured slides"`).
 - Add previous/next controls that are keyboard reachable when the carousel is
   interactive.
 - Ensure autoplay can be paused or stopped when enabled.
