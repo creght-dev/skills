@@ -23,9 +23,9 @@ different audiences and must be kept consistent. Read this before editing.
 
 Do **not** blind-copy. When porting guidance from `talizen-system`:
 
-1. **Filenames** — `talizen-system` uses `UPPERCASE.md` under `references/`
-   (e.g. `CMS.md`); this skill uses `lowercase.md` (`cms.md`, `forms.md`). Keep
-   the lowercase naming — `SKILL.md` links files by name.
+1. **Filenames** — all three skills use lowercase kebab-case under `references/`
+   (`cms.md`, `forms.md`, `error-handling.md`, `site-code.md`); `SKILL.md` links
+   files by name, so keep this consistent across the three.
 2. **Keep external-only files** — `cli.md` and `site-code.md` exist only in the
    external skills (they document the CLI / local workflow). `talizen-system` has
    no equivalent; never delete them during a sync.
