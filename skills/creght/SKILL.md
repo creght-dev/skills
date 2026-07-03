@@ -61,6 +61,13 @@ use them when appropriate; otherwise inspect local files and use the CLI.
    the verification path. Use `creght push` for a one-time upload and
    `creght sync` when you want watch mode.
 
+## Error Trigger
+
+When a typecheck, build, or lint/validate command fails, or the user reports a
+runtime or browser error, immediately activate the error-handling protocol by
+reading `references/error-handling.md`. Do not perform speculative fixes before
+checking the relevant guidance.
+
 ## Hard Platform Rules
 
 - Pages live in `/page` as `.tsx` React components.
