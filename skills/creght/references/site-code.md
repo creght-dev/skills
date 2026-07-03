@@ -70,6 +70,32 @@ If the user asks only for a component but also wants a preview, make the
 component visible in a page whenever possible. A standalone component cannot
 render as a site page by itself.
 
+## Component Registries And Effects
+
+For carousels and slideshows, see `references/carousel.md`.
+
+The platform supports shadcn/ui-style registry components. Configure the
+registries in `components.json`, then install components from them with the
+shadcn CLI (or platform install tools if the environment exposes them). Common
+registries: `@spell`, `@fancy`, `@react-bits`, and `@talizen-sections`. Prefer a
+registry component for polished visual effects — animations, particles, cursor
+or text effects, creative backgrounds — before hand-rolling one, and make sure
+animated layers do not block content, hurt readability, or break responsive
+layouts.
+
+Minimal `components.json`:
+
+```json
+{
+  "registries": {
+    "@spell": "https://spell.sh/r/{name}.json",
+    "@fancy": "https://fancycomponents.dev/r/{name}.json",
+    "@react-bits": "https://reactbits.dev/r/{name}.json",
+    "@talizen-sections": "https://unpkg.com/@talizen/talizen-sections/public/r/{name}.json"
+  }
+}
+```
+
 ## Local Imports
 
 Use relative paths for local project imports. The Creght platform does not
