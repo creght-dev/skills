@@ -181,18 +181,37 @@ creght table record create --site_id=<project_id>/<site_id> --table=appointments
 creght table record update --site_id=<project_id>/<site_id> --table=appointments --id=<record_id> --data=./patch.json
 ```
 
-Create, update, and test Func code:
+Create, update, rename, and delete Func code by editing files:
 
 ```bash
-creght func create --site_id=<project_id>/<site_id> --key=booking --file=./booking.ts
-creght func update --site_id=<project_id>/<site_id> --key=booking --file=./booking.ts
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite
+$EDITOR ./mysite/backend/func/booking.ts
+creght push --site_id=<project_id>/<site_id> --dir=./mysite
+```
+
+Path mapping:
+
+```text
+backend/func/booking.ts -> Func key booking
+backend/func/profile/settings.ts -> Func key profile/settings
+```
+
+`creght push`, `creght sync`, and `creght dev` diff `backend/func/**/*.ts` and
+apply create/update/delete operations automatically. Deleting a local Func file
+deletes the remote Func on the next push/sync. Renaming a file is treated as
+delete old key + create new key.
+
+Self-test Func methods with:
+
+```bash
 creght func run --site_id=<project_id>/<site_id> --key=booking.create --input=./input.json
 ```
 
 When an environment exposes native tools, use their equivalents:
 `list_tables`, `create_table`, `update_table`, `list_table_records`,
 `create_table_record`, `update_table_record`, `list_funcs`, `create_func`,
-`update_func`, and `run_func`.
+`update_func`, and `run_func`. In external CLI workflows, prefer editing
+`backend/func` files over manual `creght func create/update/delete`.
 
 ## Minimal Booking Example
 
