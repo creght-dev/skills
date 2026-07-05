@@ -56,19 +56,39 @@ Never ship the source's images. But know which substitute to reach for:
 
 **Photographic subjects (people, lifestyle, editorial covers, workspaces)**
 — seeded SVGs read as obviously fake here ("blob people" team cards are the
-classic complaint). Use license-free stock instead:
+classic complaint). Use license-free stock instead. Proven recipe:
 
-- Faces/avatars: `randomuser.me/api/portraits/{men,women}/<n>.jpg` (128px —
-  fine for avatar sizes). Larger portraits & lifestyle: Unsplash
-  (`images.unsplash.com/photo-<id>?w=&h=&fit=crop`) or Lorem Picsum
-  (`picsum.photos/seed/<seed>/<w>/<h>` — deterministic per seed).
-- **Don't hotlink.** `curl` each image, verify it's HTTP 200 and an actual
-  image, then `creght upload` it and use the returned CDN URL. Hotlinks rot
-  and may be unreachable for the site's audience; fall back to another
-  source or a seeded SVG when a download fails.
-- Match the source's mood with CSS (grayscale, duotone/dark gradient
-  overlays) instead of hunting for the perfect photo.
-- License: Unsplash/Picsum/randomuser are fine for a design study. Images
+- Build an **image slot map** first: walk the recon captures and list every
+  image slot with a one-line description of subject + mood + palette
+  ("hero: woman lit by red/blue gel light", "work card: charcoal fabric
+  smart speaker"). One search query per slot.
+- **Never guess Unsplash photo IDs from memory** — the URL usually returns
+  200 but the content is wrong (verified failure mode). Don't bother with
+  the search API either: the `napi` endpoint requires auth now, and plain
+  `curl` of search pages returns nothing (client-rendered).
+- What works: drive the recon browser to
+  `https://unsplash.com/s/photos/<hyphenated-query>`, wait ~2s, then pull
+  candidates from the rendered DOM — the id from
+  `figure img[src*="images.unsplash.com/photo-"]` plus the `alt` text.
+  Choose by alt text (it describes content accurately). Batch all slots in
+  one browser-code loop, 3–5 candidates each.
+- URL shape:
+  `https://images.unsplash.com/<id>?w=<px>&q=80&auto=format&fit=crop`.
+  imgix params work — `&sat=-100` makes any photo grayscale (cheap match
+  for B&W sections). Prefer CSS mood-matching (duotone/dark overlays,
+  brightness/saturate filters) over hunting for the perfect photo.
+- Faces/avatars: `randomuser.me/api/portraits/{men,women}/<n>.jpg`, or
+  reuse Unsplash portraits at small widths.
+- Verify before building: batch-check every final URL returns 200
+  (`curl -o /dev/null -w "%{http_code}"`), then visually inspect thumbnails
+  of the *critical* slots (hero especially) — a 200 does not mean the
+  content matches.
+- Hotlinking `images.unsplash.com` is fine through the build/verify loop.
+  Before **publish**, download the finals and `creght upload` them, then
+  swap to the returned CDN URLs — hotlinks rot and may be slow or blocked
+  for the site's audience; fall back to another candidate or a seeded SVG
+  when a download fails.
+- License: Unsplash/Pexels/randomuser are fine for a design study. Images
   from the source site itself are never OK.
 
 **Abstract/brand graphics, device mockups, gradients, textures** — generate
@@ -99,6 +119,9 @@ Build these once, reuse per section. Parameters come from the motion audit.
 - `Scramble` — rAF loop resolving random glyphs left→right.
 - `useClock` — **SSR-safe**: initialize to `""`, fill in `useEffect`
   (`new Date()` during render = hydration mismatch).
+- Prices/numbers — never format with `toLocaleString()` in render: server
+  and client locales can differ → React #418 hydration error. Use a manual
+  formatter (`String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ",")`).
 - Marquee — duplicated children + `@keyframes` `translateX(-50%)`;
   set duration per instance via a `[animation-duration:NNs]` utility class
   (Creght style rules discourage inline `style` for static values).

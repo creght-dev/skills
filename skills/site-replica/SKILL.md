@@ -54,11 +54,13 @@ made available, stop and tell the user replication cannot be verified.
 The design (layout, spacing, motion, interaction patterns) is replicated;
 protected content is not:
 
-1. **Never copy image/video/font assets** from the source. Generate
-   placeholder artwork instead — seeded SVG data URIs with palettes matched to
-   the source's mood (see `references/build.md`). Fonts: identify the family
-   and load it from Google Fonts / Fontsource if it is a free face; otherwise
-   pick the closest free alternative.
+1. **Never copy image/video/font assets** from the source. Substitute
+   photography with free-license stock (Unsplash/Pexels) matched slot-by-slot
+   to each source image's subject and mood — this reads far better than
+   generated art; see the search recipe in `references/build.md`. Generate
+   seeded SVG art only for abstract graphics, logos, and textures. Fonts:
+   identify the family and load it from Google Fonts / Fontsource if it is a
+   free face; otherwise pick the closest free alternative.
 2. **Never copy body copy verbatim.** Short functional labels (nav items,
    button text, section names, stats, dates) may match. Sentences and
    paragraphs get rewritten: same length, same tone, same information shape,
@@ -145,7 +147,8 @@ The task is complete when all of these hold on the Creght **preview URL**:
       overflow scan from `references/verify.md`).
 - [ ] Forms submit successfully through the platform and the submission
       appears in `creght form logs`.
-- [ ] Placeholder-asset and rewritten-copy rules hold everywhere.
+- [ ] License-safe asset rules (slot-matched free stock / generated art, no
+      source assets) and rewritten-copy rules hold everywhere.
 - [ ] Site pushed; preview URL reported to the user. Publish only when the
       user asks.
 
@@ -158,7 +161,8 @@ The task is complete when all of these hold on the Creght **preview URL**:
   marquee speed, letter-level text animation sampling, blend-mode detection,
   carousels, and how to translate measurements into framer-motion parameters.
 - `references/build.md` — Creght project layout, import map, fonts,
-  placeholder-art module, container/width system, SSR safety, forms, dynamic
-  routes, and implementation gotchas that cost real debugging time.
+  stock-image sourcing recipe + placeholder-art module, container/width
+  system, SSR safety, forms, dynamic routes, and implementation gotchas that
+  cost real debugging time.
 - `references/verify.md` — the push→compare loop, mobile walkthrough,
   overflow scan, interaction re-verification, and finishing steps.
