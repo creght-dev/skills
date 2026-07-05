@@ -63,13 +63,22 @@ Rules of interpretation:
 - Elements inside moving containers (marquee cards) are "unstable" —
   `scrollIntoViewIfNeeded` times out on them. Scroll to their *section*
   instead and probe with raw coordinates.
+- **An open menu blocks the pointer**: menu/overlay states often mount a
+  full-viewport transparent layer (Framer: `#template-overlay`) that
+  intercepts clicks — a normal `locator.click()` on anything behind it
+  retries until timeout. Close the menu with `Escape` (or dispatch a JS
+  `.click()` on the overlay itself) before probing on; if a click ever
+  times out with "element intercepts pointer events", suspect a leftover
+  overlay, not a broken selector.
 
 ## Marquees / tickers
 
 Sample an item's `getBoundingClientRect().x` twice, 1.5–2s apart:
 speed = Δx / Δt (px/s), sign = direction. Then hover the strip and re-sample:
 does it pause? Beware wrap-around jumps (a huge positive Δ means the loop
-reset between samples — resample with a shorter interval). Typical build:
+reset between samples — resample with a shorter interval), and measure with
+the ticker **in the viewport** — off-screen marquees commonly pause
+(viewport-triggered), reading as a bogus 0 px/s. Typical build:
 duplicated content + CSS `translateX(-50%)` keyframes; duration =
 half-track-length / measured speed.
 
