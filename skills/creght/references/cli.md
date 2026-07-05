@@ -124,11 +124,12 @@ creght publish --site_id=<project_id>/<site_id> --note=<note>
 
 Run `creght publish --help` if you need to confirm current publish flags.
 
-## Platform Data
+## Platform Data And Backend
 
-For CMS, content, forms, and generated types, prefer CLI commands in
-general-purpose agent environments. Do not assume Creght-system-only tools such
-as `create_collection`, `create_form`, or internal patch helpers exist.
+For CMS, content, forms, project JSON tables, Func backend code, and generated
+types, prefer CLI commands in general-purpose agent environments. Do not assume
+Creght-system-only tools such as `create_collection`, `create_form`,
+`create_table`, `create_func`, or internal patch helpers exist.
 
 Common entry points:
 
@@ -137,12 +138,31 @@ creght cms collections --site_id=<project_id>/<site_id>
 creght content list --site_id=<project_id>/<site_id> --collection=<key>
 creght content create --site_id=<project_id>/<site_id> --collection=<key> --data=./content.json
 creght form list --site_id=<project_id>/<site_id>
+creght table list --site_id=<project_id>/<site_id>
+creght table record create --site_id=<project_id>/<site_id> --table=<key> --data=./record.json
+creght func list --site_id=<project_id>/<site_id>
+creght func create --site_id=<project_id>/<site_id> --key=<key> --file=./func.ts
+creght func run --site_id=<project_id>/<site_id> --key=<key.method> --input=./input.json
 ```
 
 Use file-based JSON input for schemas, content, and form payloads when a command
 accepts it. After creating or changing collections/forms, pull or refresh
 generated files such as `/types/cms.d.ts` and `/types/form.d.ts` before writing
 code that imports those types.
+
+For backend features:
+
+- Use `creght table` to manage project JSON tables used by Func `ctx.db.*`.
+- Use `creght table record` for seed data or user-requested operational data.
+- Use `creght func` to create, update, inspect, delete, and self-test Func code.
+- Func keys are extensionless paths such as `booking` or `profile/settings`.
+- Invoke methods with `key.method`, for example `booking.create`.
+- Use `talizen/auth` for login/register/logout/current-user/OAuth UI; do not
+  implement passwords, sessions, or OAuth callbacks in Func.
+
+Read `references/auth.md` before building auth flows. Read
+`references/func.md` before using `creght table`, `creght func`, or
+`talizen/func`.
 
 For `creght content create`, `--data` may be either a plain CMS content body or
 a full content object. Top-level wrapper fields such as `slug`, `id`, `status`,
