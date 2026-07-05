@@ -2,7 +2,8 @@
 
 Creght apps are React-based websites with file-based routes under `/page`, a
 root `talizen.config.ts`, Tailwind v4 styling, generated project types, and
-platform APIs for CMS, forms, metadata, import maps, previews, and publishing.
+platform APIs for CMS, forms, Auth, Func, metadata, import maps, previews, and
+publishing.
 
 ## Routing
 
@@ -47,6 +48,11 @@ library. talizen's own `<Link>` is the only allowed link component.
 Prefer `getServerSideProps(context)` for route params and first-render data.
 Read dynamic params from `context.params`; do not use client-side param hooks
 when SSR params are available.
+
+Use SSR only for public or cache-friendly first-render data. In
+`getServerSideProps`, use only `context.request` and `context.cookies`; do not
+read auth state, private user data, or call Func. Keep login state, protected
+user data, writes, and Func calls in browser-side SDK/Func/API interactions.
 
 Example:
 

@@ -1,10 +1,10 @@
 # Creght Skills
 
-This repository provides Codex/agent skills for Creght. They help agents understand Creght project structure, CLI workflows, page development conventions, CMS/Form/SEO features, and other platform capabilities.
+This repository provides Codex/agent skills for Creght. They help agents understand Creght project structure, CLI workflows, page development conventions, CMS/Form/Auth/Func backend/SEO features, and other platform capabilities.
 
 ## Skills
 
-- **`creght`** — the base platform skill: CLI workflows, page/component conventions, CMS, forms, SEO, publishing.
+- **`creght`** — the base platform skill: CLI workflows, page/component conventions, CMS, forms, Auth, Func backend, SEO, publishing.
 - **`site-replica`** — replicate any existing website onto Creght ("复刻网站"): probes the source in a real browser, audits every animation and interaction, rebuilds it as an original React/Tailwind implementation with license-safe placeholder assets, then verifies desktop + mobile against the source in a loop until parity. Builds on top of `creght`.
 
 ## What This Skill Does
@@ -13,7 +13,7 @@ This repository provides Codex/agent skills for Creght. They help agents underst
 - Discovers project and site IDs from rendered Creght page URLs through `/.well-known/creght.json`.
 - Enforces Creght page development conventions, such as `/page` routes, the `/component` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
 - Helps write React + Tailwind v4 pages and components that follow Creght platform requirements.
-- Provides implementation references for common platform capabilities such as CMS, form submissions, SEO metadata, sitemaps, and carousel components.
+- Provides implementation references for common platform capabilities such as CMS, form submissions, Auth, Func backend code, SEO metadata, sitemaps, and carousel components.
 - Helps debug local-to-platform sync, preview, and publishing issues.
 
 ## Examples
