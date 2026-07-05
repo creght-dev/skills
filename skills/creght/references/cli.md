@@ -97,9 +97,21 @@ creght project create --name="My Project" --from_id=<project_id>
 creght project create --name="My Project" --tpl_id=<template_id>
 ```
 
-`pull` downloads remote site files. `push` uploads the current local directory
-snapshot and exits. `sync` first pushes the current snapshot, then watches local
-file changes and keeps uploading them.
+`pull` downloads a local workspace:
+
+```text
+mysite/
+  frontend/      Creght site files such as page/, component/, talizen.config.ts
+  backend/func/  project Func files such as booking.ts
+```
+
+Remote site files map to `frontend/`. Func key `booking` maps to
+`backend/func/booking.ts`; Func key `profile/settings` maps to
+`backend/func/profile/settings.ts`.
+
+`push` uploads the current local workspace snapshot and exits. `sync` first
+pushes the current snapshot, then watches local frontend and Func file changes
+and keeps uploading them.
 
 `push` and `sync` are one-way local-to-remote flows. They do not pull Web editor
 changes back into the local directory. If the site may have been edited in the
@@ -136,12 +148,12 @@ Common entry points:
 ```bash
 creght cms collections --site_id=<project_id>/<site_id>
 creght content list --site_id=<project_id>/<site_id> --collection=<key>
+creght content get --site_id=<project_id>/<site_id> --collection=<key> --id=<content_id> --out=./content.json
 creght content create --site_id=<project_id>/<site_id> --collection=<key> --data=./content.json
 creght form list --site_id=<project_id>/<site_id>
 creght table list --site_id=<project_id>/<site_id>
+creght table record get --site_id=<project_id>/<site_id> --table=<key> --id=<record_id> --out=./record.json
 creght table record create --site_id=<project_id>/<site_id> --table=<key> --data=./record.json
-creght func list --site_id=<project_id>/<site_id>
-creght func create --site_id=<project_id>/<site_id> --key=<key> --file=./func.ts
 creght func run --site_id=<project_id>/<site_id> --key=<key.method> --input=./input.json
 ```
 
@@ -150,19 +162,29 @@ accepts it. After creating or changing collections/forms, pull or refresh
 generated files such as `/types/cms.d.ts` and `/types/form.d.ts` before writing
 code that imports those types.
 
+Detail commands print JSON to stdout by default. Use `--out=./file.json` when
+the agent should save a CMS item or table record detail to disk before editing
+or comparing it.
+
 For backend features:
 
 - Use `creght table` to manage project JSON tables used by Func `ctx.db.*`.
 - Use `creght table record` for seed data or user-requested operational data.
-- Use `creght func` to create, update, inspect, delete, and self-test Func code.
-- Func keys are extensionless paths such as `booking` or `profile/settings`.
+- Use `backend/func/**/*.ts` files to create, update, rename, and delete Func
+  code. `creght push`, `creght sync`, and `creght dev` diff these files and
+  apply Func CRUD through the backend.
+- Func keys are extensionless paths such as `booking` or `profile/settings`,
+  derived from file paths under `backend/func/`.
 - Invoke methods with `key.method`, for example `booking.create`.
+- Use `creght func run` only to self-test a Func method with sample input.
+- Lower-level `creght func list/get/create/update/delete` commands may exist for
+  debugging or scripts, but are not the normal agent workflow.
 - Use `talizen/auth` for login/register/logout/current-user/OAuth UI; do not
   implement passwords, sessions, or OAuth callbacks in Func.
 
 Read `references/auth.md` before building auth flows. Read
-`references/func.md` before using `creght table`, `creght func`, or
-`talizen/func`.
+`references/func.md` before using `creght table`, editing `backend/func`, or
+calling `talizen/func`.
 
 For `creght content create`, `--data` may be either a plain CMS content body or
 a full content object. Top-level wrapper fields such as `slug`, `id`, `status`,

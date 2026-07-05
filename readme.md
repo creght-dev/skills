@@ -9,11 +9,11 @@ This repository provides Codex/agent skills for Creght. They help agents underst
 
 ## What This Skill Does
 
-- Guides agents through Creght CLI workflows for creating projects, pulling, pushing, syncing, previewing, and publishing sites.
+- Guides agents through Creght CLI workflows for creating projects, pulling workspace files, pushing/syncing frontend and Func backend file changes, previewing, and publishing sites.
 - Discovers project and site IDs from rendered Creght page URLs through `/.well-known/creght.json`.
 - Enforces Creght page development conventions, such as `/page` routes, the `/component` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
 - Helps write React + Tailwind v4 pages and components that follow Creght platform requirements.
-- Provides implementation references for common platform capabilities such as CMS, form submissions, Auth, Func backend code, SEO metadata, sitemaps, and carousel components.
+- Provides implementation references for common platform capabilities such as CMS, form submissions, Auth, file-based Func backend code under `backend/func`, SEO metadata, sitemaps, and carousel components.
 - Helps debug local-to-platform sync, preview, and publishing issues.
 
 ## Examples
