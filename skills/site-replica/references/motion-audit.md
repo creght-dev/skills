@@ -4,11 +4,36 @@ Sites like this live or die on motion details. Audit **every** interactive
 element and animation before writing any code. The output is a table:
 element → trigger → measured behavior → parameters.
 
+## Ground truth: the user's screen recording
+
+If the user provided a recording (the skill asks for one at kickoff), start
+here — it answers in minutes what probing answers in hours:
+
+```bash
+ffmpeg -i rec.mov -vf "fps=3,scale=1280:-1" frames/f%03d.png
+```
+
+Read the frames spread first (every ~6th), then zoom into transitions.
+Look specifically for: sections that pin while the next slides over them
+(page-turn), index numbers/titles that flip instead of cut, rows that
+expand on hover, cursor-following CTA pills, and anything the static
+recon missed (whole sections included). Probing afterwards only fills in
+exact numbers.
+
 ## Inventory first
 
 List candidates from recon: nav links, logo, buttons, list rows (works,
 blog), cards, images, marquees, carousels and their controls, footer links,
-contact rows, hero elements, section headings. Every one gets probed.
+contact rows, hero elements, section headings. Every one gets probed. Two
+candidate classes that are always missed:
+
+- **Every link inside the nav/menu overlay** — open the menu and hover each
+  item (underline slides, color shifts, active markers).
+- **Every collapsed list row** — a row showing only a number + title
+  (services, capabilities) is a prime suspect for hover expansion revealing
+  an image, description, and tag pills. Cards frequently carry a
+  cursor-following CTA pill ("VIEW PROJECT") — sweep the mouse across each
+  card type and watch for it.
 
 ## Hover audit — the padded before/after diff
 
@@ -100,6 +125,21 @@ thresholds, wrap-around behavior at the ends, and control hover states.
 At two scroll positions 200–800px apart, compare `rect.top + scrollY` of hero
 layers/images: values that drift mean parallax (factor = Δabs/Δscroll).
 Zero drift = no parallax; don't invent one.
+
+For every **pinned section** found in recon (3b), sample the transforms and
+opacity of its inner elements at 5+ scroll offsets across the pin. Common
+patterns to name precisely rather than approximate:
+
+- Hero pinned while the next section slides over it (curtain / page-turn) —
+  the hero itself is `fixed`/`sticky`, not scrolling away.
+- A giant wordmark that shrinks into the header logo: measure start and end
+  rects and treat it as a FLIP (scale + translate landing exactly on the
+  logo slot), not a fade-out/fade-in.
+- Index numbers / titles that change during a pin are usually vertical flip
+  transitions (old slides up and out, new slides up and in) — never hard
+  swaps.
+- A pinned section whose content moves sideways is a horizontal track:
+  measure track width minus viewport to get the translation range.
 
 ## Output
 

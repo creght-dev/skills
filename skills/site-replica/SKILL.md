@@ -38,6 +38,11 @@ made available, stop and tell the user replication cannot be verified.
   interactive detail must be **measured in a browser**, not inferred from a
   single screenshot. Guessed hover states and animation timings are the #1
   source of "看起来不像" complaints.
+- At kickoff, ask the user for a 30–60s screen recording of the source (slow
+  scroll top→bottom, plus mouse passes over menus, cards, and list rows).
+  Extract frames (`ffmpeg -vf "fps=3,scale=1280:-1"`) and read them as motion
+  ground truth — it catches pins, page-turn overlaps, and hover reveals that
+  probing misses. Don't block on it; keep probing while you wait.
 - Verify with screenshots after every push. Compare against source captures
   side by side. Fix, push, re-verify. Do not report success from code review
   alone.
@@ -79,6 +84,12 @@ Guard against it structurally:
 - The completion checklist fails if any inventory row is unbuilt or
   unverified — including detail pages, even when the user never mentioned
   them by name.
+- Coverage is **two-level: routes AND sections.** For each page, recon builds
+  a section inventory (from landmarks / annotation attributes like
+  `data-framer-name`) and every section gets its own capture, build task, and
+  verification row. Walking a page by fixed scroll steps silently skips
+  sections that fall between stops (a pricing block between testimonials and
+  FAQ is the classic casualty) — walk the section list, not scroll offsets.
 
 ## Pipeline
 
@@ -122,8 +133,14 @@ The task is complete when all of these hold on the Creght **preview URL**:
 - [ ] Desktop 1440/1920 and mobile 390 screenshots structurally match the
       source's at the same widths (content max-width, alignment, ordering).
 - [ ] Every animation found in the motion audit exists and matches: entrance
-      effects, scroll-driven effects, marquees (direction + px/s), hovers
-      (audited element by element), carousels/drag, blend/invert effects.
+      effects, scroll-driven effects (pins, curtain overlaps, horizontal
+      tracks), marquees (direction + px/s), hovers (audited element by
+      element — including menu links and collapsed list rows), cursor-follow
+      CTAs, carousels/drag, blend/invert effects.
+- [ ] Every section of every page appears in a replica screenshot compared
+      1:1 against a source capture — no sampling; a section never
+      screenshotted counts as unverified (multi-line display headings
+      especially: check line separation).
 - [ ] Mobile nav opens/closes; no horizontal overflow anywhere (run the
       overflow scan from `references/verify.md`).
 - [ ] Forms submit successfully through the platform and the submission

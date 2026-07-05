@@ -9,8 +9,11 @@ site at the end.
 1. `creght push --site_id=<p>/<s> --dir=<dir>`
 2. Open `https://<site_id>.preview.creght.cn/` in the browser. First load
    after a push can take a few seconds — wait 4–6s before screenshotting.
-3. Capture the replica at the same widths and scroll offsets as the source
-   reference set (1440 / 1920 / 390; disable smooth scroll first).
+3. Capture the replica at the same widths as the source reference set
+   (1440 / 1920 / 390; disable smooth scroll first) by walking the per-page
+   **section checklist** from recon — every section gets its own capture.
+   Sampling by scroll offset ships bugs in the sections you skipped
+   (overlapping heading lines, misaligned bands).
 4. Put replica and source captures side by side. Anything that differs goes
    on the fix list with a re-measurement of the source (never fix from
    memory).
@@ -22,7 +25,11 @@ site at the end.
 Re-run the Phase 2 probes against the preview:
 
 - Hover each audited element; screenshot on-state; compare with the source's
-  on-state capture.
+  on-state capture. Include the nav/menu overlay links (open the menu
+  first), every collapsed list row (expansions), and a cursor sweep across
+  each card type (cursor-follow CTA pills). Beware duplicate hrefs when
+  targeting: `a[href="/works"]` may match a page link instead of the menu
+  link — scope the selector to the overlay.
 - Marquee speed: sample an item's x twice → px/s must match the audit (±10%).
 - Letter animations: screenshot at ~300ms and ~600ms after reload — the
   reveal wave must progress like the source's.

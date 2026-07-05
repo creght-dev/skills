@@ -50,16 +50,35 @@ Pattern: section keeps the page side padding and any full-bleed background
 This reproduces the common behavior "20px margins below the cap, centered
 above it". Marquees stay full-bleed (no inner-max).
 
-## Placeholder artwork (`/lib/art.ts`)
+## Placeholder imagery — stock photos first, generated SVG second
 
-Never ship the source's images. Generate deterministic SVG data URIs:
+Never ship the source's images. But know which substitute to reach for:
+
+**Photographic subjects (people, lifestyle, editorial covers, workspaces)**
+— seeded SVGs read as obviously fake here ("blob people" team cards are the
+classic complaint). Use license-free stock instead:
+
+- Faces/avatars: `randomuser.me/api/portraits/{men,women}/<n>.jpg` (128px —
+  fine for avatar sizes). Larger portraits & lifestyle: Unsplash
+  (`images.unsplash.com/photo-<id>?w=&h=&fit=crop`) or Lorem Picsum
+  (`picsum.photos/seed/<seed>/<w>/<h>` — deterministic per seed).
+- **Don't hotlink.** `curl` each image, verify it's HTTP 200 and an actual
+  image, then `creght upload` it and use the returned CDN URL. Hotlinks rot
+  and may be unreachable for the site's audience; fall back to another
+  source or a seeded SVG when a download fails.
+- Match the source's mood with CSS (grayscale, duotone/dark gradient
+  overlays) instead of hunting for the perfect photo.
+- License: Unsplash/Picsum/randomuser are fine for a design study. Images
+  from the source site itself are never OK.
+
+**Abstract/brand graphics, device mockups, gradients, textures** — generate
+deterministic SVG data URIs in `/lib/art.ts`:
 
 - A seeded PRNG (e.g. mulberry32) + 4–6 blurred ellipses from a per-image
   palette over a base color ≈ abstract editorial artwork. Match each source
   image's *mood* by choosing palettes from the recon screenshots.
 - Special generators as needed: starfields (dots), radial "bloom" petals,
-  portrait silhouettes (dark base + rim-light ellipse + head/shoulders
-  shapes), tiling `feTurbulence` noise for grain overlays (as a CSS
+  tiling `feTurbulence` noise for grain overlays (as a CSS
   `@utility bg-noise`).
 - Seed everything — SSR and client must render identical markup.
 
@@ -83,6 +102,15 @@ Build these once, reuse per section. Parameters come from the motion audit.
 - Marquee — duplicated children + `@keyframes` `translateX(-50%)`;
   set duration per instance via a `[animation-duration:NNs]` utility class
   (Creght style rules discourage inline `style` for static values).
+
+## Display-font line-height (cost a real bug)
+
+Condensed display faces (Anton, Oswald, Bebas…) have content boxes of
+~1.4–1.5em — an eyeballed "tight" line-height like 0.8 makes multi-line
+headings physically overlap. Read the source's **computed** line-height and
+use that (usually 0.9–0.95 even when it looks tighter). Screenshot every
+multi-line display heading as soon as it's built; don't wait for the final
+verify pass.
 
 ## framer-motion gotchas (each one cost a bug)
 
