@@ -177,8 +177,9 @@ For backend features:
   derived from file paths under `backend/func/`.
 - Invoke methods with `key.method`, for example `booking.create`.
 - Use `creght func run` only to self-test a Func method with sample input.
-- Lower-level `creght func list/get/create/update/delete` commands may exist for
-  debugging or scripts, but are not the normal agent workflow.
+- The CLI intentionally does not expose `creght func list/get/create/update/delete`.
+  Func CRUD must go through `backend/func` files plus `creght push`, `creght sync`,
+  or `creght dev`.
 - Use `talizen/auth` for login/register/logout/current-user/OAuth UI; do not
   implement passwords, sessions, or OAuth callbacks in Func.
 

@@ -210,8 +210,8 @@ creght func run --site_id=<project_id>/<site_id> --key=booking.create --input=./
 When an environment exposes native tools, use their equivalents:
 `list_tables`, `create_table`, `update_table`, `list_table_records`,
 `create_table_record`, `update_table_record`, `list_funcs`, `create_func`,
-`update_func`, and `run_func`. In external CLI workflows, prefer editing
-`backend/func` files over manual `creght func create/update/delete`.
+`update_func`, and `run_func`. In external CLI workflows, edit `backend/func`
+files for Func CRUD; the CLI only exposes `creght func run` for self-tests.
 
 ## Minimal Booking Example
 

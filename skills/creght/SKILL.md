@@ -26,10 +26,12 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - Rendered Creght site URLs can expose site discovery metadata at
   `/.well-known/creght.json`. Use this when the user provides a public page URL
   instead of an editor URL, local directory, or explicit project/site IDs.
-- `pull` downloads remote site files into a local directory.
-- `push` uploads the current local directory snapshot to Creght and exits.
+- `pull` downloads remote frontend files into `frontend/` and Func backend code
+  into `backend/func/`.
+- `push` uploads the current local workspace snapshot to Creght and exits.
 - `sync` is watch mode: it pushes the current local snapshot, then keeps
-  listening for local file changes and pushes them in realtime.
+  listening for local frontend and Func file changes and pushes them in
+  realtime.
 - The CLI does not render sites locally.
 - Rendering, CMS, forms, Auth, Func, assets, realtime preview, and publication
   are handled by the Creght backend and web app.
