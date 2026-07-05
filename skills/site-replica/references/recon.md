@@ -119,6 +119,18 @@ computed line-height (display faces usually sit at 0.9–0.95 even when they
 *look* tighter), and where small "(LABEL)" annotations sit (often
 superscript at the title's top-right, not inline beside it).
 
+**Stretched-to-fill headlines (Framer SVG text).** If a headline visually
+spans its full container but the computed font-size implies a much narrower
+glyph run (e.g. 15 characters at 108px filling 1360px), the text is being
+stretched — Framer renders these as SVG `<text textLength=…
+lengthAdjust="spacingAndGlyphs">`, often wrapped in an ancestor with
+`mix-blend-mode: difference` (white fill inverts to dark over light
+backgrounds). Detect it by walking the heading's ancestors for `svg` /
+blend modes, and confirm by comparing box width vs font-size × char count.
+Rebuild with the same mechanism (a responsive `<svg><text textLength>`
+component), not by inflating font-size — the glyph height must stay at the
+measured size while the run stretches horizontally.
+
 ## 3. Layout measurement — do this at multiple widths
 
 The single most common replication error is content width. Measure the same
@@ -140,6 +152,24 @@ const r = el => { const b = el.getBoundingClientRect();
   the distinct names once; they reveal the section inventory and element
   roles ("Hero Image Container", "Ticker", "Dark Card"…). Webflow uses
   readable class names similarly.
+
+## 3a. Breakpoint cuts — find where the layout actually flips
+
+Resize across 390 → 768 → 820 → 1024 → 1200 → 1440 and note, per width,
+whether the hero is stacked or split, how many grid/card columns render, and
+where the header swaps between hamburger and full nav. Record the **cut
+widths** — they are part of the spec, not an implementation detail:
+
+- Framer templates commonly run phone <810, tablet 810–1199, desktop ≥1200,
+  but individual templates deviate (desktop at ~1024 happens) — measure,
+  don't assume.
+- Tablet is usually the **mobile stacked layout, not a narrow desktop** —
+  often with the desktop's vertical grid lines and side padding retained.
+  Fixed-width chrome (header blurbs, avatar clusters) frequently stays
+  hidden until the widest cut.
+- These cuts drive the build's breakpoint mapping (see build.md): choosing a
+  "desktop" breakpoint lower than the source's cut ships cramped
+  three-column layouts that overflow at 768 — a verified failure mode.
 
 ## 3b. Pinned / scroll-driven section detection
 
@@ -183,8 +213,17 @@ record:
 - Footer: stacking order commonly differs from desktop DOM order (socials
   above copyright, nav links one-per-line).
 
+## 4b. Tablet audit (~768×1024) — quick pass, catches real bugs
+
+Walk the page once at 768 and screenshot the section list. You are checking
+two things: which layout family each section uses at this width (stacked
+like mobile, or columns like desktop — see "breakpoint cuts"), and which
+desktop-only elements are still hidden. Multi-column bands (pricing tiers,
+stat rows, timelines) are the sections that break here; note whether the
+source stacks them.
+
 ## 5. Deliverable of this phase
 
-A spec note containing: page list with routes; token table; per-section
-layout numbers at 1440/1920/390; the reference screenshot set. Only then move
-to the motion audit.
+A spec note containing: page list with routes; token table; breakpoint cut
+widths; per-section layout numbers at 1440/1920/768/390; the reference
+screenshot set. Only then move to the motion audit.

@@ -10,8 +10,9 @@ site at the end.
 2. Open `https://<site_id>.preview.creght.cn/` in the browser. First load
    after a push can take a few seconds — wait 4–6s before screenshotting.
 3. Capture the replica at the same widths as the source reference set
-   (1440 / 1920 / 390; disable smooth scroll first) by walking the per-page
-   **section checklist** from recon — every section gets its own capture.
+   (1440 / 1920 / 768 / 390; disable smooth scroll first) by walking the
+   per-page **section checklist** from recon — every section gets its own
+   capture.
    Sampling by scroll offset ships bugs in the sections you skipped
    (overlapping heading lines, misaligned bands).
 4. Put replica and source captures side by side. Anything that differs goes
@@ -62,6 +63,18 @@ Re-run the Phase 2 probes against the preview:
 
 Overflowing letter-spans during an entrance animation are fine; static
 overflow is a bug.
+
+## Tablet walkthrough + multi-width overflow sweep
+
+Repeat the overflow scan at every width family, not just 390 — resize
+through **768 / 820 / 912 / 1024** and check
+`document.documentElement.scrollWidth <= innerWidth` at each stop (the
+verified failure mode: desktop three-column pricing placed on `md:`
+overflowed only at 768–834). Then walk the page once at 768 and compare
+section-by-section against the source's tablet captures: same layout family
+per section (stacked vs columns), desktop-only chrome still hidden, and the
+stacked→columns flip happening at the same cut as the source (recon's
+"breakpoint cuts" note is the reference).
 
 ## Console + resources
 

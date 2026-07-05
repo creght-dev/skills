@@ -174,6 +174,25 @@ verify pass.
 - JSX whitespace: text separated by `<br className="max-md:hidden" />` loses
   its space when the `br` hides — add an explicit `{" "}`.
 
+## Breakpoint mapping (from recon's breakpoint cuts — cost a real bug)
+
+Map the source's measured cut widths to Tailwind prefixes **before** writing
+section markup, and use the same prefix everywhere:
+
+- Mobile-first base styles = the stacked layout.
+- The multi-column "desktop" layout goes on the prefix closest to the
+  source's desktop cut — usually `lg:` (1024). Do **not** default to `md:`
+  (768): sources are almost always still stacked at 768, and desktop
+  three-column bands (pricing tiers, stat rows) placed on `md:` overflow at
+  tablet widths.
+- Fixed-width header chrome (blurb text, avatar clusters, extra buttons)
+  usually appears only at the widest cut — put it on `xl:`.
+- Grid *lines* / side paddings may follow a different (earlier) cut than the
+  column layouts — the recon tablet screenshots are the authority.
+
+A wrong mapping is cheap to fix early (one `sed` per prefix) and expensive
+late — it invalidates every width's verification.
+
 ## Mobile variants (from the recon mobile audit)
 
 Implement as responsive variants of the same components, not separate trees:

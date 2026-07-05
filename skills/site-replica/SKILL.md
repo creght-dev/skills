@@ -117,10 +117,14 @@ feature: re-measure the source first, then fix.
   detail pages of listed collections (project/blog items). Confirm scope only
   when the source has an unbounded surface (e.g. hundreds of CMS entries) —
   then replicate the template with 3–5 representative entries.
-- Match the source's responsive behavior at three checkpoints minimum:
-  ~1440 desktop, ~1920 wide desktop, ~390 mobile. Mobile is not "the desktop
-  squeezed": headers become hamburger menus, grids reflow, some elements are
-  mobile-only or desktop-only. Audit mobile separately (recon reference).
+- Match the source's responsive behavior at four checkpoints minimum:
+  ~1440 desktop, ~1920 wide desktop, ~768 tablet, ~390 mobile. Mobile is not
+  "the desktop squeezed": headers become hamburger menus, grids reflow, some
+  elements are mobile-only or desktop-only. Audit mobile separately (recon
+  reference). Tablet is not "the desktop squeezed" either — sources commonly
+  keep the mobile stacked layout (sometimes with the desktop grid lines) all
+  the way up to ~1024/1200; probe where the source's layout actually flips
+  before choosing your own breakpoints (recon reference, "breakpoint cuts").
 
 ## Completion checklist
 
@@ -132,8 +136,9 @@ The task is complete when all of these hold on the Creght **preview URL**:
       that leads to a missing page fails this item.
 - [ ] Every in-scope page renders with no console errors and no missing
       resources (favicon included).
-- [ ] Desktop 1440/1920 and mobile 390 screenshots structurally match the
-      source's at the same widths (content max-width, alignment, ordering).
+- [ ] Desktop 1440/1920, tablet 768, and mobile 390 screenshots structurally
+      match the source's at the same widths (content max-width, alignment,
+      ordering, where the stacked→columns flip happens).
 - [ ] Every animation found in the motion audit exists and matches: entrance
       effects, scroll-driven effects (pins, curtain overlaps, horizontal
       tracks), marquees (direction + px/s), hovers (audited element by
