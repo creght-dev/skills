@@ -73,6 +73,18 @@ task to "just the homepage".
 
 - Only mark the crawl done when a full pass adds zero new routes.
 
+## 1b. Section inventory — per page, before measuring
+
+Dump each page's section-level structure (annotation attributes like
+`data-framer-name`, readable class names, or landmarks) sorted by document
+offset, and turn it into a **section checklist**. Capture the page by
+walking that checklist — never by fixed scroll steps, which silently skip
+sections that fall between two stops (a pricing block between testimonials
+and FAQ is the classic casualty). A name in the dump you never captured
+("Pricing", "Desktop - Monthly") = recon incomplete. The checklist carries
+through the whole run: one build task and one verification capture per
+section.
+
 ## 2. Design tokens
 
 Run once on the homepage:
@@ -100,6 +112,13 @@ background tints, dark-section colors, divider opacities. Key type styles to
 capture precisely (font-size, letter-spacing, line-height, weight): the hero
 title and each section heading.
 
+For hero/section headings capture **per-line detail**, not just the block:
+computed color of each child span (multi-tone headings are common — gray
+first lines, white last lines), forced `<br>` breaks vs natural wrap,
+computed line-height (display faces usually sit at 0.9–0.95 even when they
+*look* tighter), and where small "(LABEL)" annotations sit (often
+superscript at the title's top-right, not inline beside it).
+
 ## 3. Layout measurement — do this at multiple widths
 
 The single most common replication error is content width. Measure the same
@@ -121,6 +140,30 @@ const r = el => { const b = el.getBoundingClientRect();
   the distinct names once; they reveal the section inventory and element
   roles ("Hero Image Container", "Ticker", "Dark Card"…). Webflow uses
   readable class names similarly.
+
+## 3b. Pinned / scroll-driven section detection
+
+Do this per section — pins are where naive replicas diverge hardest:
+
+- **Height mismatch heuristic**: wrapper height ≫ its visible content height
+  (e.g. an 1800px section whose inner "Sticky content" is 900px) means the
+  section is pinned and scrubbed by scroll. Record the pin length and what
+  changes across it (text fill? panel swap? horizontal track?).
+- Probe for sticky/fixed elements:
+
+```js
+() => [...document.querySelectorAll('*')].filter(el => {
+  const p = getComputedStyle(el).position;
+  return (p === 'sticky' || p === 'fixed') && el.getBoundingClientRect().height > 200;
+}).map(el => el.getAttribute('data-framer-name') || String(el.className).slice(0, 40))
+```
+
+- Annotation names containing "trigger", "Sticky", "Scroll content" are
+  explicit scroll-animation markers. Every one becomes a motion-spec row
+  answering "what does this trigger drive?" — an uninvestigated trigger is
+  an unfinished audit. (A "Logo trigger" + "Hero scale trigger" pair, for
+  example, usually means the hero wordmark morphs into the header logo and
+  the next section slides over a pinned hero.)
 
 ## 4. Mobile audit (~390×844) — separate pass, not an afterthought
 
