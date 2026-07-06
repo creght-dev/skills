@@ -32,6 +32,9 @@ and spacing). Re-run recon's probes against the preview and diff:
   one width means the formula is wrong).
 - **Structural landmarks**: the container-coordinate probe (3d) at 1440 and
   1728 — column lines, right-edge alignments, block widths within ~5px.
+- **Box-model spacing**: grid/flex gaps, section paddings and adjacent-block
+  vertical rhythm within ~2px of the source's computed values (these are
+  directly readable properties — no reason to accept approximation).
 - **Scroll feel**: if the source runs Lenis, wheel-decay samples on the
   replica should match the source's curve frame-by-frame (same lerp).
 - After adding `wide:` variants, regression-run the same probes one width
