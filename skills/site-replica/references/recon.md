@@ -254,6 +254,19 @@ judged from screenshots. Method:
   aligns with.
 - Repeat the probe at the wide cut (1728) — the same landmarks reveal
   layout-family changes (3b/3a).
+- **Box-model spacing is part of the landmark probe** — don't approximate
+  it with framework scale steps. For each section extract, per breakpoint
+  interval: the section wrapper's `padding-block`, every grid/flex
+  container's computed `gap` / `row-gap` / `column-gap` / `padding`, and
+  the vertical rhythm between adjacent blocks
+  (`next.top − prev.bottom` for heading → sub → body → CTA). ~5–10 values
+  per section define its rhythm; build them as exact arbitrary values
+  (`gap-[38px]`, `pt-[92px]`) — desktop spacing is often fluid too
+  (two-sample calc(), same as the type ramp). Skip the micro-tail
+  (icon-to-text gaps, sub-pixel line boxes) by default; when a residual
+  mismatch is suspected, overlay-diff same-width screenshots of source and
+  replica (difference blend) to locate the divergent block, then measure
+  just that spot.
 - These numbers are the build spec. During verification, run the *same
   probe* on the replica and diff numerically (see verify.md).
 

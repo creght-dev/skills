@@ -100,6 +100,28 @@ the ticker **in the viewport** — off-screen marquees commonly pause
 duplicated content + CSS `translateX(-50%)` keyframes; duration =
 half-track-length / measured speed.
 
+## Entrance parameters — read the declarative config before frame-fitting
+
+On Framer sites, every appear/entrance animation's exact parameters ship in
+the page as JSON: `document.getElementById('__framer__appearAnimationsContent')`
+maps each `data-framer-appear-id` to its initial/animate values and
+transition (`{type:"spring", stiffness, damping, mass, delay}` or
+`{type:"tween", duration, ease:[...]}`). Parse it, then map ids to elements
+via `[data-framer-appear-id]` — you get the full entrance choreography
+(offsets, spring constants, stagger delays) with zero sampling. Reading
+these parameter values is fine; never copy the animator runtime code
+itself. Feed the numbers to framer-motion's public API — the source's
+animator is the same spring math, so parameter equality = curve equality.
+Typical findings worth copying exactly: rise offsets per element
+(y:100–220), one shared spring (e.g. stiffness 100 / damping 27 /
+mass 0.3), sidebar slide x:-120, item springs ({bounce, duration}),
+image scale-ins (1.14→1 tween + cubic-bezier), and background layers
+settling at low opacity. Also sweep computed `transition-*` for the CSS
+hover layer (often a single site-wide `color .2s cubic-bezier(...)`), and
+dedupe computed text `color`s — sources usually use very few levels (e.g.
+ink + one 60%-alpha secondary), while eyeballed replicas scatter across
+many approximate values.
+
 ## Text entrance animations
 
 Check headings for per-character animation: split-letter animations show up
