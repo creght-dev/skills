@@ -80,6 +80,7 @@ creght logout
 creght project list
 creght project create --name="My Project"
 creght pull --site_id=<project_id>/<site_id> --dir=./mysite
+creght diff --site_id=<project_id>/<site_id> --dir=./mysite
 creght push --site_id=<project_id>/<site_id> --dir=./mysite
 creght sync --site_id=<project_id>/<site_id> --dir=./mysite
 creght preview --site_id=<project_id>/<site_id>
@@ -109,14 +110,48 @@ Remote site files map to `frontend/`. Func key `booking` maps to
 `backend/func/booking.ts`; Func key `profile/settings` maps to
 `backend/func/profile/settings.ts`.
 
-`push` uploads the current local workspace snapshot and exits. `sync` first
-pushes the current snapshot, then watches local frontend and Func file changes
-and keeps uploading them.
+`push` safely uploads local changes and exits. `sync` first runs the same safe
+push check, then watches local frontend and Func file changes and keeps
+uploading them.
 
-`push` and `sync` are one-way local-to-remote flows. They do not pull Web editor
-changes back into the local directory. If the site may have been edited in the
-Web editor, run `pull` manually or restart from a clean local copy before
-continuing.
+`pull` safely merges remote files into the local workspace and records a local
+base state in `.creght/state.json`. It updates local files that have not been
+changed locally, keeps local-only edits, and reports conflicts when local and
+remote both changed the same file/function. `diff`, `push`, and `sync` compare
+three versions: the last base state, current local files, and current remote
+files. This is the normal collaboration workflow:
+
+```bash
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite
+# edit frontend/ and backend/func/
+creght diff --site_id=<project_id>/<site_id> --dir=./mysite
+creght push --site_id=<project_id>/<site_id> --dir=./mysite
+```
+
+Default safety rules:
+
+- Remote files/functions that were added or changed elsewhere are kept. If the
+  local copy did not change from the base, `push` does not overwrite the remote
+  update.
+- Local deletions are skipped by default, so a stale local workspace does not
+  delete remote files such as `messages/*.json`. Use `--delete` only when the
+  deletion is intentional.
+- If the same file/function changed locally and remotely, `diff`/`push` report
+  a conflict. Pull or inspect remote changes before deciding what to keep.
+- Use `--force` only for intentional full local-snapshot overwrite behavior.
+
+Useful variants:
+
+```bash
+creght diff --site_id=<project_id>/<site_id> --dir=./mysite --delete
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite --force
+creght push --site_id=<project_id>/<site_id> --dir=./mysite --delete
+creght push --site_id=<project_id>/<site_id> --dir=./mysite --force
+```
+
+`push` and `sync` are still local-to-remote upload flows; they do not merge Web
+editor changes into local files. If remote changes should become local files,
+run `pull`; use `pull --force` only when overwriting local edits is intentional.
 
 Use `preview` when verification depends on platform rendering. Do not start a
 generic local renderer unless the project explicitly provides one.

@@ -28,8 +28,18 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   instead of an editor URL, local directory, or explicit project/site IDs.
 - `pull` downloads remote frontend files into `frontend/` and Func backend code
   into `backend/func/`.
-- `push` uploads the current local workspace snapshot to Creght and exits.
-- `sync` is watch mode: it pushes the current local snapshot, then keeps
+- `pull` safely merges remote frontend/Func files into the local workspace and
+  records `.creght/state.json`, the local base state used by `diff`, `push`,
+  and `sync` to compare base/local/remote safely. It reports conflicts instead
+  of overwriting local edits; `pull --force` intentionally overwrites local
+  files with remote files.
+- `diff` shows which frontend files and Func files would be created, updated,
+  deleted, skipped, or blocked by conflicts.
+- `push` safely uploads local changes relative to the last pull/push base and
+  exits. It does not delete remote files/functions unless `--delete` is
+  explicitly passed, and it reports conflicts when the same file/function
+  changed locally and remotely.
+- `sync` is watch mode: it starts with the same safe push check, then keeps
   listening for local frontend and Func file changes and pushes them in
   realtime.
 - The CLI does not render sites locally.
@@ -53,9 +63,13 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 4. Inspect the relevant `/page`, `/component`, `/types`, and root config files
    before editing.
 5. Apply focused changes that match existing project conventions.
-6. Validate with available local checks or Creght platform checks. If no local
+6. Before uploading, run `creght diff --site_id=<project_id>/<site_id>
+   --dir=<dir>` when there may be other people or Web editor changes. Resolve
+   conflicts by pulling/inspecting remote changes instead of overwriting by
+   default.
+7. Validate with available local checks or Creght platform checks. If no local
    renderer exists, use `creght push`, `creght sync`, or `creght preview` as
-   the verification path. Use `creght push` for a one-time upload and
+   the verification path. Use `creght push` for a one-time safe upload and
    `creght sync` when you want watch mode.
 
 ## Error Trigger
