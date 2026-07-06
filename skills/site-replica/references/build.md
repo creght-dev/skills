@@ -126,6 +126,55 @@ Build these once, reuse per section. Parameters come from the motion audit.
   set duration per instance via a `[animation-duration:NNs]` utility class
   (Creght style rules discourage inline `style` for static values).
 
+## Measured type ramp — one utility class per text role
+
+Turn recon 3c's measurements into CSS classes in `index.css`, and use them
+instead of per-element `text-[NNpx]` guesses:
+
+```css
+/* base = phone (fixed), md = tablet (fixed), xl = desktop (fluid calc
+   through the 1440 & 1920 samples) */
+.t-display-xl { font-size: 54px; line-height: 0.9; letter-spacing: -0.06em; font-weight: 600; }
+@media (min-width: 810px)  { .t-display-xl { font-size: 100px; } }
+@media (min-width: 1280px) { .t-display-xl { font-size: calc(28px + 5.8333vw); } }
+```
+
+- Never encode desktop sizes as plain `vw` values eyeballed at one width —
+  they will be exact at that width and wrong everywhere else. Use the
+  measured `calc(Bpx + Avw)`.
+- Fluid chrome gets the same treatment: page padding
+  (`padding-inline: calc(4.1667vw + 20px)` desktop), sidebar width
+  (`calc(25.2vw + 26px)`), hero-title caps that unlock at the wide cut.
+- Verification is numeric: the same computed-style probe run on the replica
+  must return the source's values at 1440 AND 1920 (see verify.md).
+
+## Breakpoint variants on this platform (each cost a bug)
+
+- Arbitrary variants like `min-[1280px]:` may silently not compile — use
+  named breakpoints only. Define the source's measured cuts in `@theme`:
+  `--breakpoint-md: 810px; --breakpoint-wide: 1600px;` then use `md:` /
+  `xl:` (1280) / `wide:` prefixes.
+- Sections whose layout *family* changes at the wide cut (recon 3a) get
+  `wide:` variants — grid splits (`wide:grid-cols-[38%_1fr]`), heading
+  alignment flips, extra cards + side rails. Touch only the `wide:` layer so
+  the verified smaller breakpoints stay intact, then regression-check one
+  width below the cut.
+- **`hidden` loses to a base `block` on the same element** (CSS order, not
+  class order). To hide an always-rendered extra element below the wide cut
+  use `max-wide:hidden`, not `hidden wide:block`.
+
+## Smooth scroll (Lenis)
+
+If the motion audit found Lenis, add `lenis` to the import map (same major
+version as the source), import it normally, and init in the layout
+component's `useEffect` with the dumped options
+(`new Lenis({ lerp: 0.1, autoRaf: true, autoToggle: true, /* …dumped */ })`,
+`destroy()` on cleanup). Also add Lenis's recommended host CSS
+(`html.lenis { height: auto }` etc.) and keep
+`html { scroll-behavior: auto }`. `autoToggle` handles overflow:hidden
+menus; framer-motion `useScroll` keeps working since the window still
+scrolls.
+
 ## Display-font line-height (cost a real bug)
 
 Condensed display faces (Anton, Oswald, Bebas…) have content boxes of

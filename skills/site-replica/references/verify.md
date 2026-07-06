@@ -10,16 +10,32 @@ site at the end.
 2. Open `https://<site_id>.preview.creght.cn/` in the browser. First load
    after a push can take a few seconds — wait 4–6s before screenshotting.
 3. Capture the replica at the same widths as the source reference set
-   (1440 / 1920 / 768 / 390; disable smooth scroll first) by walking the
-   per-page **section checklist** from recon — every section gets its own
-   capture.
-   Sampling by scroll offset ships bugs in the sections you skipped
-   (overlapping heading lines, misaligned bands).
+   (1440 / **1728** / 1920 / 768 / 390; disable smooth scroll first — with
+   Lenis active use `window.scrollTo`, wheel events are smoothed) by walking
+   the per-page **section checklist** from recon — every section gets its
+   own capture. Sampling by scroll offset ships bugs in the sections you
+   skipped (overlapping heading lines, misaligned bands).
 4. Put replica and source captures side by side. Anything that differs goes
    on the fix list with a re-measurement of the source (never fix from
    memory).
 5. Fix → push → re-verify only the changed features + one neighbor (regression
    check).
+
+## Numeric diff — the acceptance test screenshots can't provide
+
+Screenshots catch structure; only numbers catch "不饱满" (subtly-off type
+and spacing). Re-run recon's probes against the preview and diff:
+
+- **Type ramp**: the computed-style probe (3c) at 1440 AND 1920 — every
+  fontSize / letterSpacing / fontWeight must equal the source's values
+  (fluid `calc` formulas make both widths pass simultaneously; matching only
+  one width means the formula is wrong).
+- **Structural landmarks**: the container-coordinate probe (3d) at 1440 and
+  1728 — column lines, right-edge alignments, block widths within ~5px.
+- **Scroll feel**: if the source runs Lenis, wheel-decay samples on the
+  replica should match the source's curve frame-by-frame (same lerp).
+- After adding `wide:` variants, regression-run the same probes one width
+  *below* the cut (1440) to prove smaller breakpoints didn't move.
 
 ## Interaction re-verification (on the replica)
 

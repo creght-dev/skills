@@ -153,23 +153,109 @@ const r = el => { const b = el.getBoundingClientRect();
   roles ("Hero Image Container", "Ticker", "Dark Card"…). Webflow uses
   readable class names similarly.
 
-## 3a. Breakpoint cuts — find where the layout actually flips
+## 3a. Breakpoint cuts — enumerate from CSS first, never sweep blindly
 
-Resize across 390 → 768 → 820 → 1024 → 1200 → 1440 and note, per width,
-whether the hero is stacked or split, how many grid/card columns render, and
-where the header swaps between hamburger and full nav. Record the **cut
-widths** — they are part of the spec, not an implementation detail:
+Do NOT discover breakpoints by resizing through arbitrary widths and
+eyeballing — per-section × per-width visual inspection is slow and misses
+cuts (the verified failure: a ~1600 "wide desktop" cut where pricing/FAQ
+split into two columns, 2-up grids become 3-up with a vertical side rail,
+centered headings left-align, and capped hero titles unlock — invisible if
+you only checked 1440). Instead, **read the breakpoint set straight out of
+the stylesheets in one call**:
 
-- Framer templates commonly run phone <810, tablet 810–1199, desktop ≥1200,
-  but individual templates deviate (desktop at ~1024 happens) — measure,
-  don't assume.
+```js
+() => {
+  const cuts = new Set();
+  for (const sheet of document.styleSheets) {
+    let rules; try { rules = sheet.cssRules; } catch (e) { continue; } // CORS
+    const walk = (rs) => { for (const r of rs) {
+      if (r.media && r.media.mediaText.includes('width'))
+        [...r.media.mediaText.matchAll(/(min|max)-width:\s*([\d.]+)px/g)]
+          .forEach(m => cuts.add(Math.round(parseFloat(m[2]))));
+      if (r.cssRules) try { walk(r.cssRules); } catch (e) {}
+    } };
+    walk(rules);
+  }
+  return [...cuts].sort((a, b) => a - b); // e.g. [809,810,1279,1280,1599,1600]
+}
+```
+
+The deduped widths define the interval list (e.g. <810 / 810–1279 /
+1280–1599 / ≥1600). From then on, capture and probe at **one representative
+width per interval** (e.g. 390 / 1024 / 1440 / 1728) — every later step
+(type ramp 3c, landmarks 3d, section captures, verification) runs once per
+interval, nothing more, nothing missed.
+
+**Framer bonus — per-section variant matrix without any resizing.** Framer
+renders every breakpoint variant of a section in the DOM and toggles them
+with `ssr-variant hidden-<hash>` classes; the stylesheet maps each
+`hidden-*` class to a media range. In one pass, list each section's
+distinct `hidden-*` classes → you get a section × breakpoint matrix: which
+sections have a dedicated layout for which interval (a section with a
+wide-range variant needs a `wide:` build task) and which are fluid-only (no
+variants). Webflow similarly exposes `w-hidden-<range>` classes.
+
+Notes on the intervals themselves:
+
+- Framer templates commonly run phone <810, tablet 810–1279, desktop ≥1280,
+  plus often a wide cut at 1600 — but always read the real values, don't
+  assume.
 - Tablet is usually the **mobile stacked layout, not a narrow desktop** —
   often with the desktop's vertical grid lines and side padding retained.
   Fixed-width chrome (header blurbs, avatar clusters) frequently stays
   hidden until the widest cut.
-- These cuts drive the build's breakpoint mapping (see build.md): choosing a
-  "desktop" breakpoint lower than the source's cut ships cramped
-  three-column layouts that overflow at 768 — a verified failure mode.
+- These cuts drive the build's breakpoint mapping (see build.md): define
+  them as named breakpoints in `@theme` and use one representative width
+  per interval in the verify loop too.
+- Fallback when CSSOM is unreadable (all sheets CORS-blocked): fetch the
+  CSS files as text and regex the media queries; only if that also fails,
+  fall back to a resize sweep — then include ≥1600 widths.
+
+## 3c. Measured type ramp — extract, never eyeball
+
+Font sizes read off screenshots are always wrong ("看起来不像/不饱满" is
+usually this). Extract computed styles per element instead:
+
+- Build a probe list of ~30–60 text snippets (one per distinct text role:
+  hero intro, display headings, statements, row titles, body, buttons,
+  labels…). For each, find the deepest element containing the snippet and
+  record `fontSize / lineHeight / letterSpacing / fontWeight` from
+  `getComputedStyle` at **every breakpoint family** (390, 810/1024 for
+  tablet, 1440 AND 1920 for desktop).
+- **Desktop sizes are often fluid, not fixed.** If the same element measures
+  differently at 1440 and 1920, solve the linear function through both
+  points: `a = (s1920 − s1440) / 4.8` px-per-vw, `b = s1440 − 14.4a` →
+  `font-size: calc(Bpx + Avw)`. Two samples define it exactly. Tablet and
+  phone are usually fixed px (verify with one mid-width sample: 810 vs 1260
+  identical ⇒ fixed).
+- Line-height and letter-spacing are usually **relative** (0.9 / −0.06em)
+  and constant across widths — record them as ratios, not px.
+- Page side padding, sidebar width, and capped hero-title widths follow the
+  same pattern: measure at two desktop widths, fit `calc(Bpx + Avw)`, and
+  note any hard caps or breakpoint unlocks (e.g. title max-width 710px that
+  releases at the 1600 cut).
+- Group elements sharing identical metrics into named roles — the build
+  turns each role into one CSS utility class (see build.md "measured type
+  ramp").
+
+## 3d. Structural landmarks — relationships come from the DOM, not vision
+
+Alignment relationships (what lines up with what) must be measured, not
+judged from screenshots. Method:
+
+- Pick the page's content container (padded box) as the coordinate system;
+  record every landmark as `left/right relative to container-left` via
+  `getBoundingClientRect`.
+- Extract per section: column lines (e.g. a recurring 25% line that rows,
+  quotes, arrows and CTAs all start on), right-edge alignment (buttons/text
+  flush to container-right), block widths (a statement capped at 65.7%
+  width starting at 21.8%), extra table columns that are easy to miss
+  visually (a light-gray "Description" header), and which element each CTA
+  aligns with.
+- Repeat the probe at the wide cut (1728) — the same landmarks reveal
+  layout-family changes (3b/3a).
+- These numbers are the build spec. During verification, run the *same
+  probe* on the replica and diff numerically (see verify.md).
 
 ## 3b. Pinned / scroll-driven section detection
 
