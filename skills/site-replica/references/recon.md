@@ -259,7 +259,12 @@ judged from screenshots. Method:
 
 ## 3b. Pinned / scroll-driven section detection
 
-Do this per section — pins are where naive replicas diverge hardest:
+Do this per section — pins are where naive replicas diverge hardest.
+**Run the scan once per breakpoint interval (3a), not just at one width**:
+pins can exist only in a specific interval's layout variant (verified: a
+pricing left column that is sticky only in the ≥1600 two-column layout —
+invisible to a 1440-only scan). Record the sticky element's `top` offset
+and its parent's height (= pin travel) as part of the spec:
 
 - **Height mismatch heuristic**: wrapper height ≫ its visible content height
   (e.g. an 1800px section whose inner "Sticky content" is 900px) means the
