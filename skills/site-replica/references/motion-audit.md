@@ -71,6 +71,24 @@ Rules of interpretation:
   times out with "element intercepts pointer events", suspect a leftover
   overlay, not a broken selector.
 
+## Smooth-scroll library (Lenis & co.) — detect and copy the config
+
+Check whether the source hijacks native scrolling; the inertia is a big part
+of "手感" parity:
+
+- Signatures: `document.documentElement.className` contains `lenis` /
+  `lenis-smooth` / `lenis-autoToggle`; `window.lenis` / `window.lenisVersion`
+  globals; similar checks for Locomotive (`has-scroll-smooth`) or GSAP
+  ScrollSmoother (`#smooth-wrapper`).
+- Dump the exact options: `window.lenis.options` → lerp / duration /
+  wheelMultiplier / syncTouch / autoToggle etc. Replicate with the same
+  values, same major version.
+- Behavioral confirmation: `mouse.wheel(0, 600)` then sample `scrollY` every
+  ~80ms — an exponential decay curve (e.g. 115, 542, 801, 958, 1053…)
+  means lerp smoothing; compare the replica's curve frame-by-frame in
+  verification.
+- Build-side gotchas live in build.md ("smooth scroll").
+
 ## Marquees / tickers
 
 Sample an item's `getBoundingClientRect().x` twice, 1.5–2s apart:

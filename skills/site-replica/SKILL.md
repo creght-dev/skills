@@ -38,6 +38,17 @@ made available, stop and tell the user replication cannot be verified.
   interactive detail must be **measured in a browser**, not inferred from a
   single screenshot. Guessed hover states and animation timings are the #1
   source of "看起来不像" complaints.
+- **Numbers over eyes, always.** Enumerate the source's breakpoints from its
+  stylesheets before anything else (recon 3a) and work one representative
+  width per interval. Typography comes from `getComputedStyle` per interval
+  — desktop is often fluid `calc(px + vw)`; sample two widths and solve it
+  (recon 3c). Layout relationships (column lines, edge alignment, block
+  widths, easy-to-miss table columns) come from `getBoundingClientRect` in
+  container coordinates (recon 3d). Acceptance is a numeric diff of the same
+  probes run on the replica (verify.md), not a visual impression.
+- Detect scroll-feel libraries (Lenis etc.) and copy their exact config
+  (motion-audit); a replica without the source's scroll inertia feels wrong
+  even when every pixel matches.
 - At kickoff, ask the user for a 30–60s screen recording of the source (slow
   scroll top→bottom, plus mouse passes over menus, cards, and list rows).
   Extract frames (`ffmpeg -vf "fps=3,scale=1280:-1"`) and read them as motion
@@ -117,8 +128,10 @@ feature: re-measure the source first, then fix.
   detail pages of listed collections (project/blog items). Confirm scope only
   when the source has an unbounded surface (e.g. hundreds of CMS entries) —
   then replicate the template with 3–5 representative entries.
-- Match the source's responsive behavior at four checkpoints minimum:
-  ~1440 desktop, ~1920 wide desktop, ~768 tablet, ~390 mobile. Mobile is not
+- Match the source's responsive behavior at **one representative width per
+  media-query interval enumerated in recon 3a** (typically ~390 mobile,
+  ~1024 tablet, ~1440 desktop, ~1728 wide desktop — but the enumerated cuts
+  are the authority, not this list). Mobile is not
   "the desktop squeezed": headers become hamburger menus, grids reflow, some
   elements are mobile-only or desktop-only. Audit mobile separately (recon
   reference). Tablet is not "the desktop squeezed" either — sources commonly
@@ -136,9 +149,16 @@ The task is complete when all of these hold on the Creght **preview URL**:
       that leads to a missing page fails this item.
 - [ ] Every in-scope page renders with no console errors and no missing
       resources (favicon included).
-- [ ] Desktop 1440/1920, tablet 768, and mobile 390 screenshots structurally
+- [ ] Screenshots at one representative width per enumerated breakpoint
+      interval (recon 3a; typically 390 / 1024 / 1440 / 1728) structurally
       match the source's at the same widths (content max-width, alignment,
-      ordering, where the stacked→columns flip happens).
+      ordering, layout family per section — a wide-desktop interval left
+      unimplemented fails this item).
+- [ ] The numeric diff passes (verify.md): re-running the type-ramp and
+      landmark probes on the replica returns the source's values at two
+      desktop widths (fluid formulas) and within ~5px for column lines,
+      edge alignments and block widths; if the source runs a smooth-scroll
+      library, the replica's wheel-decay curve matches.
 - [ ] Every animation found in the motion audit exists and matches: entrance
       effects, scroll-driven effects (pins, curtain overlaps, horizontal
       tracks), marquees (direction + px/s), hovers (audited element by
