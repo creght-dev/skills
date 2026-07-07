@@ -1,5 +1,10 @@
 # Phase 1 — Recon: measure the source site
 
+> **Toolbox** — recipes and field notes, not mandates. The binding Contract
+> and Gates live in `../SKILL.md`; consult what the task's tier needs, skip
+> what it doesn't, and note the skip when a gate depends on it.
+
+
 Everything here happens in a real browser. Output of this phase: a written
 spec — page list, layout numbers, design tokens, breakpoint behavior — plus
 reference screenshots for later diffing.

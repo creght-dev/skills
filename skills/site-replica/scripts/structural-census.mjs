@@ -96,7 +96,8 @@ const censusFn = () => {
       anchors: anchorSet.slice(0, 10),
     };
   });
-  return { warn: null, sections: rows };
+  const covered = sections.reduce((a, c) => a + c.h, 0) / docH;
+  return { warn: null, coverage: Math.round(covered * 100), sections: rows };
 };
 
 async function census(page, url) {
@@ -125,6 +126,10 @@ for (const [name, r] of [['source', srcRes], ['replica', repRes]]) {
   if (r.warn) { console.error(name + ': ' + r.warn); process.exit(3); }
 }
 const src = srcRes.sections, rep = repRes.sections;
+for (const [name, r] of [['source', srcRes], ['replica', repRes]]) {
+  if (r.coverage < 90)
+    console.log(`NOTE: segmentation explains only ${r.coverage}% of the ${name} document height — eyeball the unassigned bands manually.`);
+}
 
 /* Align sections by fingerprint similarity (DP, gap penalty) so an extra or
    missing band produces ONE flag instead of cascading index mismatches. */
@@ -155,7 +160,7 @@ function alignSections(A, B) {
 const aligned = alignSections(src, rep);
 
 let violations = 0;
-console.log(`=== structural census @${width}px — src ${src.length} sections, rep ${rep.length} sections ===`);
+console.log(`=== structural census @${width}px — src ${src.length} sections (${srcRes.coverage}% of doc), rep ${rep.length} (${repRes.coverage}%) ===`);
 console.log('sec | height src→rep (Δ%) | img | link | btn | font-size multiset (src || rep)');
 for (const [si, ri] of aligned) {
   if (si === null) { console.log(' +  | REPLICA-ONLY section h=' + rep[ri].h + ' at y=' + rep[ri].top + '  <<< EXTRA'); violations++; continue; }
