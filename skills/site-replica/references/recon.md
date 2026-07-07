@@ -61,7 +61,10 @@ task to "just the homepage".
   CTA buttons, and `/sitemap.xml` if it exists.
 - Collection pages (work/blog lists) imply detail templates — open at least
   two different entries to learn what varies between them (that difference
-  is your template's data model).
+  is your template's data model). Write the varying fields down as a field
+  list (title, date, cover, tags, body…) — at build time it becomes the CMS
+  collection schema (build.md "CMS-backed collections"), so missing a field
+  here means a schema migration later.
 - Write the inventory as a table and register one task per route:
 
   | route | type | recon | built | verified |
