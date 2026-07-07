@@ -60,6 +60,12 @@ Re-run the Phase 2 probes against the preview:
   inverted colors in the glyphs, not hidden or plain-white text.
 - Forms: fill and submit on the preview; expect the success state, then
   confirm `creght form logs --site_id=… --key=…` shows the entry.
+- CMS: `creght content list --site_id=… --collection=<key>` returns the
+  seeded entries; spot-check that a title rendered on the preview's list
+  page matches a CMS entry (proves the page reads the CMS, not a leftover
+  constant); grep the repo for hardcoded content arrays
+  (`export const posts`-style) duplicating any collection — finding one
+  fails verification.
 
 ## Mobile walkthrough (390×844)
 

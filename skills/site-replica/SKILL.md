@@ -160,6 +160,19 @@ Guard against it structurally:
   sections that fall between stops (a pricing block between testimonials and
   FAQ is the classic casualty) — walk the section list, not scroll offsets.
 
+## Collection content lives in the CMS
+
+Creght has a CMS; a replica that hardcodes its blog posts or project entries
+as TypeScript constants is not done, even if every pixel matches. Every
+source collection rendered as list + detail (blog, works, case studies…)
+becomes a platform CMS collection: schema derived from the recon'd detail
+template, collection created via the CLI **before** its pages are written,
+representative entries seeded via `creght content create`, and pages reading
+them with `talizen/cms` helpers in `getServerSideProps`. Long-form bodies
+are richtext HTML strings (editable in the platform editor), not custom
+block arrays. Workflow, schema conventions, and the anti-pattern are in
+`references/build.md` ("CMS-backed collections").
+
 ## Pipeline
 
 Run the phases in order. Each phase has a dedicated reference — read it when
@@ -183,7 +196,8 @@ feature: re-measure the source first, then fix.
 - Default scope: every page reachable from the source's primary nav, plus
   detail pages of listed collections (project/blog items). Confirm scope only
   when the source has an unbounded surface (e.g. hundreds of CMS entries) —
-  then replicate the template with 3–5 representative entries.
+  then replicate the template with 3–5 representative entries, seeded into
+  the platform CMS (see "Collection content lives in the CMS").
 - Match the source's responsive behavior at **one representative width per
   media-query interval enumerated in recon 3a** (typically ~390 mobile,
   ~1024 tablet, ~1440 desktop, ~1728 wide desktop — but the enumerated cuts
@@ -228,6 +242,11 @@ The task is complete when all of these hold on the Creght **preview URL**:
       overflow scan from `references/verify.md`).
 - [ ] Forms submit successfully through the platform and the submission
       appears in `creght form logs`.
+- [ ] Collection pages are CMS-backed: `creght cms collections` lists one
+      collection per source collection, `creght content list` shows the
+      seeded entries, list/detail pages render from them, and no hardcoded
+      content array duplicates CMS data (grep the repo for
+      `export const posts`-style constants).
 - [ ] License-safe asset rules (slot-matched free stock / generated art, no
       source assets) and rewritten-copy rules hold everywhere.
 - [ ] Site pushed; preview URL reported to the user. Publish only when the

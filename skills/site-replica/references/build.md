@@ -1,8 +1,8 @@
 # Phase 3 — Build: original implementation on Creght
 
-Read the base `creght` skill (and its `site-code.md` / `cli.md` references)
-before this phase. This file covers only what replication adds on top, plus
-gotchas that cost real debugging time.
+Read the base `creght` skill (and its `site-code.md` / `cli.md` / `cms.md`
+references) before this phase. This file covers only what replication adds
+on top, plus gotchas that cost real debugging time.
 
 ## Project setup
 
@@ -20,9 +20,14 @@ Structure the port as:
 /component/Nav.tsx, Hero.tsx, Footer.tsx…  # one component per section
 /component/shared.tsx                      # animation primitives + icons
 /lib/art.ts                                # placeholder artwork generators
+/cms/*.schema.json, /cms/seed/*.json       # collection schemas + seed entries
 index.css                                  # @theme tokens + @utility classes
 talizen.config.ts                          # importMap, metadata, fonts
 ```
+
+Collection content (blog posts, works…) lives in the platform CMS, not in
+these files — see "CMS-backed collections" below before writing any list or
+detail page.
 
 ## Third-party motion + fonts
 
@@ -207,6 +212,83 @@ verify pass.
 - Elements under a drag surface need `draggable={false}` on images and
   `select-none` on the track.
 
+## CMS-backed collections — never hardcode content arrays
+
+The platform has a CMS; use it. Any content the source renders as a list
+page + detail template (blog posts, works/projects, case studies, team
+profiles…) is modeled as a CMS collection with seeded entries — **never** as
+an `export const posts: Post[] = [...]` constant in `/lib` or a page file.
+A hardcoded array is the #1 reason a delivered replica can't be handed to a
+real owner: every content edit needs a code push, and the platform's content
+editor shows nothing. This is a verified failure mode of autonomous runs —
+the array gets written "as a scaffold" and never migrated.
+
+Decision rule:
+
+- List page + detail route (`/blog` + `/blog/[slug]`) → CMS collection,
+  always.
+- Repeating entries *without* detail pages (testimonials, FAQ items,
+  job openings) → CMS collection when a site owner would plausibly add or
+  edit them; code constants are fine for purely structural fragments (nav
+  links, footer columns, feature bullets).
+- One-off page copy (hero headline, section intros) stays in code.
+
+Workflow — collection first, pages second:
+
+1. **Derive the schema from recon.** The detail-template recon (≥2 entries
+   opened) tells you what varies per entry — those fields are the schema.
+   Conventions are shared with forms (root `type: "object"`, fields under
+   `properties`, see the base skill's `forms.md`):
+   - plain text `{ "type": "string" }`, number `{ "type": "number" }`
+   - image `{ "type": "string", "format": "uri",
+     "contentMediaType": "image/*", "accept": "image/*" }`
+   - long-form body `{ "type": "string", "contentMediaType": "text/html" }`
+   - tag list `{ "type": "array", "items": { "type": "string" } }`
+   - Give every field a `"title"`, list always-present fields in
+     `required`, and add `x-propertyOrder` so the platform editor shows
+     fields in template order.
+2. **Create the collection before writing its pages**:
+   ```bash
+   creght cms collection create --site_id=<p>/<s> --key=posts \
+     --name="Blog Posts" --schema=./cms/posts.schema.json
+   ```
+3. **Seed the representative entries** (the 3–5 from scope discipline), one
+   JSON file per entry, business fields under `body`, slug as a flag:
+   ```bash
+   creght content create --site_id=<p>/<s> --collection=posts \
+     --data=./cms/seed/post-1.json --slug=why-ux-matters
+   ```
+   (A top-level `slug` in the file makes the CLI treat it as a full content
+   object instead of a body — see the base skill's `cli.md`.) Keep the
+   schema and seed JSON in the project under `./cms/` for reproducibility.
+4. **Refresh generated types** (`creght pull` or dev-sync) so
+   `/types/cms.d.ts` includes the collection, then
+   `import type { Posts } from "./types/cms"` — never hand-write the item
+   interface.
+5. **Read via `talizen/cms` in `getServerSideProps`** (base skill `cms.md`):
+   `listContents<Posts>("posts", { orderBy: … })` on the list page;
+   `getContent` — or `getContentWithPrevNext` when the source's detail page
+   has prev/next navigation — on the detail page, `notFound: true` for
+   unknown slugs. Treat `body` fields as optional (optional chaining).
+
+Long-form article bodies: store ONE richtext HTML string
+(`"<h2>…</h2><p>…</p>…"`) rendered through `dangerouslySetInnerHTML` into a
+styled prose container — NOT a custom array of typed block objects
+(`[{t:"h2",text:…},…]`). The platform's editor edits HTML richtext; a
+bespoke block format is uneditable there, which defeats the point of the
+CMS.
+
+Ordering and dates: if the source curates order (featured works first),
+seed with `creght content create … --sort=<n>` and query
+`orderBy: "sort"`; otherwise `created_at desc` is the default. Displayed dates ("Nov 18, 2024") are a
+schema field formatted at render time with a manual formatter (locale-safe —
+see the hydration note above).
+
+Images referenced inside entries follow the same asset rules as everywhere
+else: Unsplash hotlinks are fine during build/verify; before publish, upload
+finals via `creght upload` and update the entries to CDN URLs with
+`creght content update`.
+
 ## Platform features
 
 - **Forms**: create before coding —
@@ -215,7 +297,9 @@ verify pass.
   handler with explicit success/error UI. Verify later via
   `creght form logs --key=contact-form`.
 - **Dynamic routes**: `/page/<dir>/[slug].tsx` +
-  `getServerSideProps(context)` reading `context.params.slug`; return
+  `getServerSideProps(context)` reading `context.params.slug` and fetching
+  the entry from the CMS (`getContent` — see the collections section above,
+  never a local constants array); return `{ notFound: true }` or
   `{ redirect: { destination: '/<list>', permanent: false } }` for unknown
   slugs; `generateMetadata({ params })` for per-entry titles.
 - **Favicon**: `creght upload --file=favicon.svg --json` → put `file_url`
