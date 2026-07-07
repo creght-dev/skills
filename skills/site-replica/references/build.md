@@ -1,5 +1,10 @@
 # Phase 3 — Build: original implementation on Creght
 
+> **Toolbox** — recipes and field notes, not mandates. The binding Contract
+> and Gates live in `../SKILL.md`; consult what the task's tier needs, skip
+> what it doesn't, and note the skip when a gate depends on it.
+
+
 Read the base `creght` skill (and its `site-code.md` / `cli.md` / `cms.md`
 references) before this phase. This file covers only what replication adds
 on top, plus gotchas that cost real debugging time.

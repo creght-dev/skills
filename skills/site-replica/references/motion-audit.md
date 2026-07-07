@@ -1,5 +1,10 @@
 # Phase 2 — Motion audit: measure, don't guess
 
+> **Toolbox** — recipes and field notes, not mandates. The binding Contract
+> and Gates live in `../SKILL.md`; consult what the task's tier needs, skip
+> what it doesn't, and note the skip when a gate depends on it.
+
+
 Sites like this live or die on motion details. Audit **every** interactive
 element and animation before writing any code. The output is a table:
 element → trigger → measured behavior → parameters.
