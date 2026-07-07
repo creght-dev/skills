@@ -272,6 +272,40 @@ judged from screenshots. Method:
   just that spot.
 - These numbers are the build spec. During verification, run the *same
   probe* on the replica and diff numerically (see verify.md).
+- **Grid-line snapping is the whole point of the probe** (verified failure:
+  a replica passed the type-ramp diff yet read as "乱/没有秩序感"). When the
+  source draws visible vertical grid lines, extract every block's left/right
+  edge per section and diff against the line positions — on these designs
+  most structural blocks sit at **0px** on a line (header cells, footer
+  columns, CTA copy, service grids). Two sub-lessons:
+  - Expect a few recurring anchors that are *not* lines (e.g. a right-zone
+    start at 34.28% of the content box shared by FAQ/blog/testimonial
+    quotes, or symmetric ±121px insets inside one section). Measure them —
+    don't force everything onto the lines, and don't dismiss them as noise.
+  - Gutters are exact values (60px between work cards, 20px in a bento),
+    not framework defaults.
+- **Fixed-px mosaics**: bento/mosaic cells often have pixel-identical rects
+  at 1440 AND 1920 (heights like 723/475/228 with 20px gutters). Dump every
+  cell's x/y/w/h and hardcode the desktop sizes; content-driven heights
+  visibly break the composition.
+- **Composite cards**: two stacked "cards" sharing left/right edges may be
+  ONE container in the source (verified: photo + status pill + heading +
+  body + arrow button in a single 332×749 card — the replica wrongly split
+  it into two cards and gained an extra image). Check container heights
+  before splitting anything into siblings.
+- **Measure overlays in their open state.** Menu-nav type must be read with
+  the menu open; attributing a size from the global font dump picked 66px
+  when the real menu nav was 30px/39lh with 12px gaps. Same for accordions
+  and modals.
+- **Radius per card family**: border-radius is not uniform — one source used
+  20px on home work/blog/bento cards but 0px on the portfolio list and
+  detail galleries, 8px on small inner images. Probe each container type;
+  don't propagate one value.
+- **Fit-text headings**: if computed font-size is identical at every width
+  (e.g. 147px even at 390) but the rendered box height ≠ fontSize×lineHeight,
+  the block is transform-scaled to fit its container — rebuild with the same
+  scale-to-fit mechanism (or equivalent vw sizing for a single nowrap line),
+  not with breakpoint font sizes.
 
 ## 3b. Pinned / scroll-driven section detection
 

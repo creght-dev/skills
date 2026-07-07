@@ -156,6 +156,18 @@ run `pull`; use `pull --force` only when overwriting local edits is intentional.
 Use `preview` when verification depends on platform rendering. Do not start a
 generic local renderer unless the project explicitly provides one.
 
+Operational gotchas:
+
+- If `pull` fails with an API-route error (for example
+  `GET /api/p/project/<id>/func_list: route not found`), the installed CLI is
+  likely stale relative to the backend. Run `npm i -g creght-cli@latest` and
+  retry before debugging anything else.
+- Run `push` from the workspace **root** (the directory containing
+  `frontend/`), matching where the pull state was created. Pushing from a
+  subdirectory such as `frontend/` fails with
+  "no base state for remote file" conflicts even when nothing is actually in
+  conflict.
+
 ## Publishing
 
 Changing project files does not publish them to the live site by default. Use
