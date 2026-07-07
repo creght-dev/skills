@@ -122,6 +122,80 @@ dedupe computed text `color`s — sources usually use very few levels (e.g.
 ink + one 60%-alpha secondary), while eyeballed replicas scatter across
 many approximate values.
 
+## Cold load — record it FIRST, before any other audit step
+
+This step is unconditional, not judgment-based: every other capture in the
+pipeline happens after the page settles, so the opening choreography is
+structurally invisible to the whole recon unless you record it. Skipping
+this step = shipping a static hero where the source plays a 3–6s intro,
+and nobody notices until the user does.
+
+1. Fresh `recordVideo` browser context → navigate to the source → wait
+   ~8–10s doing nothing → close context → extract frames with the *system*
+   ffmpeg → **read the frame sequence** and write the intro storyboard:
+   phases, what enters, from where, in what order.
+2. If the frames show any motion, get numbers for each phase (below), and
+   at verify time record the replica's cold load the same way and compare
+   the two frame sequences phase-for-phase.
+
+The exact API — Playwright's built-in recorder, not OS screen capture:
+
+```js
+const ctx = await browser.newContext({
+  viewport: { width: 1440, height: 900 },
+  recordVideo: { dir: 'out/video/', size: { width: 1440, height: 900 } },
+});
+const page = await ctx.newPage();
+await page.goto(url, { waitUntil: 'domcontentloaded' });   // NOT networkidle —
+await page.waitForTimeout(9000);   // the intro starts before idle; just wait
+const videoPath = await page.video().path();
+await ctx.close();                 // the .webm is only flushed on close
+```
+
+```bash
+ffmpeg -i out/video/page-*.webm -vf "fps=4,scale=960:-2" frames/f%03d.png
+```
+
+Operational notes (each one cost time):
+
+- It records **rendered page frames** via CDP screencast — works headless,
+  needs no display or screen-recording permission, no cursor in frame.
+- Playwright's *bundled* ffmpeg is a minimal build (no `scale` filter, it
+  errors on normal filtergraphs) — always extract with the system ffmpeg.
+- The screencast frame rate is not constant (frames are produced on render
+  activity); the `fps=N` resample gives a uniform timeline so frame number
+  × 1/N = seconds.
+- The video starts at navigation, so it includes a blank loading period —
+  align timelines to "content first paints", not to frame 0. Frame times
+  therefore run ~1–2s later than rAF-sampler times for the same phase;
+  compare phase order and durations, not absolute timestamps.
+- Same recipe on the replica at verify time; put the two frame strips side
+  by side phase-for-phase.
+
+Multi-phase intros driven by the runtime (photo stack flies in → main photo
+expands to full-bleed → headline scales in → overlays fade up) don't fully
+live in the appear-config JSON. Reconstruct the timeline by sampling:
+
+- Inject via `page.addInitScript` (so sampling starts before the site's JS):
+  a `requestAnimationFrame` loop for ~8–9s recording, per keyed selector
+  (`[data-framer-name="…"]`), `t`, computed `opacity`, `transform`, and the
+  bounding rect. Post-process into "element → first-motion time → from/to"
+  rows; spring starts read as sub-pixel creep for hundreds of ms, so take
+  the first *sustained* change as the start, not the first visible one.
+- `document.getAnimations()` returning empty does **not** mean "no
+  animation" — Framer/motion springs write inline styles from rAF and never
+  register WAAPI animations. Empty getAnimations + moving transforms =
+  sample, don't conclude.
+- **Record your own ground-truth video**: launch the automation context with
+  `recordVideo`, load the page, wait out the intro, then extract frames.
+  Playwright's bundled ffmpeg is a minimal build (no `scale` filter — it
+  errors on normal filtergraphs); use the system ffmpeg for extraction.
+  Do the same on the replica afterwards and compare the two frame sequences
+  phase by phase.
+- Decode transforms: `matrix(0.9816, 0.1908, …)` → rotate = atan2(b,a)
+  (≈11°); a rect much smaller than the element's layout size means an
+  animated scale factor is in flight.
+
 ## Text entrance animations
 
 Check headings for per-character animation: split-letter animations show up

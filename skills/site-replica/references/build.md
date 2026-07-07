@@ -12,6 +12,9 @@ creght project list                                # find <project_id>/<site_id>
 creght pull --site_id=<p>/<s> --dir=./<dir>        # skeleton + AGENTS.md
 ```
 
+(CLI operational gotchas — stale-CLI pull errors, push working-directory
+rules — live in the base creght skill's `references/cli.md`.)
+
 Structure the port as:
 
 ```
@@ -77,6 +80,16 @@ classic complaint). Use license-free stock instead. Proven recipe:
   `figure img[src*="images.unsplash.com/photo-"]` plus the `alt` text.
   Choose by alt text (it describes content accurately). Batch all slots in
   one browser-code loop, 3–5 candidates each.
+- **Unsplash bot wall (Anubis/BotStopper)**: the default automation UA gets
+  an instant "Oh noes! Access Denied" page (zero results, no error). Set a
+  normal Chrome UA on the context, load one search page, and wait out the
+  "Making sure you're not a bot!" proof-of-work interstitial (~20–25s,
+  poll `page.title()` until it clears) — the clearance cookie then covers
+  every search in the same browser context, so run all slot queries through
+  that one context.
+- Alt text lies sometimes. For the *hero* and other identity-critical slots,
+  download 200px thumbs of the top candidates, hstack them into one strip
+  (ffmpeg) and pick visually — one Read call per batch instead of per image.
 - URL shape:
   `https://images.unsplash.com/<id>?w=<px>&q=80&auto=format&fit=crop`.
   imgix params work — `&sat=-100` makes any photo grayscale (cheap match
@@ -106,6 +119,34 @@ deterministic SVG data URIs in `/lib/art.ts`:
   tiling `feTurbulence` noise for grain overlays (as a CSS
   `@utility bg-noise`).
 - Seed everything — SSR and client must render identical markup.
+
+## Grid alignment — no-gap grids (cost a full rework)
+
+When recon found blocks snapping to visible grid lines, **never build the
+columns with CSS `gap`**: `grid-cols-4 gap-8` shifts every column start off
+the lines (footer nav landed at 1086 instead of the 1062 line) and the whole
+page loses the source's order. Instead:
+
+- Bare `grid grid-cols-4` (no gap) over the padded content box — cell edges
+  then sit exactly on the quarter lines at every width.
+- Inter-cell spacing comes from *in-cell padding* measured in recon (e.g.
+  `pl-[30px]` insets inside a services column), not from gap.
+- Non-line anchors from recon become percent offsets of the content box
+  (`md:ml-[34.28%]`, `md:mr-[8.85%]`), which keeps them proportional at
+  1200–1920 the way the source behaves.
+- Staggered column layouts (right column shifted one row down, "01 alone on
+  the first row") are an explicit `md:mt-[<row-pitch>px]` on the second
+  column, with per-cell `border-t` for the row separators.
+
+## text-indent is inherited (cost a broken hero quote)
+
+CSS `text-indent` inherits into every block container descendant — including
+the `inline-block` word spans of a split-text animation. Each word's glyphs
+shift right inside their own shrink-to-fit box and overlap the next word
+(long words worst). For a first-line indent on split text, render an inline
+spacer instead: `<span class="inline-block w-[40.5%]" aria-hidden />` before
+the first word (put a hanging quote mark after the spacer if the design has
+one). Never put `indent-[…]` on the paragraph.
 
 ## Animation primitives (component/shared.tsx)
 

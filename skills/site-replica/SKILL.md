@@ -54,6 +54,16 @@ made available, stop and tell the user replication cannot be verified.
   Extract frames (`ffmpeg -vf "fps=3,scale=1280:-1"`) and read them as motion
   ground truth — it catches pins, page-turn overlaps, and hover reveals that
   probing misses. Don't block on it; keep probing while you wait.
+- **Self-record the source's cold load — unconditionally, on the very first
+  recon navigation.** Settled screenshots hide the opening choreography
+  completely, so unless this step is forced, load intros go unreplicated
+  (verified: a 5s hero intro — name card → photos flying in → main photo
+  expanding to full-bleed — was invisible in every static capture). Launch
+  the first navigation in a `recordVideo` context, wait ~8–10s, extract
+  frames with the *system* ffmpeg at 4–6fps, and READ the frames before
+  assuming the hero is static. Anything that moves becomes motion-spec rows
+  (motion-audit.md "cold load"), and verification requires the replica's own
+  cold-load recording to match phase-for-phase.
 - Verify with screenshots after every push. Compare against source captures
   side by side. Fix, push, re-verify. Do not report success from code review
   alone.
@@ -234,6 +244,11 @@ The task is complete when all of these hold on the Creght **preview URL**:
       tracks), marquees (direction + px/s), hovers (audited element by
       element — including menu links and collapsed list rows), cursor-follow
       CTAs, carousels/drag, blend/invert effects.
+- [ ] The cold-load choreography matches: frames extracted from self-recorded
+      videos of the source's AND the replica's first load line up
+      phase-for-phase (same elements, same order, comparable timing). A
+      static replica hero over an animated source hero fails this item even
+      if every settled screenshot matches.
 - [ ] Every section of every page appears in a replica screenshot compared
       1:1 against a source capture — no sampling; a section never
       screenshotted counts as unverified (multi-line display headings

@@ -21,6 +21,49 @@ site at the end.
 5. Fix → push → re-verify only the changed features + one neighbor (regression
    check).
 
+## Structural census — mechanical coverage that FEEDS the visual pass
+
+Two complementary failure modes, neither channel may replace the other:
+
+- *Eyes without numbers* miss what screenshots can't resolve — a menu built
+  at 66px instead of 30px, a bento with 23 images where the source had 37,
+  sections 10–17% short, columns 24px off the grid lines. All verified
+  misses of judgment-curated probe lists (builder and verifier share the
+  same blind spots).
+- *Numbers without eyes* miss what invariants can't express — overlapping
+  glyphs from an inherited `text-indent` (passes every count/height/size
+  check), a hero photo with the wrong mood, wrong easing, broken z-order.
+
+So the census script is **evidence and coverage for the agent's visual
+judgment — never the acceptance test itself**. Run it against the **live
+source as oracle** (never your own spec — a wrong spec validates a wrong
+build):
+
+```bash
+node <skill>/scripts/structural-census.mjs <sourceURL> <previewURL> 1440 ./census-shots
+```
+
+It mechanically diffs rewrite-invariant properties per similarity-aligned
+section — height (±4%), img/link/button counts, font-size multisets,
+left-edge anchor sets — and, with the last arg, emits **paired per-section
+screenshots** (`secN-src.png` / `secN-rep.png`). Then:
+
+1. Every flagged row is a fix-list item (counts are load-bearing: an image
+   diff catches a wrongly-split composite card; a size-multiset diff
+   catches a mis-sized menu).
+2. **Read every screenshot pair** — flagged or not — and judge visually:
+   composition, color, imagery mood, overlaps, motion states. The pairs
+   exist so the visual walk has mechanical coverage instead of sampled
+   coverage; the judgment in them is yours, not the script's.
+3. Re-run after fixes; repeat at 390; run once with the menu overlay open
+   on both sites (interactive states are where curated lists go blind).
+4. If segmentation declares failure (exit 3: sidebar / horizontal / canvas
+   genres), fall back to manual section mapping — do not trust a table the
+   segmenter couldn't build.
+
+"Invariants clean" plus "every pair visually judged equivalent" together
+are the acceptance — neither alone.
+
 ## Numeric diff — the acceptance test screenshots can't provide
 
 Screenshots catch structure; only numbers catch "不饱满" (subtly-off type
@@ -32,6 +75,12 @@ and spacing). Re-run recon's probes against the preview and diff:
   one width means the formula is wrong).
 - **Structural landmarks**: the container-coordinate probe (3d) at 1440 and
   1728 — column lines, right-edge alignments, block widths within ~5px.
+- **Block-edge alignment**: for grid-line designs, diff every section's key
+  block left-edges against the source's measured anchors (line positions +
+  the non-line anchors). Target is **0px**, not ~5px — a `gap`-based grid
+  fails this while passing everything else, and that single failure reads
+  as "没有秩序感" to the user. Also diff card gutters (60/20px-class values)
+  and the border-radius of each card family (they differ per section).
 - **Box-model spacing**: grid/flex gaps, section paddings and adjacent-block
   vertical rhythm within ~2px of the source's computed values (these are
   directly readable properties — no reason to accept approximation).
@@ -50,9 +99,21 @@ Re-run the Phase 2 probes against the preview:
   each card type (cursor-follow CTA pills). Beware duplicate hrefs when
   targeting: `a[href="/works"]` may match a page link instead of the menu
   link — scope the selector to the overlay.
+- **Tailwind v4 gotcha when probing hovers numerically**: v4's
+  `scale-*` / `rotate-*` utilities set the independent `scale` / `rotate`
+  CSS properties — computed `transform` stays `none`. Read
+  `getComputedStyle(el).scale` and `.rotate` too, or a working hover reads
+  as "missing" and you'll chase a non-bug.
+- **Open-state typography**: with the menu open, diff the nav links'
+  fontSize/x/y against the source's open-menu measurements (same for
+  accordions/modals) — closed-state probes never catch an oversized menu.
 - Marquee speed: sample an item's x twice → px/s must match the audit (±10%).
 - Letter animations: screenshot at ~300ms and ~600ms after reload — the
   reveal wave must progress like the source's.
+- Cold-load choreography: record the replica's first load (`recordVideo`
+  context, ~8–10s), extract frames with the system ffmpeg, and compare the
+  sequence phase-for-phase against the source's cold-load frames from the
+  motion audit (same elements entering, same order, comparable timing).
 - Deck/fan or other layered hovers: settled-state screenshot vs source.
 - Carousel: click next mid-transition capture (push effect visible?); drag
   250px and confirm snap; check ends don't wrap weirdly.
