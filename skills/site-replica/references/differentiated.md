@@ -13,6 +13,21 @@ pass the recognition test below.
 
 Run it as a **separate new project** derived from the replica (never mutate
 the study copy — clean provenance, and the study keeps its attribution).
+
+**Inputs to look for in the study's workspace** (a well-run replica leaves
+these; use them instead of re-probing the source from scratch):
+
+- `SPEC.md` — the measured source spec. Everything in it that is *expressive*
+  (palette, type pairing, ornament, chrome behaviors, watermark motifs) is
+  raw material for the signature inventory; everything *structural* (routes,
+  section order, breakpoints) is the bones you keep.
+- `recon/` screenshots — the recognition-test baseline. Thumbnail-compare
+  against THESE (the original source), not against the study replica.
+- `site/cms/*.schema.json` + `seed/` — re-create collections in the NEW
+  project and re-seed; never point two projects at one collection.
+- The study's invented brand is disposable: it was made for attribution-safe
+  study, not for shipping. Invent a fresh one for the template.
+
 Then:
 
 1. **Signature inventory first.** List what makes the source recognizable
@@ -49,7 +64,14 @@ Then:
 7. **Asset hygiene for production**: download and re-host all stock imagery
    on the platform CDN (no hotlinks); small avatars become generated
    placeholders (initials SVG), never real-person photos implying they are
-   staff or clients; keep license provenance in code comments.
+   staff or clients; keep license provenance in code comments. Hotlinks
+   hide in TWO places — the code's image map AND inside CMS entry bodies
+   (covers, inline article images); update both.
+8. **Multilingual studies**: the identity layer spans every locale. Rewritten
+   copy must land in ALL `/messages/*.json` catalogs and in each CMS entry's
+   `_i18n[locale]` translations — rewriting only the default language ships
+   a half-swapped identity in the other locale. Grep the old brand and old
+   slogans per locale before calling it done.
 
 The Contract in `../SKILL.md` still applies in full — differentiated mode
 adds the identity layer on top of it, it does not replace it.
