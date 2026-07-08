@@ -47,27 +47,48 @@ Then:
 3. **Restructure a few sections beyond re-skinning**: full-bleed bands →
    inset rounded cards, stacked tiers → side-by-side columns, a different
    hero mechanism. Layout bones may stay; their dressing must not.
-4. **Recognition test (the acceptance gate)**: someone who knows the source
+4. **Motion parity — identity swaps must not drain motion density.**
+   Every signature element you delete or mechanism you swap usually
+   carries an animation with it (watermark → its scroll parallax; corner
+   notch → its hover reveal; capsule arrow chip → its color-swap hover;
+   slide carousel → its lateral momentum; bottom sheet / fullscreen
+   overlay → its dramatic open; sliding tab underline → its transition,
+   and hard-swap filters drop the grid transition too). Deleting them one
+   by one ships a build that is *correct but flat* — the loss is invisible
+   in static screenshots and only shows up when someone uses the site.
+   So: extend the signature inventory with a **motion column** (what
+   animation each element carries), and for every removed row design an
+   equivalent in the NEW ornament language — different mechanism, equal or
+   higher richness (e.g. watermark parallax → framed-image parallax or
+   hairline draw-ins; notch reveal → hairline sweep + index highlight;
+   slide momentum → fade + Ken Burns + staggered copy entrance; hard
+   filter swap → re-keyed stagger). Acceptance: a per-section motion count
+   table, new build ≥ study, with no mechanism close enough to read as
+   the source's.
+5. **Recognition test (the acceptance gate)**: someone who knows the source
    template should NOT identify the new site as that template from a
    side-by-side thumbnail pass. If any single section still reads as the
-   source, its signature elements weren't actually replaced.
-5. **Brand & attribution hygiene**: invented brand name (never ® / ™ on
+   source, its signature elements weren't actually replaced. Run it
+   scrolling too, not just on stills — motion mechanisms can be
+   recognizable even when the skin is not (and 4 above can tempt you to
+   copy the source's motion back; don't).
+6. **Brand & attribution hygiene**: invented brand name (never ® / ™ on
    marks you don't own), no source contact details or brand strings
    anywhere (grep for them), and remove the design-study attribution only
    after the design has genuinely diverged.
-6. **Content truthfulness beats design risk in practice**: placeholder
+7. **Content truthfulness beats design risk in practice**: placeholder
    ratings, client counts, testimonials and prices are fabrications —
    shipping them is false-advertising exposure (under e.g. 中国《广告法》/
    《反不正当竞争法》, often the bigger real-world risk than layout
    similarity). Mark every fabricated figure as placeholder-to-replace and
    say so explicitly in the handoff report.
-7. **Asset hygiene for production**: download and re-host all stock imagery
+8. **Asset hygiene for production**: download and re-host all stock imagery
    on the platform CDN (no hotlinks); small avatars become generated
    placeholders (initials SVG), never real-person photos implying they are
    staff or clients; keep license provenance in code comments. Hotlinks
    hide in TWO places — the code's image map AND inside CMS entry bodies
    (covers, inline article images); update both.
-8. **Multilingual studies**: the identity layer spans every locale. Rewritten
+9. **Multilingual studies**: the identity layer spans every locale. Rewritten
    copy must land in ALL `/messages/*.json` catalogs and in each CMS entry's
    `_i18n[locale]` translations — rewriting only the default language ships
    a half-swapped identity in the other locale. Grep the old brand and old
