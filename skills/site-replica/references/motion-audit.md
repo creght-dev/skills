@@ -75,6 +75,25 @@ Rules of interpretation:
   `.click()` on the overlay itself) before probing on; if a click ever
   times out with "element intercepts pointer events", suspect a leftover
   overlay, not a broken selector.
+- **Unhover is half the effect**: capture a third frame ~150ms after moving
+  the mouse OFF. Link underlines routinely grow from the left but collapse
+  toward the right (`transform-origin` flips) — the off-transition is part
+  of the spec (verified user-reported miss).
+- **Hover chrome must survive touch**: replay the nav on a `hasTouch`
+  context at tablet width (~834px). On touch, a tap fires the emulated
+  `mouseenter` AND `click` together — if the source serves hover panels to
+  touch layouts, note how it avoids the "panel flashes then navigates"
+  trap (many sites dodge it by switching to the drawer via UA, not width).
+  The replica needs an explicit answer: first tap opens, second navigates,
+  mask closes.
+
+## Decorative text parallax — giant watermarks move
+
+Any oversized decorative text (PROJECT/SERVICES watermarks, "SINCE 2003"
+bands) gets a two-offset probe: read its `transform` at two scroll
+positions ~700px apart. A changing translateX/Y = scroll-linked parallax
+to reproduce (rAF + section progress). Verified user-reported miss — the
+watermark looked static in single screenshots.
 
 ## Smooth-scroll library (Lenis & co.) — detect and copy the config
 

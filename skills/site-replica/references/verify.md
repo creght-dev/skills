@@ -76,6 +76,25 @@ node <skill>/scripts/structural-census.mjs <sourceURL> <previewURL> 1440 ./censu
 - Carousels: click next and capture mid-transition; drag 250px and confirm
   snap; check the ends. Blend/invert text: screenshot the overlap region —
   inverted glyphs, not white text.
+- Nav panels: hover EVERY parent item and pair-compare each panel with the
+  source's captures (layout differs per item); capture mid-close (~120ms
+  after mouse-off) to prove the open/close transition animates; while a
+  panel is open confirm only the hovered item is highlighted and the header
+  background matches the source's open state.
+- Unhover direction: for underlined links, screenshot ~150ms after moving
+  off — the collapse direction (usually toward the right) must match.
+- Parallax watermarks: read the decorative text's `transform` at two scroll
+  offsets; a static value where the source moves is a fail.
+- Functional controls end-to-end: click the language switcher and assert
+  the URL/locale actually changes (desktop AND mobile drawer); submit the
+  search; a nonexistent URL renders the replicated 404 with HTTP 404.
+- Touch pass: on a `hasTouch` context at ~834px, first tap on a nav parent
+  opens its panel without navigating; a child tap navigates; a mask tap
+  closes. (Single taps on hover-chrome firing emulated mouseenter+click is
+  the classic "panel flashes then jumps" bug.)
+- Per-template hero probe: on every template (not just home), assert title
+  fontSize, hero height, and content left edge against the source's
+  measurements — inner-page heroes drift first when only home was measured.
 
 ## G6 — responsive walkthroughs
 

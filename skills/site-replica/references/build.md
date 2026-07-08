@@ -67,9 +67,23 @@ above it". Marquees stay full-bleed (no inner-max).
 
 Never ship the source's images. But know which substitute to reach for:
 
-**Photographic subjects (people, lifestyle, editorial covers, workspaces)**
-— seeded SVGs read as obviously fake here ("blob people" team cards are the
-classic complaint). Use license-free stock instead. Proven recipe:
+**Photographic subjects (people, lifestyle, editorial covers, workspaces,
+and PRODUCTS/machines/objects)** — seeded or hand-drawn SVGs read as
+obviously fake here ("blob people" team cards; a hand-drawn flat-vector
+forklift set was likewise rejected by the user). Use license-free stock
+instead. If the source's exact presentation (e.g. white-background cutout
+product shots) isn't findable in free stock, use real photos in an adapted
+presentation (rounded photo cards) rather than generated art — never
+substitute illustration for photography without explicit user approval.
+
+**Mood is part of the slot spec.** For identity-critical slots (hero
+especially) match the source's tonal mood — dark/muted vs bright — not just
+the subject. Verified feedback loop: "太花了" (too busy) then "太亮了"
+(too bright, want dark like slide 2). Compare candidate brightness against
+the source frame before committing; busy signage/motion-blur reads as
+clutter at hero scale.
+
+Proven recipe:
 
 - Build an **image slot map** first: walk the recon captures and list every
   image slot with a one-line description of subject + mood + palette
@@ -334,6 +348,25 @@ Images referenced inside entries follow the same asset rules as everywhere
 else: Unsplash hotlinks are fine during build/verify; before publish, upload
 finals via `creght upload` and update the entries to CDN URLs with
 `creght content update`.
+
+## Functional controls — chrome that works, not chrome that looks
+
+- **Multilingual source ⇒ platform i18n**, not a visual language menu. Wire
+  the real locale config + `/messages` catalogs + locale-aware links, and a
+  switcher that actually navigates (verified user report: "中英文切换在 PC
+  和手机上都不生效" — the sheet existed but did nothing). Test the switch
+  end-to-end on both desktop and the mobile drawer.
+- **Hover nav on touch**: parent items that open panels must intercept the
+  first tap (open panel, preventDefault), navigate on the second tap or on
+  child taps, and close on mask tap. Guard the `mouseenter` handler with a
+  touch flag set in `onTouchStart` — otherwise the emulated mouseenter +
+  click on a single tap makes the panel flash and immediately navigate.
+- **Exclusive highlight states**: while a nav panel is open, suppress the
+  route-active highlight so only the hovered item is lit; never restyle the
+  whole header bar to a new background the source doesn't use.
+- **404/500 pages**: build the site's own error pages using the platform's
+  convention (on this platform: `/page/404.tsx`, `/page/500.tsx` — both
+  route misses and `notFound: true` prefer them).
 
 ## Platform features
 

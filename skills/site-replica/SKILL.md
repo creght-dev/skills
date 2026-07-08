@@ -80,7 +80,8 @@ The parenthesis names the default, cheapest evidence path. If that tool
 misfits this site, produce the same evidence another way and say why.
 
 - **G1 Coverage**: crawling the replica reaches every inventory route and
-  finds no broken links (crawl-diff recipe, verify.md).
+  finds no broken links (crawl-diff recipe, verify.md). The 404 page is part
+  of the inventory — probe a nonexistent URL on the source during recon.
 - **G2 Structure parity**: per-section heights, element counts, font-size
   sets and left-edge anchors match the source
   (`scripts/structural-census.mjs`).
@@ -91,8 +92,10 @@ misfits this site, produce the same evidence another way and say why.
 - **G4 Cold load**: the replica's self-recorded first load matches the
   source's phase-for-phase (recording recipe, motion-audit.md).
 - **G5 Motion & interaction**: every motion-spec row observed working on
-  the preview — hovers, menu overlay, accordions, carousels, scroll
-  effects, scroll feel (recipes in motion-audit.md / verify.md).
+  the preview — hovers (nav panels, cards, links), menu overlay, accordions,
+  carousels, scroll effects, scroll feel (recipes in motion-audit.md /
+  verify.md). A control that looks functional must function (language
+  switcher switches); hover-driven chrome must also work under touch.
 - **G6 Responsive**: no horizontal overflow at any width family; mobile
   menu works; each section's layout family matches the source per
   breakpoint (walkthrough recipes, verify.md).
