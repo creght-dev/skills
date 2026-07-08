@@ -64,6 +64,10 @@ task to "just the homepage".
   grids, "View Work" buttons, or footer links.
 - Also check: footer nav (often has routes the header lacks), logo link,
   CTA buttons, and `/sitemap.xml` if it exists.
+- **Error pages are routes too**: request a nonexistent URL and screenshot
+  the source's 404 (and /500 if reachable). It goes in the inventory and
+  gets built like any page (verified miss: a minimal 404 — giant numeral,
+  gray "PAGE NOT FOUND", home pill — only surfaced via user feedback).
 - Collection pages (work/blog lists) imply detail templates — open at least
   two different entries to learn what varies between them (that difference
   is your template's data model). Write the varying fields down as a field
@@ -311,6 +315,32 @@ judged from screenshots. Method:
   the block is transform-scaled to fit its container — rebuild with the same
   scale-to-fit mechanism (or equivalent vw sizing for a single nowrap line),
   not with breakpoint font sizes.
+
+## 3e. Chrome states — header and nav are sections with states
+
+The header is measured **per state**, not once (verified misses: a mini
+header that also shrinks 80→64px on scroll; a full-width mega panel where
+the replica shipped a small dropdown):
+
+- Sticky header: measure height, background, and text color at scrollY 0
+  AND after scrolling — diff all three; a subtle height change is part of
+  the design.
+- Hover EVERY nav parent item and screenshot what opens. Mega panels differ
+  per item (a products panel may be a bare image grid + overview row while
+  other items get a title column + cards) — capture each one, note open/
+  close/switch transitions, and which item is highlighted while open.
+- Language/search/user controls: open each one and capture it. If the
+  source is multilingual, switching language is FUNCTIONALITY to replicate
+  (platform i18n + real switcher), not a visual prop.
+
+## 3f. Per-template hero probe — never extrapolate from the homepage
+
+Run the type/box probe (fs, line-height, hero height, content left edge)
+on the hero of EVERY template — list pages, detail pages, about, services —
+not just the homepage. Verified miss: inner-page heroes were 60px/620px/
+container-aligned in the source but shipped 48px/500px/60px-inset because
+only the home hero was measured. Inner heroes also often align to the
+content container while the home hero uses its own inset.
 
 ## 3b. Pinned / scroll-driven section detection
 

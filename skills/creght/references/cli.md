@@ -234,28 +234,27 @@ Read `references/auth.md` before building auth flows. Read
 `references/func.md` before using `creght table`, editing `backend/func`, or
 calling `talizen/func`.
 
-For `creght content create`, `--data` may be either a plain CMS content body or
-a full content object. Top-level wrapper fields such as `slug`, `id`, `status`,
-`sort`, and `tags` make the CLI treat the file as a full content
-object. If imported business JSON has a top-level `slug`, either pass the slug
-as a flag and remove it from the data file:
-
-```bash
-creght content create --site_id=<project_id>/<site_id> --collection=prompts --data=./content-body.json --slug=typography-v02
-```
-
-Or wrap business fields under `body`:
+For `creght content create` and `creght content update`, `--data` accepts
+exactly one format: a full content object whose business fields are wrapped
+under an object-valued `body` key. `slug`/`sort` are optional in the file
+(flags take precedence). Bare body files are rejected with a format error.
 
 ```json
 {
   "slug": "typography-v02",
+  "sort": 1,
   "body": {
     "title": "Typography V.02",
     "description": "100vh",
-    "tags": ["skill"]
+    "tags": ["skill"],
+    "_i18n": { "en": { "title": "Typography V.02" } }
   }
 }
 ```
+
+`content update` exits non-zero with `not updated: <reason>` when the server
+reports that no field actually changed (values identical to stored content) —
+treat that as a signal to check the payload, not as success.
 
 ## Asset Upload
 
