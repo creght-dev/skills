@@ -76,6 +76,8 @@ Rules:
    `{ ok: false, code: "slot_taken" }` instead of throwing.
 8. Throw only for unexpected failures or invalid requests that should surface as
    errors.
+9. Do not hard-code API keys, bearer tokens, passwords, webhook secrets, or
+   service credentials in Func source.
 
 Preferred type import:
 
@@ -119,6 +121,28 @@ code must use ESM exports and the `(input, ctx)` signature.
 visible to Func code. The platform uses them internally for project isolation.
 For browser visitor identity, use `ctx.auth.currentUser()` or
 `ctx.auth.requireUser()`.
+
+## Secrets And Environment Variables
+
+Keep secrets out of source files. If a Func needs a third-party API key or other
+secret, read it from `process.env.NAME`:
+
+```ts
+export async function generate(input, ctx) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    return { ok: false, code: "missing_openai_token", message: "OPENAI_API_KEY is not configured." }
+  }
+  // Use apiKey only inside server-side Func code.
+}
+```
+
+The env value itself must be added manually in the Creght platform Backend / Env
+panel at `panel/backend/env` for the project. Do not put a real value in
+`talizen.config.ts`, `backend/func/*.ts`, page/component code, examples,
+comments, or generated test fixtures. The Creght CLI cannot create, list,
+update, or delete project env variables, so do not attempt or claim CLI env
+management.
 
 ## Assets In Func
 
@@ -186,6 +210,11 @@ filters that the platform can index later.
 
 In general-purpose agent environments, use the Creght CLI when platform table or
 Func tools are unavailable.
+
+The CLI cannot manage project env variables. If Func code uses
+`process.env.NAME`, instruct the user to add or update that value manually in
+the Creght platform Backend / Env panel at `panel/backend/env` before running
+or publishing the Func.
 
 Create or update a JSON table:
 
@@ -360,8 +389,10 @@ Before building a Func-backed feature:
    CLI expose table management.
 3. Create a project-level Func with an extensionless key.
 4. Export one method per operation.
-5. Call the method with `invoke("key.method", input)` from the page.
-6. Run lint or preview validation after editing page/component code.
+5. If the Func needs secrets, read `process.env.NAME` and tell the user to add
+   the env value manually in Creght Backend / Env at `panel/backend/env`.
+6. Call the method with `invoke("key.method", input)` from the page.
+7. Run lint or preview validation after editing page/component code.
 
 For a simple appointment workflow, the normal shape is:
 

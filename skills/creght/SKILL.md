@@ -110,6 +110,11 @@ checking the relevant guidance.
   Do not fake persistent backend state in client code, do not expose project
   IDs, and do not create `/func/*` pages. Read `references/func.md` before
   writing Func code or client code that calls Func.
+- Never write API keys, tokens, passwords, or other secrets into page,
+  component, config, or Func source code. Func code must read secrets through
+  `process.env.NAME`, and the user must manually add those variables in the
+  Creght platform Backend / Env panel at `panel/backend/env`. The Creght CLI
+  cannot create, list, update, or delete project env variables.
 - Use the browser-side `talizen/auth` SDK for user login, registration, logout,
   current user state, and OAuth/social login providers configured in the
   project. Do not create a `user` / `users` / `auth_users` database table for
@@ -134,7 +139,8 @@ Read `references/func.md` before using Func or database table CLI commands, or
 writing client code that calls Func. This includes requests involving custom
 backend actions, `invoke(...)`, `/api/func`, database tables, record CRUD,
 booking/RSVP/lead capture, protected user-specific business logic, or any
-question about whether to create a user database table or write backend logic.
+question about whether to create a user database table, write backend logic, or
+use a third-party API key from backend code.
 
 Use SSR only for public or cache-friendly first-render data. Do not put login
 state, private user data, writes, or Func calls in `getServerSideProps`; keep
