@@ -125,6 +125,12 @@ Proven recipe:
   swap to the returned CDN URLs — hotlinks rot and may be slow or blocked
   for the site's audience; fall back to another candidate or a seeded SVG
   when a download fails.
+- Use `creght upload` only for build-time files that exist on disk. If the
+  replica includes a Func that creates assets at runtime, such as AI-generated
+  images, upload those from the Func with
+  `ctx.assets.upload({ filename, mimeType, base64 })` and persist only the
+  returned CDN URL/path/size in JSON tables. Never store or list base64
+  image/video/audio payloads in JSON records.
 - License: Unsplash/Pexels/randomuser are fine for a design study. Images
   from the source site itself are never OK.
 
@@ -347,7 +353,8 @@ see the hydration note above).
 Images referenced inside entries follow the same asset rules as everywhere
 else: Unsplash hotlinks are fine during build/verify; before publish, upload
 finals via `creght upload` and update the entries to CDN URLs with
-`creght content update`.
+`creght content update`. For entries populated by Func at runtime, store the
+URL returned by `ctx.assets.upload`, not a base64 payload.
 
 ## Functional controls — chrome that works, not chrome that looks
 

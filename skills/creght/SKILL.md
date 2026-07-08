@@ -159,7 +159,7 @@ client-side so the whole page cache is not invalidated by counters.
 - `references/auth.md`: platform auth, password login/register, current user,
   logout, OAuth/social login providers, and protected UI patterns.
 - `references/func.md`: project-level Func code, JSON-table access,
-  multi-method files, platform auth usage, and client-side
+  Func-generated asset uploads, multi-method files, platform auth usage, and client-side
   `invoke("file.method")` calls.
 - `references/seo.md`: site and page metadata.
 - `references/i18n.md`: multilingual sites — locale routing, reading the

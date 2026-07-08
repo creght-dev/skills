@@ -96,6 +96,7 @@ Available helpers:
 - `ctx.db.delete(tableKey, id)`
 - `ctx.auth.currentUser()`
 - `ctx.auth.requireUser()`
+- `ctx.assets.upload({ filename, mimeType, base64 })`
 - `ctx.cache.get(key)`
 - `ctx.cache.set(key, value, ttlSeconds)`
 - `ctx.cache.del(key)`
@@ -118,6 +119,26 @@ code must use ESM exports and the `(input, ctx)` signature.
 visible to Func code. The platform uses them internally for project isolation.
 For browser visitor identity, use `ctx.auth.currentUser()` or
 `ctx.auth.requireUser()`.
+
+## Assets In Func
+
+Use `ctx.assets.upload({ filename, mimeType, base64 })` when a Func creates a
+large binary asset at runtime, such as an AI-generated image. It uploads the
+asset to the project's Creght-hosted OSS/CDN storage and returns:
+
+```ts
+{
+  fileUrl: "https://...",
+  filePath: "project/...",
+  size: 123456
+}
+```
+
+Store `fileUrl`, `filePath`, `size`, and other metadata in JSON tables. Do not
+store base64 image/video/audio payloads in `ctx.db` records and do not return
+large base64 payloads from Func methods; Func results have a bounded response
+size and community/list endpoints should stay lightweight. Use `creght upload`
+only for local build-time files, not for runtime-generated Func assets.
 
 ## Auth In Func
 

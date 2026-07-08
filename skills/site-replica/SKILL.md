@@ -106,6 +106,10 @@ misfits this site, produce the same evidence another way and say why.
   collection arrays.
 - **G9 License**: grep finds no source brand strings; assets and copy
   satisfy Contract rule 1.
+- **G10 Asset delivery**: production assets are Creght-hosted or generated
+  locally; no source-site hotlinks remain. Build-time files use
+  `creght upload`; runtime-generated Func assets use `ctx.assets.upload` and
+  store only CDN URLs/metadata, never base64 payloads in JSON tables.
 
 ## Tool governance
 
