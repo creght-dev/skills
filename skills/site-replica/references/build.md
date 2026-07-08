@@ -371,6 +371,16 @@ URL returned by `ctx.assets.upload`, not a base64 payload.
 - **Exclusive highlight states**: while a nav panel is open, suppress the
   route-active highlight so only the hovered item is lit; never restyle the
   whole header bar to a new background the source doesn't use.
+- **Scroll-state `backdrop-blur` on the header breaks the mobile menu**
+  (verified user report: "滚动到顶部能正常展开，不是顶部就不能正常展开").
+  `backdrop-filter` (like `filter`/`transform`) turns the header into the
+  **containing block for `position: fixed` descendants** — a
+  `fixed inset-0` menu overlay nested inside the header gets anchored to the
+  header's ~76px box instead of the viewport, and only when scrolled (at the
+  top the class is absent, so it works). Fix: keep the `<header>` element
+  filter-free — put the blur/background on an `absolute inset-0` child
+  layer (nav row gets `relative`), or render the overlay as a sibling of
+  the header, never under an ancestor that ever gains a filter.
 - **404/500 pages**: build the site's own error pages using the platform's
   convention (on this platform: `/page/404.tsx`, `/page/500.tsx` — both
   route misses and `notFound: true` prefer them).
