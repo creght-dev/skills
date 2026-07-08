@@ -92,6 +92,14 @@ node <skill>/scripts/structural-census.mjs <sourceURL> <previewURL> 1440 ./censu
   opens its panel without navigating; a child tap navigates; a mask tap
   closes. (Single taps on hover-chrome firing emulated mouseenter+click is
   the classic "panel flashes then jumps" bug.)
+- Mobile menu **in the scrolled state too, not just at the top**: scroll
+  ~2 viewports down, open the menu, and assert the overlay's
+  `getBoundingClientRect()` covers the full viewport (height ≈ innerHeight,
+  top 0) and a mid-list link is tappable. A header that gains
+  `backdrop-blur`/`transform` on scroll becomes the containing block for a
+  `fixed` overlay nested inside it — the menu then collapses to the header's
+  box and the bug is invisible in a top-of-page test (verified user
+  report; fix recipe in build.md).
 - Per-template hero probe: on every template (not just home), assert title
   fontSize, hero height, and content left edge against the source's
   measurements — inner-page heroes drift first when only home was measured.
