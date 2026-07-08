@@ -259,7 +259,9 @@ treat that as a signal to check the payload, not as success.
 ## Asset Upload
 
 Use `creght upload` when site code needs a local file to become a
-Creght-hosted asset.
+Creght-hosted asset. This is for build-time/static files that already exist on
+disk, such as downloaded stock images, generated favicons, mockups, textures,
+or exported illustrations.
 
 ```bash
 creght upload --site_id=<project_id>/<site_id> --file=./image.png
@@ -268,3 +270,8 @@ creght upload --site_id=<project_id>/<site_id> --file=./image.png --json
 
 With `--json`, the command returns one key, `file_url`, containing the full CDN
 URL for the uploaded file.
+
+For assets created inside a Func at runtime, such as OpenAI-generated images,
+use `ctx.assets.upload({ filename, mimeType, base64 })` from the Func instead
+of `creght upload`. Persist the returned CDN URL and metadata in JSON tables;
+do not store base64 payloads in records or return them from list endpoints.
