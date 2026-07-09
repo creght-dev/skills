@@ -2,13 +2,20 @@
 
 Creght uses Tailwind CSS v4.
 
-## Component Styling
+## Component Styling — utility-first
 
-- Use utility classes for component styling.
-- Avoid inline `style` props except for genuinely dynamic values that cannot be
-  represented with classes or CSS variables.
-- Do not add ad-hoc `<style>` tags in page components.
-- Do not create arbitrary extra CSS files for one-off component styling.
+Style with Tailwind utility classes on the elements. This is the default, not a
+preference: the platform's Tailwind pipeline is more reliable than hand-written
+CSS in `index.css`, which has caused real bugs (a later generic class silently
+overriding an earlier rule, cascade/purge quirks). Arbitrary values are fine
+when no token fits (`pt-[92px]`, `text-[clamp(26px,4.6vw,58px)]`).
+
+Write standalone CSS (in `index.css`) only for what utilities can't express:
+`@keyframes`, `:has()`/complex-selector state (especially driving CSS
+variables), and scales reused across many elements (hoist to an `@utility`). Do
+not re-author component layout as semantic CSS classes. Never use inline `style`
+(except genuinely dynamic values like a JS-computed transform) or `<style>` tags
+in components, and never add one-off `.css` files.
 
 When adding color transitions, drive the color from one source to avoid double
 hover transitions. Either let children inherit the parent color or control the
@@ -16,10 +23,9 @@ child color with a single hover or `group-hover` rule.
 
 ## Site-Level `index.css`
 
-Use `/index.css` for site-level Tailwind source such as `@theme`, `@utility`,
-and base layers. A dedicated site file lets you define theme tokens and custom
-utilities without inline styles on every component. This file supports both
-plain CSS and Tailwind directives.
+Use `/index.css` only for `@theme` tokens, `@utility` definitions (applied back
+as classes), base layers, and the narrow escape-hatch CSS above — not for
+component layout. Supports both plain CSS and Tailwind directives.
 
 Minimal example:
 

@@ -98,8 +98,12 @@ checking the relevant guidance.
 - Do not proactively create `*.canvas.ts` or `*.canvas.tsx` files. They are
   platform editor preview entries. Edit existing canvas files only when the user
   explicitly asks.
-- Use Tailwind v4 utility classes for component styling. Avoid inline `style`
-  props and ad-hoc `<style>` tags in page components.
+- Style utility-first: Tailwind v4 utility classes on the elements are the
+  default (the platform's Tailwind pipeline is more reliable than hand CSS).
+  Standalone CSS in `index.css` only for what Tailwind can't express (keyframes,
+  `:has()`/complex selectors, fluid `@utility` scales); never re-author
+  component layout as semantic CSS, and no inline `style` or `<style>` in pages.
+  See `references/css.md`.
 - Use relative paths for local project imports. The Creght platform does not
   support alias imports such as `@/lib/utils`; write them as relative imports
   like `../lib/utils` or `./lib/utils` from the importing file.
