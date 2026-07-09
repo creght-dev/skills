@@ -184,6 +184,28 @@ Common return shape:
 }
 ```
 
+## Creating & Seeding Content (CLI)
+
+Content is created and updated with the CLI: `creght content create|update
+--data=<file>`. The `--data` file is a full content object whose business fields
+are wrapped under a `body` key — the same shape as the generated `Item.body`
+above. Top-level `slug`/`sort` are optional (matching flags win), and a bare
+body file (fields not under `body`) is rejected with a format error.
+
+```json
+{
+  "slug": "why-ux-matters",
+  "sort": 1,
+  "body": { "title": "Why UX matters", "excerpt": "…", "tags": ["ux"] }
+}
+```
+
+The exact `body` field names and types for a collection come from
+`/types/cms.d.ts` (or `creght cms collection get`), not from `--help`. Run
+`creght content --help` for the current flags; `--out=<file>` saves a fetched
+item to disk. `content update` exits non-zero with `not updated: <reason>` when
+no field actually changed — check the payload, don't treat it as success.
+
 ## General CMS Guidelines
 
 - Use optional chaining for nested fields, especially `body`.
