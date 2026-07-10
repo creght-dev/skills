@@ -381,6 +381,13 @@ URL returned by `ctx.assets.upload`, not a base64 payload.
   filter-free — put the blur/background on an `absolute inset-0` child
   layer (nav row gets `relative`), or render the overlay as a sibling of
   the header, never under an ancestor that ever gains a filter.
+- **Open mobile menu can trap its lower items on short viewports**
+  (recurring verified failure: menu opens but the overflowing part can't be
+  scrolled to). When the item list is taller than the viewport — landscape phones, small
+  devices, or a long nav with an expanded submenu — the bottom items can
+  become unreachable if the menu can't scroll. Test the open menu at a
+  deliberately short height (e.g. 390×520) with every submenu expanded, not
+  just a tall 390×844 portrait.
 - **404/500 pages**: build the site's own error pages using the platform's
   convention (on this platform: `/page/404.tsx`, `/page/500.tsx` — both
   route misses and `notFound: true` prefer them).
