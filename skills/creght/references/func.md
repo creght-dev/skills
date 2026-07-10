@@ -128,9 +128,20 @@ code must use ESM exports and the `(input, ctx)` signature.
 The request body readers follow Fetch `Request` semantics: they return Promises
 and the body can be consumed only once. For webhook signatures, prefer
 `await ctx.request.arrayBuffer()` so the exact incoming bytes are verified.
-The runtime provides `TextEncoder` and the HMAC SHA-256 subset of
-`crypto.subtle.importKey/sign/verify` for Stripe, Creem, and similar webhook
-verification flows.
+The runtime exposes `TextEncoder`/`TextDecoder` and a global Web Crypto `crypto`
+(a global — do not import it; `node:crypto` is not available). It follows the
+standard WebCrypto shape (async, Promises in/out, `ArrayBuffer`):
+
+- `crypto.subtle.digest` — SHA-1 / SHA-256 / SHA-384 / SHA-512 (no key, no importKey)
+- `crypto.subtle.importKey` — `raw` (HMAC, AES), `pkcs8` (RSA private), `spki`
+  (RSA public); pass DER bytes for pkcs8/spki
+- `crypto.subtle.sign` / `verify` — HMAC, RSASSA-PKCS1-v1_5, RSA-PSS
+- `crypto.subtle.encrypt` / `decrypt` — AES-GCM, RSA-OAEP
+- `crypto.subtle.generateKey` / `exportKey`
+- `crypto.getRandomValues`, `crypto.randomUUID`
+
+This covers HMAC webhook verification (Stripe, Creem), RSA2 / SHA256withRSA
+signing and verification (Alipay), and RSA + AES-256-GCM flows (WeChat Pay v3).
 
 `ctx.response.status(code)` sets the real HTTP response status for the Func
 request. It accepts statuses from 100 through 599 and remains effective when a
