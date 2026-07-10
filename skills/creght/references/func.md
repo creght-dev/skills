@@ -182,6 +182,92 @@ comments, or generated test fixtures. The Creght CLI cannot create, list,
 update, or delete project env variables, so do not attempt or claim CLI env
 management.
 
+## Payment Integration
+
+Func can integrate payment providers entirely server-side. There is no built-in
+payment SDK — wire each provider through its REST API plus a webhook. The runtime
+gives you everything needed:
+
+- `fetch` — call the provider API (create checkout, capture, query an order).
+- `process.env` — API keys and webhook secrets (set them in Backend / Env at
+  `panel/backend/env`; never hard-code).
+- `crypto.subtle` — verify/produce signatures (HMAC, RSA) and decrypt callbacks
+  (AES-GCM); see the WebCrypto list above.
+- `btoa` / `atob` — Basic-auth headers and PEM/cert handling.
+- Auth + JSON tables — link the payment to a user and store orders/entitlements.
+
+Golden rules (every provider):
+
+1. Grant access ONLY from a signature-verified webhook (or a server-side order
+   lookup). The browser success/redirect URL is a hint and can be forged.
+2. Verify signatures over the exact raw bytes: `await ctx.request.arrayBuffer()`.
+3. Make the webhook idempotent — dedupe on the provider order/event id.
+4. On failure return a non-2xx via `ctx.response.status(...)` so the provider
+   retries; return 2xx once handled so it stops.
+
+Supported providers and the primitive each needs:
+
+| Provider | Verification | Func primitive |
+| --- | --- | --- |
+| Creem (Merchant of Record; digital goods only) | HMAC-SHA256 of raw body vs `creem-signature` | `importKey(raw, HMAC)` + `sign` |
+| Stripe | HMAC-SHA256 vs `Stripe-Signature` (`t=…,v1=…`) | HMAC |
+| PayPal (digital or physical) | verify-webhook-signature API (a `fetch`), or offline SHA256withRSA against `Paypal-Cert-Url` | `fetch` + `btoa` (OAuth); RSA `verify` (offline) |
+| Alipay 支付宝 | RSA2 = SHA256withRSA over the sorted param string | `importKey(pkcs8/spki, RSASSA-PKCS1-v1_5)` + `sign` / `verify` |
+| WeChat Pay v3 微信支付 | SHA256withRSA sign/verify + AES-256-GCM callback decrypt | RSA `sign`/`verify` + AES-GCM `decrypt` |
+
+One-line recipe per provider:
+
+- **Creem** — `POST https://api.creem.io/v1/checkouts` (`x-api-key`, pass
+  `metadata.userId`); webhook: verify HMAC, grant on `checkout.completed`.
+- **Stripe** — `POST /v1/checkout/sessions`; webhook: parse `Stripe-Signature`,
+  HMAC over `"{t}.{rawBody}"`, grant on `checkout.session.completed`.
+- **PayPal** — `btoa(id + ":" + secret)` → OAuth token → `POST /v2/checkout/orders`
+  → capture; webhook: POST the transmission headers + raw body to PayPal's verify
+  API.
+- **Alipay** — build the sorted `key=value&…` string, `sign` with the merchant
+  pkcs8 key (RSASSA-PKCS1-v1_5 / SHA-256); on async notify, `verify` with Alipay's
+  public key (spki).
+- **WeChat Pay v3** — `sign` the canonical request string with the merchant
+  private key; decrypt the callback `resource` with AES-GCM (APIv3 key, `nonce`,
+  `associated_data`); `verify` responses with the platform public key.
+
+HMAC webhook verify (Creem / Stripe shape), the most common case:
+
+```ts
+const raw = await ctx.request.arrayBuffer()
+const key = await crypto.subtle.importKey(
+  "raw",
+  new TextEncoder().encode(process.env.CREEM_WEBHOOK_SECRET),
+  { name: "HMAC", hash: "SHA-256" },
+  false,
+  ["sign"],
+)
+const mac = await crypto.subtle.sign("HMAC", key, raw)
+const hex = Array.from(new Uint8Array(mac)).map((b) => b.toString(16).padStart(2, "0")).join("")
+if (hex !== ctx.request.headers.get("creem-signature")) {
+  ctx.response.status(400)
+  return { ok: false }
+}
+```
+
+Alipay RSA2 verify (async notify) — RSA needs `importKey`, unlike keyless `digest`:
+
+```ts
+const key = await crypto.subtle.importKey(
+  "spki",
+  alipayPublicKeyDer,
+  { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+  false,
+  ["verify"],
+)
+const ok = await crypto.subtle.verify(
+  "RSASSA-PKCS1-v1_5",
+  key,
+  signatureBytes,
+  new TextEncoder().encode(sortedParamString),
+)
+```
+
 ## Assets In Func
 
 Use `ctx.assets.upload({ filename, mimeType, base64 })` when a Func creates a
