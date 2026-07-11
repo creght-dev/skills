@@ -166,12 +166,55 @@ Do not use `defineConfig` from `talizen/config`.
 
 - `importMap.imports` for user-defined third-party dependencies.
 - `metadata` for global SEO.
+- `viewport` for site-level initial viewport tags, similar to Next.js App
+  Router's `viewport` object. Page-level `export const viewport` /
+  `generateViewport` is not supported.
 - `customCode.head` and `customCode.body` for small analytics, verification, or
   script snippets not covered by structured metadata.
 - `redirects` for site-level URL redirects (see below).
 
 Do not duplicate metadata in `customCode`; prefer structured `metadata` whenever
 the field fits.
+
+## Viewport
+
+Configure the site's default viewport in `talizen.config.ts` with a plain
+`viewport` object. Do not put viewport settings under `metadata`, and do not
+write a raw `<meta name="viewport">` in `customCode.head`.
+
+If omitted, Creght renders:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+Example:
+
+```ts
+export default {
+  viewport: {
+    width: 1200,
+    initialScale: null,
+    maximumScale: 1,
+    userScalable: false,
+    interactiveWidget: "resizes-visual",
+    themeColor: "#111111",
+    colorScheme: "dark",
+  },
+};
+```
+
+Supported fields:
+
+- `width` / `height`: string or number, e.g. `"device-width"` or `1200`.
+- `initialScale` / `minimumScale` / `maximumScale`: number. Use `null` to
+  remove a default field; e.g. `initialScale: null` removes
+  `initial-scale=1`.
+- `userScalable`: boolean; `false` emits `user-scalable=no`, `true` emits
+  `user-scalable=yes`.
+- `interactiveWidget`: string, e.g. `"resizes-visual"`.
+- `themeColor`: emits `<meta name="theme-color">`.
+- `colorScheme`: emits `<meta name="color-scheme">`.
 
 ## Redirects
 
