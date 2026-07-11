@@ -31,8 +31,8 @@ Do not use Func for:
   Use the platform project auth APIs instead.
 
 For login, registration, logout, current user, OAuth/social login, and account
-UI, read `references/auth.md` and use the browser-side `talizen/auth` SDK from
-page/component code.
+UI, read `references/auth.md` and use the browser-side `talizen/auth`
+`useAuth()` hook from page/component code.
 
 ## Func Keys And Methods
 
@@ -230,7 +230,7 @@ export function create(input, ctx: TalizenFuncContext) {
 `ctx.auth.requireUser()` throws `login required` when the visitor is not logged
 in. These helpers do not create accounts or sessions. Registration, password
 login, OAuth login, logout, and current-user UI are browser-side platform auth
-operations from `talizen/auth`; see `references/auth.md`.
+flows; React UI must use `talizen/auth` `useAuth()`. See `references/auth.md`.
 
 ## JSON Tables
 
@@ -399,8 +399,9 @@ Rules for page code:
 ## Func And getServerSideProps
 
 Do not call Func from `getServerSideProps`. Server-side page code receives a
-small request context, but it does not expose `ctx.auth`, `ctx.func`, `ctx.db`,
-or `ctx.cache`. Keep Func calls in browser-side interactions or API-style flows.
+small request context with `ctx.request` and `ctx.cookies`, but it does not
+expose `ctx.auth`, `ctx.func`, `ctx.db`, or `ctx.cache`. Keep Func calls in
+browser-side interactions or API-style flows.
 
 ```ts
 import type { TalizenServerSideContext } from "talizen/server-runtime"
@@ -425,9 +426,12 @@ called from browser-side code via `talizen/func`.
 
 Render cache behavior:
 
-- `ctx.cookies.*` makes the SSR response private/no-store.
-- Func is deliberately unavailable in SSR so arbitrary db/cache/auth/cookie
-  logic cannot make HTML caching unpredictable.
+- `ctx.cookies.get(...)` records cookie-vary names so HTML cache variants stay
+  explicit.
+- `ctx.cookies.set(...)` and `ctx.cookies.delete(...)` make the SSR response
+  no-store.
+- Auth and Func are deliberately unavailable in SSR so user/db/cache logic
+  cannot become hidden HTML cache dependencies.
 
 ## Agent Checklist
 

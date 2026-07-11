@@ -227,8 +227,9 @@ For backend features:
 - The CLI intentionally does not expose `creght func list/get/create/update/delete`.
   Func CRUD must go through `backend/func` files plus `creght push`, `creght sync`,
   or `creght dev`.
-- Use `talizen/auth` for login/register/logout/current-user/OAuth UI; do not
-  implement passwords, sessions, or OAuth callbacks in Func.
+- Use `talizen/auth` for auth UI. React components should use `useAuth()` for
+  login/register/logout/current-user state; do not implement passwords,
+  sessions, or OAuth callbacks in Func.
 
 Read `references/auth.md` before building auth flows. Read
 `references/func.md` before using `creght table`, editing `backend/func`, or
