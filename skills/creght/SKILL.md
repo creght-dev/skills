@@ -93,8 +93,8 @@ checking the relevant guidance.
   `next/router`, `next/navigation`, or other router libraries.
 - Prefer `getServerSideProps(context)` for route params and public first-render
   data. Read route params from `context.params` when SSR params are available.
-  In SSR code, use only `context.request` and `context.cookies`; do not read
-  auth state or call Func from `getServerSideProps`.
+  In SSR code, use `context.request` and `context.cookies`; do not read auth
+  state, import `talizen/auth`, or call Func from `getServerSideProps`.
 - Do not proactively create `*.canvas.ts` or `*.canvas.tsx` files. They are
   platform editor preview entries. Edit existing canvas files only when the user
   explicitly asks.
@@ -126,13 +126,14 @@ checking the relevant guidance.
   `process.env.NAME`, and the user must manually add those variables in the
   Creght platform Backend / Env panel at `panel/backend/env`. The Creght CLI
   cannot create, list, update, or delete project env variables.
-- Use the browser-side `talizen/auth` SDK for user login, registration, logout,
-  current user state, and OAuth/social login providers configured in the
-  project. Do not create a `user` / `users` / `auth_users` database table for
-  account identity, and do not write Func code that implements passwords,
-  sessions, OAuth callbacks, login, or registration. Read
-  `references/auth.md` before building login, signup, account, OAuth, or
-  protected UI flows.
+- Use the browser-side `talizen/auth` SDK for auth UI. React components must
+  use `useAuth()` for login, registration, logout, and current-user state;
+  do not import top-level `login` / `logout`. Page `getServerSideProps` does
+  not expose `ctx.auth`; protected backend actions must read the user from Func
+  `ctx.auth`. Do not create a `user` / `users` / `auth_users` database table
+  for account identity, and do not write Func code that implements passwords,
+  sessions, OAuth callbacks, login, or registration. Read `references/auth.md`
+  before building login, signup, account, OAuth, or protected UI flows.
 - Before using `talizen/auth` or `talizen/func`, read the type definitions from
   the `talizen` version used by the current project when exact signatures are
   needed.
@@ -144,7 +145,8 @@ checking the relevant guidance.
 ## Backend Capability Patterns
 
 Read `references/auth.md` before writing login, registration, logout, current
-user, OAuth/social login, account, or protected UI code.
+user, OAuth/social login, account, or protected UI code. In React UI, use
+`useAuth()` instead of importing top-level `login` / `logout`.
 
 Read `references/func.md` before using Func or database table CLI commands, or
 writing client code that calls Func. This includes requests involving custom
@@ -153,7 +155,7 @@ booking/RSVP/lead capture, protected user-specific business logic, or any
 question about whether to create a user database table, write backend logic, or
 use a third-party API key from backend code.
 
-Use SSR only for public or cache-friendly first-render data. Do not put login
+Use SSR for public or cookie-vary-safe first-render data. Do not put login
 state, private user data, writes, or Func calls in `getServerSideProps`; keep
 those flows in browser-side SDK/Func/API interactions.
 
