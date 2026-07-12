@@ -30,7 +30,7 @@
 
 以下案例均使用 **Fable 5** 完成。
 
-| 源站 | 复刻站 | 二开后 | 模型 |
+| 源站 | 复刻站 | 差异化模式 | 模型 |
 | --- | --- | --- | --- |
 | https://trifecta.framer.media/ | https://p1io0guo97bm.site.creght.cn/ | https://p1it45pqg8q6.site.creght.cn/ | Fable 5 |
 | https://bildium.webflow.io/home-one | 未列出 | https://p1qhs734c56q.site.creght.cn/ | Fable 5 |
