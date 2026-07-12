@@ -38,7 +38,7 @@ materials with license-safe alternatives.
 
 All examples below were created with **Fable 5**.
 
-| Source site | Replica | After secondary development | Model |
+| Source site | Replica | Differentiated Mode | Model |
 | --- | --- | --- | --- |
 | https://trifecta.framer.media/ | https://p1io0guo97bm.site.creght.cn/ | https://p1it45pqg8q6.site.creght.cn/ | Fable 5 |
 | https://bildium.webflow.io/home-one | Not listed | https://p1qhs734c56q.site.creght.cn/ | Fable 5 |
