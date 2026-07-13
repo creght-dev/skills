@@ -26,22 +26,22 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 - Rendered Creght site URLs can expose site discovery metadata at
   `/.well-known/creght.json`. Use this when the user provides a public page URL
   instead of an editor URL, local directory, or explicit project/site IDs.
-- `pull` downloads remote frontend files into `frontend/` and Func backend code
-  into `backend/func/`.
-- `pull` safely merges remote frontend/Func files into the local workspace and
+- `pull` downloads remote site files into a local workspace whose paths mirror
+  remote site paths exactly (`page/Index.tsx` <-> `/page/Index.tsx`); Func
+  backend code lives under `backend/func/`.
+- `pull` safely merges remote site files into the local workspace and
   records `.creght/state.json`, the local base state used by `diff`, `push`,
   and `sync` to compare base/local/remote safely. It reports conflicts instead
   of overwriting local edits; `pull --force` intentionally overwrites local
   files with remote files.
-- `diff` shows which frontend files and Func files would be created, updated,
-  deleted, skipped, or blocked by conflicts.
+- `diff` shows which site files would be created, updated, deleted, skipped,
+  or blocked by conflicts.
 - `push` safely uploads local changes relative to the last pull/push base and
   exits. It does not delete remote files/functions unless `--delete` is
   explicitly passed, and it reports conflicts when the same file/function
   changed locally and remotely.
 - `sync` is watch mode: it starts with the same safe push check, then keeps
-  listening for local frontend and Func file changes and pushes them in
-  realtime.
+  listening for local file changes and pushes them in realtime.
 - The CLI does not render sites locally.
 - Rendering, CMS, forms, Auth, Func, assets, realtime preview, and publication
   are handled by the Creght backend and web app.
@@ -107,7 +107,7 @@ checking the relevant guidance.
 - Use relative paths for local project imports. The Creght platform does not
   support alias imports such as `@/lib/utils`; write them as relative imports
   like `../lib/utils` or `./lib/utils` from the importing file.
-- Media assets are CDN resources, not editable frontend/Func source files. Do
+- Media assets are CDN resources, not editable site/Func source files. Do
   not create, copy, import, or reference images, PDFs, videos, fonts, or other
   binary assets as local project files. Page/component code must use complete
   CDN URLs returned by Creght asset tooling or supplied by the user; do not use
