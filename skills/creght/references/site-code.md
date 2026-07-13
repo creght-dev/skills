@@ -1,22 +1,22 @@
 # Creght Site Code
 
-Creght apps are React-based websites with file-based routes under `/page`, a
+Creght apps are React-based websites with file-based routes under `/pages`, a
 root `talizen.config.ts`, Tailwind v4 styling, generated project types, and
 platform APIs for CMS, forms, Auth, Func, metadata, import maps, previews, and
 publishing.
 
 ## Routing
 
-Routing is derived from `/page` file names by Creght conventions:
+Routing is derived from `/pages` file names by Creght conventions:
 
-- `/page/Index.tsx` -> `/`
-- `/page/About.tsx` -> `/about`
+- `/pages/Index.tsx` -> `/`
+- `/pages/About.tsx` -> `/about`
 
 For non-`Index` pages, do not guess kebab-case routes. Prefer the lowercase
 canonical path returned by lint or platform validation; for example,
-`/page/BlockElementsPage.tsx` should be linked as `/blockelementspage`.
+`/pages/BlockElementsPage.tsx` should be linked as `/blockelementspage`.
 
-Files like `/page/XXXX.canvas.tsx` are canvas preview entries used by the
+Files like `/pages/XXXX.canvas.tsx` are canvas preview entries used by the
 platform editor, not normal route files to generate by hand.
 
 For localized routing (locale prefixes and per-locale page files), see
@@ -70,7 +70,7 @@ export async function getServerSideProps(context) {
 ## Components
 
 Keep page files focused on route-level composition. Put reusable UI in
-`/component` or another shared components directory that already exists in the
+`/components` or another shared components directory that already exists in the
 project.
 
 If the user asks only for a component but also wants a preview, make the

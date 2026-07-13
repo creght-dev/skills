@@ -106,8 +106,8 @@ exactly:
 
 ```text
 mysite/
-  page/          e.g. page/Index.tsx <-> remote /page/Index.tsx
-  component/
+  pages/          e.g. pages/Index.tsx <-> remote /pages/Index.tsx
+  components/
   talizen.config.ts
   backend/func/  project Func files such as booking.ts
 ```
@@ -127,7 +127,7 @@ files. This is the normal collaboration workflow:
 
 ```bash
 creght pull --site_id=<project_id>/<site_id> --dir=./mysite
-# edit site files, e.g. page/ and backend/func/
+# edit site files, e.g. pages/ and backend/func/
 creght diff --site_id=<project_id>/<site_id> --dir=./mysite
 creght push --site_id=<project_id>/<site_id> --dir=./mysite
 ```
@@ -161,7 +161,7 @@ Operational gotchas:
   retry before debugging anything else.
 - Run `push` from the workspace **root** (the directory containing
   `.creght/state.json`), matching where the pull state was created. Pushing
-  from a subdirectory such as `page/` fails with
+  from a subdirectory such as `pages/` fails with
   "no base state for remote file" conflicts even when nothing is actually in
   conflict.
 
