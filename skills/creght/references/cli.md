@@ -138,7 +138,7 @@ Default safety rules:
   delete remote files such as `messages/*.json`. Use `--delete` only when the
   deletion is intentional.
 - If the same file/function changed locally and remotely, `diff`/`push` report
-  a conflict. Pull or inspect remote changes before deciding what to keep.
+  a conflict. Inspect with `cat`/`diff <path>` before deciding what to keep.
 - Use `--force` only for intentional full local-snapshot overwrite behavior.
 
 Useful variants:
@@ -149,6 +149,23 @@ creght pull --site_id=<project_id>/<site_id> --dir=./mysite --force
 creght push --site_id=<project_id>/<site_id> --dir=./mysite --delete
 creght push --site_id=<project_id>/<site_id> --dir=./mysite --force
 ```
+
+Single-file inspection and repair (v0.4.0+), for resolving conflicts without
+pulling or overwriting the whole workspace:
+
+```bash
+creght cat page/Index.tsx --site_id=<pid>/<sid>                  # print remote file
+creght cat page/Index.tsx --ref=local --dir=./mysite             # print local copy
+creght diff page/Index.tsx --site_id=<pid>/<sid> --dir=./mysite  # line diff remote vs local
+creght diff --site_id=<pid>/<sid> --dir=./mysite --json          # machine-readable plan
+creght pull page/Index.tsx --site_id=<pid>/<sid> --dir=./mysite  # pull one file + its base state
+```
+
+`diff --json` prints `{"has_conflicts":bool,"files":[{"path","status","action"}]}`
+with status `local-change | remote-only | conflict | no-base` — parse it to
+decide resolution per file. For a conflicted file, inspect both sides with
+`cat`/`diff <path>`, then `pull <path>` (add `--force` to overwrite a local
+edit) to take the remote copy, or push your local version.
 
 `push` and `sync` are still local-to-remote upload flows; they do not merge Web
 editor changes into local files. If remote changes should become local files,
