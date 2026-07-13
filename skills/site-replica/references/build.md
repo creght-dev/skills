@@ -23,10 +23,10 @@ rules — live in the base creght skill's `references/cli.md`.)
 Structure the port as:
 
 ```
-/page/Index.tsx, /page/Works.tsx, ...      # one file per route
-/page/<collection>/[slug].tsx              # detail templates
-/component/Nav.tsx, Hero.tsx, Footer.tsx…  # one component per section
-/component/shared.tsx                      # animation primitives + icons
+/pages/Index.tsx, /pages/Works.tsx, ...      # one file per route
+/pages/<collection>/[slug].tsx              # detail templates
+/components/Nav.tsx, Hero.tsx, Footer.tsx…  # one component per section
+/components/shared.tsx                      # animation primitives + icons
 /lib/art.ts                                # placeholder artwork generators
 /cms/*.schema.json, /cms/seed/*.json       # collection schemas + seed entries
 index.css                                  # @theme tokens + @utility classes
@@ -173,7 +173,7 @@ spacer instead: `<span class="inline-block w-[40.5%]" aria-hidden />` before
 the first word (put a hanging quote mark after the spacer if the design has
 one). Never put `indent-[…]` on the paragraph.
 
-## Animation primitives (component/shared.tsx)
+## Animation primitives (components/shared.tsx)
 
 Build these once, reuse per section. Parameters come from the motion audit.
 
@@ -389,7 +389,7 @@ URL returned by `ctx.assets.upload`, not a base64 payload.
   deliberately short height (e.g. 390×520) with every submenu expanded, not
   just a tall 390×844 portrait.
 - **404/500 pages**: build the site's own error pages using the platform's
-  convention (on this platform: `/page/404.tsx`, `/page/500.tsx` — both
+  convention (on this platform: `/pages/404.tsx`, `/pages/500.tsx` — both
   route misses and `notFound: true` prefer them).
 
 ## Platform features
@@ -399,7 +399,7 @@ URL returned by `ctx.assets.upload`, not a base64 payload.
   then `submitForm<Payload>("contact-form", payload)` from the submit
   handler with explicit success/error UI. Verify later via
   `creght form logs --key=contact-form`.
-- **Dynamic routes**: `/page/<dir>/[slug].tsx` +
+- **Dynamic routes**: `/pages/<dir>/[slug].tsx` +
   `getServerSideProps(context)` reading `context.params.slug` and fetching
   the entry from the CMS (`getContent` — see the collections section above,
   never a local constants array); return `{ notFound: true }` or

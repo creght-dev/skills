@@ -3,7 +3,7 @@ name: creght
 description: >
   Use when working with Creght sites or the Creght CLI, including pulling site
   code locally, pushing local changes, running watch-mode sync, writing
-  Creght-compatible React page/component code, CMS, form, Auth, and Func
+  Creght-compatible React pages/components code, CMS, form, Auth, and Func
   backend integration, routing, styling, metadata, previewing, publishing, or
   debugging local-to-platform workflows.
 ---
@@ -27,7 +27,7 @@ use them when appropriate; otherwise inspect local files and use the CLI.
   `/.well-known/creght.json`. Use this when the user provides a public page URL
   instead of an editor URL, local directory, or explicit project/site IDs.
 - `pull` downloads remote site files into a local workspace whose paths mirror
-  remote site paths exactly (`page/Index.tsx` <-> `/page/Index.tsx`); Func
+  remote site paths exactly (`pages/Index.tsx` <-> `/pages/Index.tsx`); Func
   backend code lives under `backend/func/`.
 - `pull` safely merges remote site files into the local workspace and
   records `.creght/state.json`, the local base state used by `diff`, `push`,
@@ -60,7 +60,7 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 2. Read local project guidance such as `AGENTS.md` if present.
 3. Read `talizen.config.ts` when imports, metadata, custom code, or site-level
    styling may be involved.
-4. Inspect the relevant `/page`, `/component`, `/types`, and root config files
+4. Inspect the relevant `/pages`, `/components`, `/types`, and root config files
    before editing.
 5. Apply focused changes that match existing project conventions.
 6. Before uploading, run `creght diff --site_id=<project_id>/<site_id>
@@ -81,8 +81,8 @@ checking the relevant guidance.
 
 ## Hard Platform Rules
 
-- Pages live in `/page` as `.tsx` React components.
-- Keep reusable UI in `/component` or another shared components directory.
+- Pages live in `/pages` as `.tsx` React components.
+- Keep reusable UI in `/components` or another shared components directory.
 - Do not introduce `react-router-dom`, `next/link`, `next/router`,
   `next/navigation`, `getStaticProps`, or `getStaticPaths`.
 - Use native anchors such as `<a href="/about">...</a>` for navigation. On a
@@ -174,7 +174,7 @@ client-side so the whole page cache is not invalidated by counters.
 
 - `references/cli.md`: CLI install/use, endpoint defaults, platform data and
   backend commands, rendered URL site discovery, and asset upload commands.
-- `references/site-code.md`: routing, page/component structure, import maps,
+- `references/site-code.md`: routing, pages/components structure, import maps,
   and config rules.
 - `references/cms.md`: CMS data fetching and generated schema usage.
 - `references/forms.md`: form submissions and payload typing.

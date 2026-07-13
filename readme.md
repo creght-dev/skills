@@ -4,14 +4,14 @@ This repository provides Codex/agent skills for Creght. They help agents underst
 
 ## Skills
 
-- **`creght`** — the base platform skill: CLI workflows, page/component conventions, CMS, forms, Auth, Func backend, SEO, publishing.
+- **`creght`** — the base platform skill: CLI workflows, pages/components conventions, CMS, forms, Auth, Func backend, SEO, publishing.
 - **`site-replica`** — replicate any existing website onto Creght ("复刻网站"): probes the source in a real browser, audits every animation and interaction, rebuilds it as an original React/Tailwind implementation with license-safe placeholder assets, then verifies desktop + mobile against the source in a loop until parity. Builds on top of `creght`.
 
 ## What This Skill Does
 
 - Guides agents through Creght CLI workflows for creating projects, pulling workspace files, pushing/syncing frontend and Func backend file changes, previewing, and publishing sites.
 - Discovers project and site IDs from rendered Creght page URLs through `/.well-known/creght.json`.
-- Enforces Creght page development conventions, such as `/page` routes, the `/component` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
+- Enforces Creght page development conventions, such as `/pages` routes, the `/components` directory, native `<a>` navigation, and `getServerSideProps` for data loading.
 - Helps write React + Tailwind v4 pages and components that follow Creght platform requirements.
 - Provides implementation references for common platform capabilities such as CMS, form submissions, Auth, file-based Func backend code under `backend/func`, SEO metadata, sitemaps, and carousel components.
 - Helps debug local-to-platform sync, preview, and publishing issues.
@@ -19,7 +19,7 @@ This repository provides Codex/agent skills for Creght. They help agents underst
 ## Examples
 
 ```text
-Add an About page to this Creght project, following the existing page and component structure. {YOUR_CREGHT_PROJECT_EDIT_URL like https://creght.cn/editor/project/pveao61akhoy/site/pveao646es1u}
+Add an About page to this Creght project, following the existing pages and components structure. {YOUR_CREGHT_PROJECT_EDIT_URL like https://creght.cn/editor/project/pveao61akhoy/site/pveao646es1u}
 ```
 
 ```text
