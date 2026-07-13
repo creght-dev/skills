@@ -98,21 +98,22 @@ creght project create --name="My Project" --from_id=<project_id>
 creght project create --name="My Project" --tpl_id=<template_id>
 ```
 
-`pull` downloads a local workspace:
+`pull` downloads a local workspace whose paths mirror remote site paths
+exactly:
 
 ```text
 mysite/
-  frontend/      Creght site files such as page/, component/, talizen.config.ts
+  page/          e.g. page/Index.tsx <-> remote /page/Index.tsx
+  component/
+  talizen.config.ts
   backend/func/  project Func files such as booking.ts
 ```
 
-Remote site files map to `frontend/`. Func key `booking` maps to
-`backend/func/booking.ts`; Func key `profile/settings` maps to
-`backend/func/profile/settings.ts`.
+Func key `booking` maps to `backend/func/booking.ts`; Func key
+`profile/settings` maps to `backend/func/profile/settings.ts`.
 
 `push` safely uploads local changes and exits. `sync` first runs the same safe
-push check, then watches local frontend and Func file changes and keeps
-uploading them.
+push check, then watches local file changes and keeps uploading them.
 
 `pull` safely merges remote files into the local workspace and records a local
 base state in `.creght/state.json`. It updates local files that have not been
@@ -123,7 +124,7 @@ files. This is the normal collaboration workflow:
 
 ```bash
 creght pull --site_id=<project_id>/<site_id> --dir=./mysite
-# edit frontend/ and backend/func/
+# edit site files, e.g. page/ and backend/func/
 creght diff --site_id=<project_id>/<site_id> --dir=./mysite
 creght push --site_id=<project_id>/<site_id> --dir=./mysite
 ```
@@ -163,8 +164,8 @@ Operational gotchas:
   likely stale relative to the backend. Run `npm i -g creght-cli@latest` and
   retry before debugging anything else.
 - Run `push` from the workspace **root** (the directory containing
-  `frontend/`), matching where the pull state was created. Pushing from a
-  subdirectory such as `frontend/` fails with
+  `.creght/state.json`), matching where the pull state was created. Pushing
+  from a subdirectory such as `page/` fails with
   "no base state for remote file" conflicts even when nothing is actually in
   conflict.
 
