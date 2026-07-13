@@ -25,8 +25,11 @@ API: https://creght.cn
 Web: https://creght.cn
 ```
 
-Use `creght <command> --help` for exact flags. Prefer this over memorizing
-rare subcommands because the CLI surface can change.
+`creght -h` and `creght <command> -h` are the authoritative, always-current
+command reference: exact flags, arguments, output formats, and examples. This
+document only covers the workflow model and platform conventions the CLI help
+cannot explain; when in doubt about a command's usage, run its `-h` instead of
+relying on examples here.
 
 ## Discovering a Site From a Rendered URL
 
@@ -138,34 +141,10 @@ Default safety rules:
   delete remote files such as `messages/*.json`. Use `--delete` only when the
   deletion is intentional.
 - If the same file/function changed locally and remotely, `diff`/`push` report
-  a conflict. Inspect with `cat`/`diff <path>` before deciding what to keep.
+  a conflict. Conflicts can be inspected and resolved per file — `cat` and
+  `diff`/`pull` accept a single `<path>`, and `diff --json` prints a
+  machine-readable plan; see each command's `-h`.
 - Use `--force` only for intentional full local-snapshot overwrite behavior.
-
-Useful variants:
-
-```bash
-creght diff --site_id=<project_id>/<site_id> --dir=./mysite --delete
-creght pull --site_id=<project_id>/<site_id> --dir=./mysite --force
-creght push --site_id=<project_id>/<site_id> --dir=./mysite --delete
-creght push --site_id=<project_id>/<site_id> --dir=./mysite --force
-```
-
-Single-file inspection and repair (v0.4.0+), for resolving conflicts without
-pulling or overwriting the whole workspace:
-
-```bash
-creght cat page/Index.tsx --site_id=<pid>/<sid>                  # print remote file
-creght cat page/Index.tsx --ref=local --dir=./mysite             # print local copy
-creght diff page/Index.tsx --site_id=<pid>/<sid> --dir=./mysite  # line diff remote vs local
-creght diff --site_id=<pid>/<sid> --dir=./mysite --json          # machine-readable plan
-creght pull page/Index.tsx --site_id=<pid>/<sid> --dir=./mysite  # pull one file + its base state
-```
-
-`diff --json` prints `{"has_conflicts":bool,"files":[{"path","status","action"}]}`
-with status `local-change | remote-only | conflict | no-base` — parse it to
-decide resolution per file. For a conflicted file, inspect both sides with
-`cat`/`diff <path>`, then `pull <path>` (add `--force` to overwrite a local
-edit) to take the remote copy, or push your local version.
 
 `push` and `sync` are still local-to-remote upload flows; they do not merge Web
 editor changes into local files. If remote changes should become local files,
@@ -253,44 +232,14 @@ Read `references/auth.md` before building auth flows. Read
 `references/func.md` before using `creght table`, editing `backend/func`, or
 calling `talizen/func`.
 
-For `creght content create` and `creght content update`, `--data` accepts
-exactly one format: a full content object whose business fields are wrapped
-under an object-valued `body` key. `slug`/`sort` are optional in the file
-(flags take precedence). Bare body files are rejected with a format error.
-
-```json
-{
-  "slug": "typography-v02",
-  "sort": 1,
-  "body": {
-    "title": "Typography V.02",
-    "description": "100vh",
-    "tags": ["skill"],
-    "_i18n": { "en": { "title": "Typography V.02" } }
-  }
-}
-```
-
-`content update` exits non-zero with `not updated: <reason>` when the server
-reports that no field actually changed (values identical to stored content) —
-treat that as a signal to check the payload, not as success.
+`creght content create/update --data` requires a specific payload format and
+`content update` treats "no field changed" as a non-zero error — see
+`creght content -h` for the format and semantics before building payloads.
 
 ## Asset Upload
 
-Use `creght upload` when site code needs a local file to become a
-Creght-hosted asset. This is for build-time/static files that already exist on
-disk, such as downloaded stock images, generated favicons, mockups, textures,
-or exported illustrations.
-
-```bash
-creght upload --site_id=<project_id>/<site_id> --file=./image.png
-creght upload --site_id=<project_id>/<site_id> --file=./image.png --json
-```
-
-With `--json`, the command returns one key, `file_url`, containing the full CDN
-URL for the uploaded file.
-
-For assets created inside a Func at runtime, such as OpenAI-generated images,
-use `ctx.assets.upload({ filename, mimeType, base64 })` from the Func instead
-of `creght upload`. Persist the returned CDN URL and metadata in JSON tables;
-do not store base64 payloads in records or return them from list endpoints.
+Use `creght upload` (see its `-h`) when site code needs an existing local file
+to become a Creght-hosted asset (downloaded stock images, generated favicons,
+mockups). For assets created inside a Func at runtime, use
+`ctx.assets.upload({ filename, mimeType, base64 })` from the Func instead;
+persist the returned CDN URL in JSON tables, never base64 payloads.
