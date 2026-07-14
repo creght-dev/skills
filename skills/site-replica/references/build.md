@@ -246,6 +246,27 @@ component's `useEffect` with the dumped options
 menus; framer-motion `useScroll` keeps working since the window still
 scrolls.
 
+- **Lenis eats wheel events inside overlays that need their own scroll**
+  (verified user report: a fullscreen menu whose items were taller than the
+  viewport couldn't be scrolled — the lower items and the close button were
+  unreachable, the light/menu felt "stuck"). Lenis hijacks wheel on the
+  window, so an `overflow-y-auto` overlay never receives them. Fix: put
+  `data-lenis-prevent` on the overlay's scroll container (Lenis skips wheel
+  events whose target is inside it) plus `overscroll-contain`; native scroll
+  then works. Applies to any nested scroller over a Lenis page (menu drawers,
+  modals, long dropdowns), not just the mobile menu.
+- **Keep the overlay's close affordance reachable while it scrolls.** A
+  header/close bar that lives inside the scrolling overlay scrolls away with
+  the content, stranding the user with no way out. Make it `sticky top-0`
+  (opaque bg, `z` above the list) — or `position: fixed` relative to the
+  viewport — so the close control is always on screen.
+- **Cursor-driven reveals (spotlight/torch) must reset on `mouseleave`.** A
+  section that reveals art through a radial mask following the pointer will
+  freeze at the last cursor position when the mouse exits if you only wire
+  `mousemove`. Add `onMouseLeave` to fade the revealed layer's opacity to 0
+  (or collapse the mask), with a transition, so the effect clears when the
+  pointer leaves.
+
 ## Display-font line-height (cost a real bug)
 
 Condensed display faces (Anton, Oswald, Bebas…) have content boxes of
