@@ -295,10 +295,10 @@ backend/func/booking.ts -> Func key booking
 backend/func/profile/settings.ts -> Func key profile/settings
 ```
 
-`creght push`, `creght sync`, and `creght dev` diff `backend/func/**/*.ts` and
-apply create/update/delete operations automatically. Deleting a local Func file
-deletes the remote Func on the next push/sync. Renaming a file is treated as
-delete old key + create new key.
+`creght push` and `creght dev` diff `backend/func/**/*.ts` and apply
+create/update/delete operations automatically. Deleting a local Func file
+deletes the remote Func on the next `push --delete`. Renaming a file is treated
+as delete old key + create new key.
 
 Self-test Func methods with:
 
