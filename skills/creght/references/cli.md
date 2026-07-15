@@ -1,8 +1,9 @@
 # Creght CLI
 
 The Creght CLI is a local bridge for Creght site code. It handles auth,
-project creation and discovery, file pull/push/sync, remote preview, publishing,
-platform data operations, and asset uploads.
+project creation and discovery, file pull/push with three-way merge and
+conflict resolution, remote preview, publishing, platform data operations, and
+asset uploads.
 
 The CLI does not render sites locally. Rendering, CMS, assets, realtime preview,
 and publication are handled by the Creght backend and web app.
@@ -82,13 +83,25 @@ creght login
 creght logout
 creght project list
 creght project create --name="My Project"
-creght pull --site_id=<project_id>/<site_id> --dir=./mysite
-creght diff --site_id=<project_id>/<site_id> --dir=./mysite
-creght push --site_id=<project_id>/<site_id> --dir=./mysite
-creght sync --site_id=<project_id>/<site_id> --dir=./mysite
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull
+creght diff
+creght push
+creght resolve --list
 creght preview --site_id=<project_id>/<site_id>
 creght publish --site_id=<project_id>/<site_id>
 ```
+
+Only the first pull needs `--site_id` (and usually `--dir`). After that,
+`.creght/state.json` records the site reference; from the workspace root or
+any child directory, `pull`, `diff`, `push`, `cat`, and `resolve` discover it
+by walking upward, so ongoing usage passes neither `--site_id` nor `--dir`.
+Pass them explicitly only when targeting a different workspace or site.
+
+Single-file `<path>` arguments resolve from the current directory, git-style:
+`Index.tsx` run from inside `page/` means `/page/Index.tsx`. Paths starting
+with `/` are always workspace-root paths. When the discovered workspace root
+differs from the current directory, commands print `workspace: <root>` first —
+if that path looks unexpected, stop and check before pushing.
 
 `project list` lists available projects and sites. `project create` creates a
 new project and prints the created project ID.
@@ -115,21 +128,26 @@ mysite/
 Func key `booking` maps to `backend/func/booking.ts`; Func key
 `profile/settings` maps to `backend/func/profile/settings.ts`.
 
-`push` safely uploads local changes and exits. `sync` first runs the same safe
-push check, then watches local file changes and keeps uploading them.
+`push` safely uploads local changes and exits.
 
-`pull` safely merges remote files into the local workspace and records a local
-base state in `.creght/state.json`. It updates local files that have not been
-changed locally, keeps local-only edits, and reports conflicts when local and
-remote both changed the same file/function. `diff`, `push`, and `sync` compare
-three versions: the last base state, current local files, and current remote
-files. This is the normal collaboration workflow:
+`pull` merges remote files into the local workspace and records a local base
+snapshot (`.creght/state.json` plus base file contents under `.creght/base/`).
+It updates local files that have not been changed locally, keeps local-only
+edits, and three-way merges files that changed on both sides: non-overlapping
+edits merge automatically (reported as `merged`, the result stays local until
+the next push), overlapping edits write git-style conflict markers
+(`<<<<<<< local` / `=======` / `>>>>>>> remote`) into the file and `pull`
+exits non-zero. `diff` and `push` compare three versions: the last base state,
+current local files, and current remote files. This is the normal
+collaboration workflow:
 
 ```bash
-creght pull --site_id=<project_id>/<site_id> --dir=./mysite
+creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull only
+cd ./mysite
 # edit site files, e.g. pages/ and backend/func/
-creght diff --site_id=<project_id>/<site_id> --dir=./mysite
-creght push --site_id=<project_id>/<site_id> --dir=./mysite
+creght diff
+creght pull      # merge any remote edits; resolve markers if reported
+creght push
 ```
 
 Default safety rules:
@@ -141,14 +159,23 @@ Default safety rules:
   delete remote files such as `messages/*.json`. Use `--delete` only when the
   deletion is intentional.
 - If the same file/function changed locally and remotely, `diff`/`push` report
-  a conflict. Conflicts can be inspected and resolved per file — `cat` and
-  `diff`/`pull` accept a single `<path>`, and `diff --json` prints a
-  machine-readable plan; see each command's `-h`.
-- Use `--force` only for intentional full local-snapshot overwrite behavior.
+  a conflict. Run `creght pull` to three-way merge it (or `push
+  --skip-conflicts` to push everything else and leave it for a later pull).
+  Conflicts can be inspected and resolved per file — `cat`, `diff`, `pull`,
+  and `push` accept a single `<path>`, and `diff --json` prints a
+  machine-readable plan whose conflict entries carry `reason`,
+  `auto_mergeable`, and `base_to_local_diff` / `base_to_remote_diff`; see each
+  command's `-h`.
+- When `pull` leaves conflict markers in a file, `push` refuses to upload it.
+  Run `creght resolve --list` to find marker files and `creght resolve <path>
+  --ours|--theirs` (or edit the markers by hand) before pushing.
+- Use `--force` only for intentional overwrite behavior. Before overwriting,
+  the CLI backs up the losing side (local files on `pull`, diverged remote
+  copies on `push --force`) under `.creght/backup/<timestamp>-*/`.
 
-`push` and `sync` are still local-to-remote upload flows; they do not merge Web
-editor changes into local files. If remote changes should become local files,
-run `pull`; use `pull --force` only when overwriting local edits is intentional.
+`push` is still a local-to-remote upload flow; it does not merge Web editor
+changes into local files. If remote changes should become local files, run
+`pull`; use `pull --force` only when overwriting local edits is intentional.
 
 Use `preview` when verification depends on platform rendering. Do not start a
 generic local renderer unless the project explicitly provides one.
@@ -159,11 +186,11 @@ Operational gotchas:
   `GET /api/p/project/<id>/func_list: route not found`), the installed CLI is
   likely stale relative to the backend. Run `npm i -g creght-cli@latest` and
   retry before debugging anything else.
-- Run `push` from the workspace **root** (the directory containing
-  `.creght/state.json`), matching where the pull state was created. Pushing
-  from a subdirectory such as `pages/` fails with
-  "no base state for remote file" conflicts even when nothing is actually in
-  conflict.
+- `push` requires a pulled workspace: without a discoverable
+  `.creght/state.json` it refuses to treat an arbitrary directory as a
+  workspace (this guards against uploading an unrelated repo). Run the first
+  `pull` before pushing; afterwards `push` works from the root or any child
+  directory.
 
 ## Publishing
 
@@ -215,15 +242,15 @@ For backend features:
 - Use `creght table` to manage project JSON tables used by Func `ctx.db.*`.
 - Use `creght table record` for seed data or user-requested operational data.
 - Use `backend/func/**/*.ts` files to create, update, rename, and delete Func
-  code. `creght push`, `creght sync`, and `creght dev` diff these files and
-  apply Func CRUD through the backend.
+  code. `creght push` and `creght dev` diff these files and apply Func CRUD
+  through the backend.
 - Func keys are extensionless paths such as `booking` or `profile/settings`,
   derived from file paths under `backend/func/`.
 - Invoke methods with `key.method`, for example `booking.create`.
 - Use `creght func run` only to self-test a Func method with sample input.
 - The CLI intentionally does not expose `creght func list/get/create/update/delete`.
-  Func CRUD must go through `backend/func` files plus `creght push`, `creght sync`,
-  or `creght dev`.
+  Func CRUD must go through `backend/func` files plus `creght push` or
+  `creght dev`.
 - Use `talizen/auth` for auth UI. React components should use `useAuth()` for
   login/register/logout/current-user state; do not implement passwords,
   sessions, or OAuth callbacks in Func.

@@ -2,7 +2,7 @@
 name: creght
 description: >
   Use when working with Creght sites or the Creght CLI, including pulling site
-  code locally, pushing local changes, running watch-mode sync, writing
+  code locally, pushing local changes, resolving sync conflicts, writing
   Creght-compatible React pages/components code, CMS, form, Auth, and Func
   backend integration, routing, styling, metadata, previewing, publishing, or
   debugging local-to-platform workflows.
@@ -12,7 +12,7 @@ description: >
 
 Creght sites are React-based websites rendered by the Creght platform. Local
 agents usually work by using the Creght CLI to pull site files, editing those
-files locally, then pushing, syncing, or previewing through Creght.
+files locally, then pushing or previewing through Creght.
 
 This skill is for general-purpose agents. Do not assume Creght-system-only
 tools are available. If the current environment exposes Creght tools such as
@@ -21,27 +21,35 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 
 ## Core Model
 
-- The CLI handles login, project creation and discovery, pull, push, sync,
-  preview, and publish workflows, plus platform data and asset operations.
+- The CLI handles login, project creation and discovery, pull, push, conflict
+  resolution, preview, and publish workflows, plus platform data and asset
+  operations.
 - Rendered Creght site URLs can expose site discovery metadata at
   `/.well-known/creght.json`. Use this when the user provides a public page URL
   instead of an editor URL, local directory, or explicit project/site IDs.
 - `pull` downloads remote site files into a local workspace whose paths mirror
   remote site paths exactly (`pages/Index.tsx` <-> `/pages/Index.tsx`); Func
   backend code lives under `backend/func/`.
-- `pull` safely merges remote site files into the local workspace and
-  records `.creght/state.json`, the local base state used by `diff`, `push`,
-  and `sync` to compare base/local/remote safely. It reports conflicts instead
-  of overwriting local edits; `pull --force` intentionally overwrites local
-  files with remote files.
+- `pull` merges remote site files into the local workspace and records a base
+  snapshot (`.creght/state.json` plus base contents under `.creght/base/`)
+  used by `diff` and `push` to compare base/local/remote safely. Files changed
+  on both sides are three-way merged: non-overlapping edits merge
+  automatically, overlapping edits write git-style conflict markers into the
+  file and `pull` exits non-zero. Local content that pull overwrites is backed
+  up under `.creght/backup/` first; `pull --force` skips merging and
+  intentionally overwrites local files with remote files.
 - `diff` shows which site files would be created, updated, deleted, skipped,
-  or blocked by conflicts.
+  or blocked by conflicts. `diff --json` marks each conflict with `reason`,
+  `auto_mergeable`, and `base_to_local_diff` / `base_to_remote_diff`.
 - `push` safely uploads local changes relative to the last pull/push base and
   exits. It does not delete remote files/functions unless `--delete` is
-  explicitly passed, and it reports conflicts when the same file/function
-  changed locally and remotely.
-- `sync` is watch mode: it starts with the same safe push check, then keeps
-  listening for local file changes and pushes them in realtime.
+  explicitly passed, it reports conflicts when the same file/function changed
+  locally and remotely (pull to merge, or `--skip-conflicts` to push the
+  rest), and it refuses files that still contain conflict markers. `push
+  <path>` uploads a single file.
+- `resolve` handles conflict markers left by pull: `resolve --list` finds the
+  files, `resolve <path> --ours|--theirs` keeps one side, or edit the markers
+  by hand; then push.
 - The CLI does not render sites locally.
 - Rendering, CMS, forms, Auth, Func, assets, realtime preview, and publication
   are handled by the Creght backend and web app.
@@ -63,14 +71,16 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 4. Inspect the relevant `/pages`, `/components`, `/types`, and root config files
    before editing.
 5. Apply focused changes that match existing project conventions.
-6. Before uploading, run `creght diff --site_id=<project_id>/<site_id>
-   --dir=<dir>` when there may be other people or Web editor changes. Resolve
-   conflicts by pulling/inspecting remote changes instead of overwriting by
-   default.
+6. Before uploading, run `creght diff` (inside a pulled workspace, `pull`,
+   `diff`, `push`, `cat`, and `resolve` discover the site from
+   `.creght/state.json` automatically — no `--site_id`/`--dir` needed) when
+   there may be other people or Web editor changes. On conflicts, run `creght pull` to three-way
+   merge remote edits instead of overwriting by default; if the merge leaves
+   conflict markers, resolve them (`creght resolve`, or edit by hand) before
+   pushing.
 7. Validate with available local checks or Creght platform checks. If no local
-   renderer exists, use `creght push`, `creght sync`, or `creght preview` as
-   the verification path. Use `creght push` for a one-time safe upload and
-   `creght sync` when you want watch mode.
+   renderer exists, use `creght push` or `creght preview` as the verification
+   path.
 
 ## Error Trigger
 
