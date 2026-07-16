@@ -4,8 +4,9 @@ description: >
   Use when working with Creght sites or the Creght CLI, including pulling site
   code locally, pushing local changes, resolving sync conflicts, writing
   Creght-compatible React pages/components code, CMS, form, Auth, and Func
-  backend integration, routing, styling, metadata, previewing, publishing, or
-  debugging local-to-platform workflows.
+  backend integration, routing, styling, metadata, previewing, publishing,
+  domain binding, DNS/SSL, website analytics, environment variables, editor
+  operations, or debugging local-to-platform workflows.
 ---
 
 # Creght
@@ -81,6 +82,15 @@ use them when appropriate; otherwise inspect local files and use the CLI.
 7. Validate with available local checks or Creght platform checks. If no local
    renderer exists, use `creght push` or `creght preview` as the verification
    path.
+
+## Question-Only Tasks
+
+When the user asks how to use the Creght editor or where to find a platform
+feature, answer directly without editing files, running the CLI, or changing
+platform state. Read `references/console-operations.md` for domains, DNS/SSL,
+publishing, analytics, environment variables, members, plans, and other editor
+navigation questions. If the user asks to implement custom event tracking, also
+read `references/analytics.md`.
 
 ## Error Trigger
 
@@ -201,6 +211,8 @@ client-side so the whole page cache is not invalidated by counters.
 - `references/carousel.md`: carousel/slideshow default approach.
 - `references/analytics.md`: automatic visit analytics and custom event tracking
   (`data-track` attributes and `talizen/analytics` `track()`).
+- `references/console-operations.md`: question-only guidance about domains,
+  DNS/SSL, publishing, analytics, environment variables, members, and plans.
 - `references/error-handling.md`: bounded handling for typecheck, build,
   lint/validate, and user-reported runtime or browser errors.
 
