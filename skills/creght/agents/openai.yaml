@@ -1,3 +1,4 @@
 interface:
   display_name: "Creght"
-  short_description: "Build, push, sync, preview, and publish Creght sites"
+  short_description: "Build Creght sites and guide editor operations"
+  default_prompt: "Use $creght to help with this Creght site, CLI, or editor task."
