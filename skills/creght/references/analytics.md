@@ -12,9 +12,7 @@ only for custom events.
 ## Automatic visit analytics (no code)
 
 Every published page reports a pageview on load — the platform injects the beacon
-during rendering (published sites only, never in preview). Do **not** add your own
-pageview beacon or a third-party analytics snippet for this; it is already handled.
-Each pageview records:
+during rendering (published sites only, never in preview). Each pageview records:
 
 - PV / UV (unique visitors, deduped by a first-party cookie) / unique IPs
 - Country + city (from IP)
@@ -23,15 +21,19 @@ Each pageview records:
 - The **external referrer domain** (e.g. `google.com`, `t.co`) — same-site
   navigation is ignored, so this reflects real traffic sources
 
+Do **not** add your own pageview beacon or a third-party analytics snippet for
+this; it is already handled.
+
 ## Custom events (track)
 
-Measure actions inside the page (button clicks, tab switches, etc.). Two ways:
+Use custom events to measure actions inside the page (button clicks, tab
+switches, etc.). Two ways, pick whichever fits:
 
 ### 1. Declarative — `data-track` (no JS)
 
-Add `data-track="<event_name>"` to any element; it reports automatically on click.
-Any `data-track-*` attributes become event properties (key = the part after
-`data-track-`).
+Add `data-track="<event_name>"` to any element. It reports automatically when the
+element (or any child) is clicked. Any `data-track-*` attributes become event
+properties (the key is the part after `data-track-`).
 
 ```tsx
 <button data-track="click_buy" data-track-plan="pro" data-track-position="hero">
