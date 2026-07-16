@@ -199,6 +199,8 @@ client-side so the whole page cache is not invalidated by counters.
 - `references/css.md`: Tailwind v4 and `index.css` conventions.
 - `references/sitemap.md`: root-level sitemap generation.
 - `references/carousel.md`: carousel/slideshow default approach.
+- `references/analytics.md`: automatic visit analytics and custom event tracking
+  (`data-track` attributes and `talizen/analytics` `track()`).
 - `references/error-handling.md`: bounded handling for typecheck, build,
   lint/validate, and user-reported runtime or browser errors.
 
