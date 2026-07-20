@@ -98,7 +98,7 @@ by walking upward, so ongoing usage passes neither `--site_id` nor `--dir`.
 Pass them explicitly only when targeting a different workspace or site.
 
 Single-file `<path>` arguments resolve from the current directory, git-style:
-`Index.tsx` run from inside `page/` means `/page/Index.tsx`. Paths starting
+`Index.tsx` run from inside `pages/` means `/pages/Index.tsx`. Paths starting
 with `/` are always workspace-root paths. When the discovered workspace root
 differs from the current directory, commands print `workspace: <root>` first —
 if that path looks unexpected, stop and check before pushing.
@@ -124,6 +124,9 @@ mysite/
   talizen.config.ts
   backend/func/  project Func files such as booking.ts
 ```
+
+`page/` and `component/` are also supported. Keep existing roots; use plural
+names for new workspaces.
 
 Func key `booking` maps to `backend/func/booking.ts`; Func key
 `profile/settings` maps to `backend/func/profile/settings.ts`.
