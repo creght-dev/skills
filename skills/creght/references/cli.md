@@ -89,6 +89,7 @@ creght push
 creght resolve --list
 creght preview --site_id=<project_id>/<site_id>
 creght publish --site_id=<project_id>/<site_id>
+creght importmap   # print the site's effective importMap (platform built-ins + talizen.config)
 ```
 
 Only the first pull needs `--site_id` (and usually `--dir`). After that,
