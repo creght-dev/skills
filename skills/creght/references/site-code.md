@@ -42,14 +42,28 @@ Do not import `next/link`, `next/router`, `next/navigation`, or other routers.
 Use `getServerSideProps(context)` for route params and public first-render data.
 Read dynamic params from `context.params`.
 
-Do not read auth or call Func in SSR. Use `useAuth()` in React UI and Func
-`ctx.auth` for protected backend actions.
+Type the context — don't use `any` or an untyped `context`. Type the whole
+function with `GetServerSideProps<Props, Params>` and the page props with
+`InferGetServerSidePropsType`, both imported from `talizen`:
 
 ```tsx
-export async function getServerSideProps(context) {
-  return { props: { slug: context.params?.slug } }
+import type { GetServerSideProps, InferGetServerSidePropsType } from "talizen"
+
+export const getServerSideProps: GetServerSideProps<{ slug: string }, { slug: string }> = async (context) => {
+  return { props: { slug: context.params.slug } }
+}
+
+export default function Page(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return <main>{props.slug}</main>
 }
 ```
+
+Fields: `params`, `searchParams`, `request` (`host` / `headers.get()`), `cookies`
+(`get`/`has`/`set`/`delete`), and `locale` / `locales` / `defaultLocale` /
+`routingDefaultLocale`. `req`, `query`, and `request.cookies` are deprecated aliases.
+
+Do not read auth or call Func in SSR. Use `useAuth()` in React UI and Func
+`ctx.auth` for protected backend actions.
 
 ## Components
 
