@@ -11,211 +11,112 @@ description: >
 
 # Creght
 
-Creght sites are React-based websites rendered by the Creght platform. Local
-agents usually work by using the Creght CLI to pull site files, editing those
-files locally, then pushing or previewing through Creght.
-
-This skill is for general-purpose agents. Do not assume Creght-system-only
-tools are available. If the current environment exposes Creght tools such as
-linting, schema creation, module type fetching, versioning, or patch helpers,
-use them when appropriate; otherwise inspect local files and use the CLI.
+Creght sites are React websites rendered by the Creght platform. General agents
+usually use the Creght CLI to pull site files, edit locally, then diff, push, or
+preview through Creght. Do not assume Creght-system-only tools are available;
+use them if exposed, otherwise inspect files and use the CLI.
 
 ## Core Model
 
-- The CLI handles login, project creation and discovery, pull, push, conflict
-  resolution, preview, and publish workflows, plus platform data and asset
-  operations.
-- Rendered Creght site URLs can expose site discovery metadata at
-  `/.well-known/creght.json`. Use this when the user provides a public page URL
-  instead of an editor URL, local directory, or explicit project/site IDs.
-- `pull` downloads remote site files into a local workspace whose paths mirror
-  remote site paths exactly (`pages/Index.tsx` <-> `/pages/Index.tsx`); Func
-  backend code lives under `backend/func/`.
-- `pull` merges remote site files into the local workspace and records a base
-  snapshot (`.creght/state.json` plus base contents under `.creght/base/`)
-  used by `diff` and `push` to compare base/local/remote safely. Files changed
-  on both sides are three-way merged: non-overlapping edits merge
-  automatically, overlapping edits write git-style conflict markers into the
-  file and `pull` exits non-zero. Local content that pull overwrites is backed
-  up under `.creght/backup/` first; `pull --force` skips merging and
-  intentionally overwrites local files with remote files.
-- `diff` shows which site files would be created, updated, deleted, skipped,
-  or blocked by conflicts. `diff --json` marks each conflict with `reason`,
-  `auto_mergeable`, and `base_to_local_diff` / `base_to_remote_diff`.
-- `push` safely uploads local changes relative to the last pull/push base and
-  exits. It does not delete remote files/functions unless `--delete` is
-  explicitly passed, it reports conflicts when the same file/function changed
-  locally and remotely (pull to merge, or `--skip-conflicts` to push the
-  rest), and it refuses files that still contain conflict markers. `push
-  <path>` uploads a single file.
-- `resolve` handles conflict markers left by pull: `resolve --list` finds the
-  files, `resolve <path> --ours|--theirs` keeps one side, or edit the markers
-  by hand; then push.
-- The CLI does not render sites locally.
-- Rendering, CMS, forms, Auth, Func, assets, realtime preview, and publication
-  are handled by the Creght backend and web app.
-- Site code must follow Creght platform rules; do not treat a Creght site as a
-  generic Vite, Next.js, or browser SPA project.
-- If the user's message does not contain an actionable requirement, such as only
-  attaching an image without instructions, do not create or modify a website.
-  Ask the user what they want to build or change.
+- The CLI handles login, project/site discovery, pull, push, diff, conflict
+  resolution, preview, publish, platform data, and asset operations.
+- Public rendered origins may expose `/.well-known/creght.json`; use it to
+  discover `project_id` and `site_id` from a page URL.
+- `pull` mirrors remote paths locally, records `.creght/state.json`, and keeps
+  base snapshots under `.creght/base/` for safe diff/push. Overwritten local
+  content is backed up under `.creght/backup/`.
+- `pull` three-way merges remote/local edits; overlapping edits leave conflict
+  markers and exit non-zero. Use `resolve --list`, `resolve <path>
+  --ours|--theirs`, or manual edits before pushing.
+- `diff` reports creates, updates, deletes, skipped files, and conflicts.
+- `push` uploads local changes relative to the last base. It does not delete
+  remote files/functions unless `--delete` is passed, refuses conflict markers,
+  and reports remote/local conflicts.
+- The CLI does not render sites locally; rendering, CMS, forms, Auth, Func,
+  realtime preview, and publication are backend/web-app responsibilities.
+- If the user provides no actionable requirement, ask what to build or change.
 
 ## Default Workflow
 
-1. Locate the site directory. If the user provided a rendered page URL, first
-   fetch that URL's origin plus `/.well-known/creght.json` to discover the
-   `project_id` and `site_id`, then use the CLI pull workflow if the site is
-   not local yet.
-2. Read local project guidance such as `AGENTS.md` if present.
-3. Read `talizen.config.ts` when imports, metadata, custom code, or site-level
-   styling may be involved.
-4. Inspect the relevant page/component files, `/types`, and root config files;
-   follow the project's existing root convention.
-5. Apply focused changes that match existing project conventions.
-6. Before uploading, run `creght diff` (inside a pulled workspace, `pull`,
-   `diff`, `push`, `cat`, and `resolve` discover the site from
-   `.creght/state.json` automatically — no `--site_id`/`--dir` needed) when
-   there may be other people or Web editor changes. On conflicts, run `creght pull` to three-way
-   merge remote edits instead of overwriting by default; if the merge leaves
-   conflict markers, resolve them (`creght resolve`, or edit by hand) before
-   pushing.
-7. Validate with available local checks or Creght platform checks. If no local
-   renderer exists, use `creght push` or `creght preview` as the verification
-   path.
-
-## Question-Only Tasks
-
-When the user asks how to use the Creght editor or where to find a platform
-feature, answer directly without editing files, running the CLI, or changing
-platform state. Read `references/console-operations.md` for domains, DNS/SSL,
-publishing, analytics, environment variables, members, plans, and other editor
-navigation questions. If the user asks to implement custom event tracking, also
-read `references/analytics.md`.
-
-## Error Trigger
-
-When a typecheck, build, or lint/validate command fails, or the user reports a
-runtime or browser error, immediately activate the error-handling protocol by
-reading `references/error-handling.md`. Do not perform speculative fixes before
-checking the relevant guidance.
+1. Locate the site directory. If given a rendered URL, fetch origin +
+   `/.well-known/creght.json`, then pull if needed.
+2. Read local `AGENTS.md` if present.
+3. Read `talizen.config.ts` when config, imports, metadata, custom code, or
+   site-level CSS may be involved.
+4. Inspect relevant page/component/backend files, `/types`, and root configs.
+5. Apply focused edits that preserve local conventions.
+6. Before upload, run `creght diff` inside a pulled workspace when remote/editor
+   changes are possible. Pull to merge conflicts; resolve markers before push.
+7. Validate with local checks or Creght platform checks. Without a local
+   renderer, use `creght push` or `creght preview` as verification.
+8. On typecheck, build, lint/validate, runtime, or browser errors, immediately
+   read `references/error-handling.md` before fixing.
 
 ## Hard Platform Rules
 
-- Use the project's existing `/pages` or `/page` route root and `/components`
-  or `/component` UI root; do not rename or mix them. Prefer the plural names
-  for new projects.
-- Do not introduce `react-router-dom`, `next/link`, `next/router`,
+- Preserve existing `/pages` or `/page` route root and `/components` or
+  `/component` UI root. Prefer plural roots only for new projects.
+- Do not add `react-router-dom`, `next/link`, `next/router`,
   `next/navigation`, `getStaticProps`, or `getStaticPaths`.
-- Use native anchors such as `<a href="/about">...</a>` for navigation. On a
-  multilingual site, use talizen's locale-aware `<Link>`
-  (`import { Link } from "talizen"`, v0.2.0+) for internal links — it
-  auto-prefixes the current locale (a plain `<a>` drops the visitor out of their
-  language). talizen's own `<Link>` is allowed; do not use `next/link`,
-  `next/router`, `next/navigation`, or other router libraries.
-- Prefer `getServerSideProps(context)` for route params and public first-render
-  data. Read route params from `context.params` when SSR params are available.
-  In SSR code, use `context.request` and `context.cookies`; do not read auth
-  state, import `talizen/auth`, or call Func from `getServerSideProps`.
-- Do not proactively create `*.canvas.ts` or `*.canvas.tsx` files. They are
-  platform editor preview entries. Edit existing canvas files only when the user
-  explicitly asks.
-- Style utility-first: Tailwind v4 utility classes on the elements are the
-  default (the platform's Tailwind pipeline is more reliable than hand CSS).
-  Standalone CSS in `index.css` only for what Tailwind can't express (keyframes,
-  `:has()`/complex selectors, fluid `@utility` scales); never re-author
-  component layout as semantic CSS, and no inline `style` or `<style>` in pages.
-  See `references/css.md`.
-- Use relative paths for local project imports. The Creght platform does not
-  support alias imports such as `@/lib/utils`; write them as relative imports
-  like `../lib/utils` or `./lib/utils` from the importing file.
-- Media assets (images, PDFs, videos, fonts, other binaries) are hosted
-  resources, not editable site/Func source files. Reference each by a complete
-  absolute URL — the Creght CDN, a user-supplied URL, an external/third-party
-  host (hotlinking is allowed), or a `data:` URI for tiny inline assets are all
-  fine. Do NOT commit or import binaries as local project files, reference them
-  by relative or local paths, or guess/synthesize a fallback path. Prefer the
-  Creght CDN for anything you ship — external hotlinks can rot, be slow, or get
-  blocked — so when you have a local binary that must ship, or want to stabilize
-  a hotlink before publish, upload it through the platform/CLI asset flow
-  (`creght upload`, which returns a CDN URL) instead of committing the file.
-- Use structured `metadata` for SEO instead of custom `seo` fields or raw
-  `<title>` / `<meta name="description">` tags.
-- For simple backend workflows such as booking, RSVP, lead capture,
-  availability checks, status updates, and JSON-table reads/writes, use Func.
-  Do not fake persistent backend state in client code, do not expose project
-  IDs, and do not create `/func/*` pages. Read `references/func.md` before
-  writing Func code or client code that calls Func.
-- Never write API keys, tokens, passwords, or other secrets into page,
-  component, config, or Func source code. Func code must read secrets through
-  `process.env.NAME`, and the user must manually add those variables in the
-  Creght platform Backend / Env panel at `panel/backend/env`. The Creght CLI
-  cannot create, list, update, or delete project env variables.
-- Use the browser-side `talizen/auth` SDK for auth UI. React components must
-  use `useAuth()` for login, registration, logout, and current-user state;
-  do not import top-level `login` / `logout`. Page `getServerSideProps` does
-  not expose `ctx.auth`; protected backend actions must read the user from Func
-  `ctx.auth`. Do not create a `user` / `users` / `auth_users` database table
-  for account identity, and do not write Func code that implements passwords,
-  sessions, OAuth callbacks, login, or registration. Read `references/auth.md`
-  before building login, signup, account, OAuth, or protected UI flows.
-- Before using `talizen/auth` or `talizen/func`, read the type definitions from
-  the `talizen` version used by the current project when exact signatures are
-  needed.
-- When a typecheck, build, lint/validate, or user-reported runtime or browser
-  error occurs, the first response must be to read and follow
-  `references/error-handling.md`. Do not make speculative code changes before
-  checking that guidance.
+- Use native anchors for navigation. On multilingual sites, use Talizen's
+  locale-aware `<Link>`; never use router libraries.
+- Use `getServerSideProps(context)` for route params and public first-render
+  data. Do not read auth, import browser SDKs, or call Func in SSR.
+- Do not create `*.canvas.ts(x)` files unless explicitly asked.
+- Prefer Tailwind v4 utilities. Use `/index.css` only for tokens, keyframes,
+  complex selectors, or custom utilities. No inline `style` or page `<style>`.
+- Use relative imports for local files; aliases such as `@/lib/utils` are
+  unsupported.
+- Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
+  `creght upload`, or tiny `data:` URIs.
+- Use structured `metadata`, not custom `seo` fields or duplicate raw SEO tags.
+- Use Func for backend workflows and persistent writes. Do not fake persistence
+  in React state, expose project IDs, or create `/func/*` pages.
+- Keep secrets out of source. Func reads `process.env.NAME`; the user manually
+  manages env vars in Backend / Env at `panel/backend/env`. The CLI cannot
+  create, list, update, or delete env vars.
+- Use browser `talizen/auth` `useAuth()` for auth UI. Do not implement account
+  identity, passwords, sessions, OAuth callbacks, login, or registration with
+  Func or JSON tables.
+- When exact SDK signatures matter, read installed `talizen` type definitions.
 
-## Backend Capability Patterns
+## Reference Routing
 
-Read `references/auth.md` before writing login, registration, logout, current
-user, OAuth/social login, account, or protected UI code. In React UI, use
-`useAuth()` instead of importing top-level `login` / `logout`.
+- `references/cli.md`: CLI install/use, discovery, pull/diff/push/resolve,
+  platform data, backend commands, publish, asset upload.
+- `references/site-code.md`: routes, pages/components, SSR, imports, import
+  maps, `talizen.config.ts`, redirects, package types.
+- `references/css.md`: Tailwind v4 and `/index.css`.
+- `references/cms.md`: CMS schema types and fetch patterns.
+- `references/forms.md`: form schema and `talizen/form`.
+- `references/auth.md`: auth UI, current user, logout, OAuth, protected flows.
+- `references/func.md`: Func code, JSON tables, secrets, asset uploads, auth in
+  Func, CLI management, browser `invoke("file.method")`.
+- `references/seo.md`: `metadata`, viewport, OG, keywords, legacy migration.
+- `references/i18n.md`: multilingual routing, locale APIs, `_i18n`, messages.
+- `references/sitemap.md`: root-level sitemap.
+- `references/carousel.md`: carousel/slideshow setup.
+- `references/analytics.md`: visit analytics and custom event tracking.
+- `references/console-operations.md`: question-only editor guidance.
+- `references/error-handling.md`: bounded recovery for validation/runtime errors.
 
-Read `references/func.md` before using Func or database table CLI commands, or
-writing client code that calls Func. This includes requests involving custom
-backend actions, `invoke(...)`, `/api/func`, database tables, record CRUD,
-booking/RSVP/lead capture, protected user-specific business logic, or any
-question about whether to create a user database table, write backend logic, or
-use a third-party API key from backend code.
+## Read Before
 
-Use SSR for public or cookie-vary-safe first-render data. Do not put login
-state, private user data, writes, or Func calls in `getServerSideProps`; keep
-those flows in browser-side SDK/Func/API interactions.
+- General site-authoring: read `references/site-code.md`.
+- CLI pull/push/conflicts/assets/publish: read `references/cli.md`.
+- Auth UI or protected flows: read `references/auth.md`.
+- Func, JSON tables, backend actions, secrets, `invoke(...)`, or `/api/func`:
+  read `references/func.md`.
+- SEO, OG, keywords, favicon, viewport, or legacy SEO: read `references/seo.md`.
+- Multilingual work: read `references/i18n.md`.
+- Editor-navigation questions only: read `references/console-operations.md` and
+  answer directly without editing or running CLI.
 
-For password-gated pages, keep protected content out of SSR HTML and client
-bundles: render a public password gate, verify the password through Func/API,
-set a signed access cookie, then fetch protected content from Func/API.
+## Common Patterns
 
-For article lists with fast-changing like counts, SSR/cache the CMS article list
-only; fetch like counts after hydration with Func/API and update/toggle likes
-client-side so the whole page cache is not invalidated by counters.
-
-## Reference Map
-
-- `references/cli.md`: CLI install/use, endpoint defaults, platform data and
-  backend commands, rendered URL site discovery, and asset upload commands.
-- `references/site-code.md`: routing, pages/components structure, import maps,
-  and config rules.
-- `references/cms.md`: CMS data fetching and generated schema usage.
-- `references/forms.md`: form submissions and payload typing.
-- `references/auth.md`: platform auth, password login/register, current user,
-  logout, OAuth/social login providers, and protected UI patterns.
-- `references/func.md`: project-level Func code, JSON-table access,
-  Func-generated asset uploads, multi-method files, platform auth usage, and client-side
-  `invoke("file.method")` calls.
-- `references/seo.md`: site and page metadata.
-- `references/i18n.md`: multilingual sites — locale routing, reading the
-  locale, `_i18n` content storage, and `/messages` UI text.
-- `references/css.md`: Tailwind v4 and `index.css` conventions.
-- `references/sitemap.md`: root-level sitemap generation.
-- `references/carousel.md`: carousel/slideshow default approach.
-- `references/analytics.md`: automatic visit analytics and custom event tracking
-  (`data-track` attributes and `talizen/analytics` `track()`).
-- `references/console-operations.md`: question-only guidance about domains,
-  DNS/SSL, publishing, analytics, environment variables, members, and plans.
-- `references/error-handling.md`: bounded handling for typecheck, build,
-  lint/validate, and user-reported runtime or browser errors.
-
-For most site-authoring tasks, read `references/site-code.md` first, then load
-the specific topic reference only if the task touches that area.
+- Use SSR only for public or cookie-vary-safe first-render data; keep private
+  user data, auth state, writes, and Func calls in browser SDK/Func/API flows.
+- Password-gated pages should render a public gate, verify through Func/API, set
+  a signed access cookie, then fetch protected content from Func/API.
+- Article lists with fast-changing counters should SSR/cache the list and fetch
+  counters after hydration.
