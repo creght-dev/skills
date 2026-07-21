@@ -196,3 +196,4 @@ Common return shape:
 - Do not rely on old helper names from legacy docs.
 - When creating or updating content through platform APIs or tools, follow the
   collection JSON Schema.
+- For Markdown body fields, prefer `type: "string"` with `contentMediaType: "text/markdown"` because Creght's visual editor can recognize it and render the proper Markdown editing control; it also recognizes `text/html` as rich text HTML, `image/*` as image URL/upload fields, `video/*` as video URL/upload fields, and other `contentMediaType` values as generic file fields.
