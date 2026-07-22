@@ -17,8 +17,9 @@ For non-`Index` pages, do not guess kebab-case routes. Prefer the lowercase
 canonical path from lint/platform validation, such as
 `/pages/BlockElementsPage.tsx` -> `/blockelementspage`.
 
-Do not create `*.canvas.tsx` files by hand. For localized routing, read
-`references/i18n.md`.
+Do not create `*.canvas.tsx` files by hand unless the user explicitly asks;
+they are editor-only artboards, not routes — read `references/canvas.md`. For
+localized routing, read `references/i18n.md`.
 
 ## Navigation
 
