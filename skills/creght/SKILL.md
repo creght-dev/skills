@@ -62,7 +62,8 @@ use them if exposed, otherwise inspect files and use the CLI.
   locale-aware `<Link>`; never use router libraries.
 - Use `getServerSideProps(context)` for route params and public first-render
   data. Do not read auth, import browser SDKs, or call Func in SSR.
-- Do not create `*.canvas.ts(x)` files unless explicitly asked.
+- Do not create `*.canvas.ts(x)` files unless explicitly asked. When asked to
+  stage or preview drafts on the editor canvas, read `references/canvas.md`.
 - Prefer Tailwind v4 utilities. Use `/index.css` only for tokens, keyframes,
   complex selectors, or custom utilities. No inline `style` or page `<style>`.
 - Use relative imports for local files; aliases such as `@/lib/utils` are
@@ -86,6 +87,8 @@ use them if exposed, otherwise inspect files and use the CLI.
   platform data, backend commands, publish, asset upload.
 - `references/site-code.md`: routes, pages/components, SSR, imports, import
   maps, `talizen.config.ts`, redirects, package types.
+- `references/canvas.md`: `*.canvas.tsx` editor artboards, frame layout,
+  staging draft sections next to the page.
 - `references/css.md`: Tailwind v4 and `/index.css`.
 - `references/cms.md`: CMS schema types and fetch patterns.
 - `references/forms.md`: form schema and `talizen/form`.
@@ -109,6 +112,8 @@ use them if exposed, otherwise inspect files and use the CLI.
   read `references/func.md`.
 - SEO, OG, keywords, favicon, viewport, or legacy SEO: read `references/seo.md`.
 - Multilingual work: read `references/i18n.md`.
+- Editing `*.canvas.tsx` or staging a draft for visual review: read
+  `references/canvas.md`.
 - Editor-navigation questions only: read `references/console-operations.md` and
   answer directly without editing or running CLI.
 
