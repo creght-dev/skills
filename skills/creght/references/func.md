@@ -37,6 +37,9 @@ Use `main` only for a single-operation Func; otherwise export named methods.
 6. Never hard-code secrets or project IDs.
 7. Do not use legacy globals (`data`, `db`, `auth`, `cache`) or CommonJS
    exports.
+8. Func is not a full JavaScript runtime. Timer APIs such as `setTimeout` /
+   `setInterval` are unsupported — do not use them for delays, polling, or
+   retries inside Func.
 
 ```ts
 import type { TalizenFuncContext } from "talizen/func-runtime"
@@ -108,6 +111,11 @@ files deletes remote Funcs only on `push --delete`.
 
 ## Calling From Pages
 
+`invoke` defaults to a **5s** timeout (`timeoutMs: 5000`). Override it when the
+Func needs longer — for example model image or video generation often needs
+**60s+**. Errors such as `context deadline exceeded` or `context timeout`
+usually mean the default timeout is too short; raise `timeoutMs`.
+
 ```tsx
 import { invoke, TalizenFuncError } from "talizen/func"
 
@@ -115,6 +123,20 @@ try {
   const result = await invoke("booking.create", input)
 } catch (error) {
   const message = error instanceof TalizenFuncError ? error.message : "Unable to submit."
+}
+```
+
+Set a longer timeout when needed:
+
+```tsx
+import { invoke } from "talizen/func"
+
+try {
+  const result = await invoke("image.generate", input, {
+    timeoutMs: 60000, // e.g. model image / video generation
+  })
+} catch (error) {
+  // timeout or other Func errors
 }
 ```
 
