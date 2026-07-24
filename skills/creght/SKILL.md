@@ -70,6 +70,9 @@ use them if exposed, otherwise inspect files and use the CLI.
   unsupported.
 - Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
   `creght upload`, or tiny `data:` URIs.
+- Static files, including a self-contained standalone HTML file, go under
+  `public/` (served at the domain root); a project-root `index.html` is NOT
+  served. For one-file artifacts (deck/poster/preview) read `references/site-code.md`.
 - Use structured `metadata`, not custom `seo` fields or duplicate raw SEO tags.
 - Use Func for backend workflows and persistent writes. Do not fake persistence
   in React state, expose project IDs, or create `/func/*` pages.
@@ -86,7 +89,7 @@ use them if exposed, otherwise inspect files and use the CLI.
 - `references/cli.md`: CLI install/use, discovery, pull/diff/push/resolve,
   platform data, backend commands, publish, asset upload.
 - `references/site-code.md`: routes, pages/components, SSR, imports, import
-  maps, `talizen.config.ts`, redirects, package types.
+  maps, `talizen.config.ts`, redirects, package types, `public/` static files.
 - `references/canvas.md`: `*.canvas.tsx` editor artboards, frame layout,
   staging draft sections next to the page.
 - `references/css.md`: Tailwind v4 and `/index.css`.

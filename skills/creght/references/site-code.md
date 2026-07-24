@@ -135,6 +135,22 @@ export default {
 Use `redirects` for static site-level redirects. For data-dependent redirects,
 return `redirect` from `getServerSideProps`.
 
+## Public Static Files
+
+`public/` holds raw static files served verbatim at the domain root, outside
+React/SSR/routing: `public/<path>` -> `<domain>/<path>` (e.g. `public/deck.html`
+-> `<domain>/deck.html`, `public/logo.svg` -> `<domain>/logo.svg`).
+
+Default all website work to Creght pages. Use `public/` only for a genuinely
+self-contained artifact the user explicitly wants as one HTML file — a
+roadshow/presentation deck, poster, or one-off preview. Such a file may inline
+its own CSS/JS or load CDN assets, and is previewable/shareable by URL.
+
+A `public/*.html` file is not part of routing, SSR, `metadata`/SEO, i18n, CMS,
+or the component system; do not use it for real site pages. Never write a
+project-root `index.html` to satisfy a "single HTML file" request — it is not
+served; put it in `public/`.
+
 ## Package Types
 
 Use `fetch_module_types(specifier)` only when exact signatures are unknown, the
