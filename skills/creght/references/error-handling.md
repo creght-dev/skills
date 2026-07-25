@@ -29,6 +29,9 @@ Continue only when there is new concrete evidence, such as console output, lint
 or typecheck diagnostics, a stack trace, network logs, or a specific file
 location.
 
+Revert a fix that did not change the symptom before trying the next one. Report
+the change you verified as the fix, never an unconfirmed hypothesis.
+
 ## Browser And Runtime Errors
 
 For browser, runtime, or network render errors the user reports from the preview:
@@ -49,6 +52,24 @@ For browser, runtime, or network render errors the user reports from the preview
 - Add a simple fallback for resource loading failure.
 - Use a more widely supported browser API.
 - Adjust module loading only when project code clearly caused the issue.
+
+## Diagnosing A Broken Page
+
+Re-open the page's preview URL with `?dev` appended. Dev mode server-renders the
+full render diagnostics into the page, including the SSR error a normal request
+hides. Do this before guessing.
+
+A page that shows its own empty or not-found branch, or that lost its
+`getServerSideProps` props, while the record exists and the route is right, is
+an SSR load failure — not a data bug. Check in order:
+
+1. Bare imports in the page's module graph: a package that is not a platform
+   built-in cannot load in SSR (`references/site-code.md` "SSR Availability").
+2. `window` / `document` at module scope or during render.
+3. The data layer.
+
+`getContent(key, slug)` takes a slug and is not locale-sensitive. Do not swap it
+for a `listContents` scan on suspicion.
 
 ## Known Non-Fixable Cases
 
