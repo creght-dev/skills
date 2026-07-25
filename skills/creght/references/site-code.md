@@ -108,26 +108,27 @@ upload tools, or tiny `data:` URIs. Runtime Func assets use
 
 ### SSR Availability
 
-The browser resolves every importMap entry from its CDN URL. SSR resolves bare
-imports from the render server's `node_modules`, which holds only the platform
-built-ins: `react`, `talizen/*`, `lucide-react`, `clsx`, `tailwind-merge`,
-`class-variance-authority`, `radix-ui`, `motion` / `framer-motion`, `gsap`,
-`three`, `@react-three/*`, `lenis`, `ogl`, `matter-js`, `react-icons`.
+The browser resolves importMap entries from their CDN URLs. SSR resolves bare
+imports from the render server's `node_modules`, which holds only the packages
+the platform provides. Read the project's `talizen.config.ts` to tell the two
+apart: entries declared there were added by the project and do not exist on the
+render server. Do not assume a fixed built-in list — the platform updates its
+own set independently.
 
-A package added to `talizen.config.ts` therefore works in the browser but breaks
-SSR of every page importing it: the page drops to client-only rendering and may
-show its own empty or not-found branch while route and data are fine. Lint only
-checks that the specifier is declared, so it still passes.
+Importing a project-added package anywhere in a page's module graph therefore
+breaks that page's SSR. The page falls back to client-only rendering, losing SSR
+and SEO, and may also lose its `getServerSideProps` props and render its own
+empty or not-found branch while route and data are fine. Lint only checks that
+the specifier is declared, so it still passes.
 
-- Prefer writing the code over adding a dependency for a small job.
-- If one is required, isolate it in a component file whose first line is
-  `'use client'` — that file is stubbed during SSR. On the page file itself the
-  directive does nothing.
-- Verify on the real preview URL, not on lint.
+No directive keeps SSR for such a page. Write the logic in project code, or use
+a package the platform already provides.
 
 Browser globals cause a softer version of the same downgrade: keep `window`,
 `document`, and `navigator` out of module scope and render (including
 `useState` / `useRef` initializers), inside `useEffect` and handlers.
+
+Verify on the real preview URL, not on lint.
 
 ## talizen.config.ts
 
