@@ -110,16 +110,42 @@ Common return shape:
 Common optional params include `limit`, `offset`, `searchKey`, `orderBy`, and
 `filter`.
 
-Common `orderBy` values:
+## Ordering
 
-- `created_at`
-- `created_at desc`
-- `updated_at`
-- `updated_at desc`
-- `sort`
-- `sort desc`
+`orderBy` takes comma-separated terms, each `<field>` or `<field> asc|desc`
+(direction defaults to `asc`). Two kinds of field:
 
-Default order is usually `created_at desc`.
+- System columns: `id`, `created_at`, `updated_at`, `sort`
+- Body fields, addressed as `body.<key>`: `body.date desc`, nested
+  `body.meta.rank asc`
+
+The default order is `sort desc, id desc` — the same order the CMS admin list
+uses, so a page with no `orderBy` shows what the editor sees.
+
+```ts
+// Newest-first news list, ordered by the editorial publish date.
+const content = await listContents<Articles>("articles", {
+  limit: 10,
+  orderBy: "body.date desc, created_at desc",
+})
+```
+
+Notes:
+
+- A bare body field name (`orderBy: "date desc"`) is rejected with a 400 — the
+  `body.` prefix is required. Unsupported fields fail loudly instead of silently
+  falling back to the default order.
+- Body values are compared as stored: numbers numerically, strings
+  lexicographically. Dates therefore only sort correctly in ISO form
+  (`2026-07-17`), which is what a `format: date` schema field produces — a
+  free-text `2026/7/1` will not sort correctly.
+- Entries missing the field sort last.
+- Sort on the server with `orderBy`; do not fetch a large `limit` and re-sort in
+  JS, which silently breaks as soon as the collection outgrows one page.
+
+To change the order editors see in the CMS admin list, set each entry's `sort`
+(bigger first). Never delete and recreate entries to reorder them: it changes
+their ids, and site versions do not snapshot CMS content, so it cannot be undone.
 
 ## Filter Content
 
@@ -183,6 +209,12 @@ Common return shape:
   prev?: Blogs
 }
 ```
+
+Known limitation: prev/next neighbours are resolved against the default
+`sort desc, id desc` order only. Passing any other `orderBy` (including
+`body.<key>`) still returns the default-order neighbours, so a detail page whose
+list is ordered by a body field will show neighbours that do not match that
+list.
 
 ## General CMS Guidelines
 
