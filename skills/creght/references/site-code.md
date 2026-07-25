@@ -106,6 +106,29 @@ Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
 upload tools, or tiny `data:` URIs. Runtime Func assets use
 `ctx.assets.upload(...)` and store returned metadata.
 
+### SSR Availability
+
+The browser resolves every importMap entry from its CDN URL. SSR resolves bare
+imports from the render server's `node_modules`, which holds only the platform
+built-ins: `react`, `talizen/*`, `lucide-react`, `clsx`, `tailwind-merge`,
+`class-variance-authority`, `radix-ui`, `motion` / `framer-motion`, `gsap`,
+`three`, `@react-three/*`, `lenis`, `ogl`, `matter-js`, `react-icons`.
+
+A package added to `talizen.config.ts` therefore works in the browser but breaks
+SSR of every page importing it: the page drops to client-only rendering and may
+show its own empty or not-found branch while route and data are fine. Lint only
+checks that the specifier is declared, so it still passes.
+
+- Prefer writing the code over adding a dependency for a small job.
+- If one is required, isolate it in a component file whose first line is
+  `'use client'` — that file is stubbed during SSR. On the page file itself the
+  directive does nothing.
+- Verify on the real preview URL, not on lint.
+
+Browser globals cause a softer version of the same downgrade: keep `window`,
+`document`, and `navigator` out of module scope and render (including
+`useState` / `useRef` initializers), inside `useEffect` and handlers.
+
 ## talizen.config.ts
 
 Use `export default` with a plain object. Do not import packages except

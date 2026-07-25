@@ -48,7 +48,9 @@ use them if exposed, otherwise inspect files and use the CLI.
 6. Before upload, run `creght diff` inside a pulled workspace when remote/editor
    changes are possible. Pull to merge conflicts; resolve markers before push.
 7. Validate with local checks or Creght platform checks. Without a local
-   renderer, use `creght push` or `creght preview` as verification.
+   renderer, use `creght push` or `creght preview` as verification — lint and
+   typecheck are compile checks only, so confirm the real route renders (add
+   `?dev` if it looks wrong).
 8. On typecheck, build, lint/validate, runtime, or browser errors, immediately
    read `references/error-handling.md` before fixing.
 
@@ -68,6 +70,10 @@ use them if exposed, otherwise inspect files and use the CLI.
   complex selectors, or custom utilities. No inline `style` or page `<style>`.
 - Use relative imports for local files; aliases such as `@/lib/utils` are
   unsupported.
+- Only platform built-in importMap packages may appear in a page's module graph.
+  A dependency added to `talizen.config.ts` resolves in the browser but not in
+  SSR, silently dropping the page to client-only rendering; lint misses it.
+  See `references/site-code.md` "SSR Availability".
 - Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
   `creght upload`, or tiny `data:` URIs.
 - Static files, including a self-contained standalone HTML file, go under
@@ -121,6 +127,9 @@ use them if exposed, otherwise inspect files and use the CLI.
   `references/canvas.md`.
 - Editor-navigation questions only: read `references/console-operations.md` and
   answer directly without editing or running CLI.
+- A page renders wrong, empty, or not-found while the data exists: re-open it
+  with `?dev` for full render diagnostics, then read
+  `references/error-handling.md` before editing data code.
 
 ## Common Patterns
 
