@@ -52,6 +52,10 @@ signed-in project user with `ctx.auth.currentUser()` or
 `ctx.auth.requireUser()`. Func auth is not for implementing login,
 registration, logout, or OAuth.
 
+A password-gated page follows the same boundary: render a public gate, verify
+through Func/API, set a signed access cookie, then fetch the protected content
+from Func/API.
+
 ## Registration And Profile
 
 In React UI, prefer `useAuth().register(...)` and

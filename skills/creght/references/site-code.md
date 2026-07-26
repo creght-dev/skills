@@ -66,6 +66,11 @@ Fields: `params`, `searchParams`, `request` (`host` / `headers.get()`), `cookies
 Do not read auth or call Func in SSR. Use `useAuth()` in React UI and Func
 `ctx.auth` for protected backend actions.
 
+SSR is for public or cookie-vary-safe first-render data only; keep login state,
+private user data, and writes in browser SDK/Func/API flows. When part of the
+page changes fast (e.g. an article list with view counters), SSR/cache the
+stable part and fetch the volatile part after hydration.
+
 ## Components
 
 Keep page files for route composition. Put reusable UI in the existing

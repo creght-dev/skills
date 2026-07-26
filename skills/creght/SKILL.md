@@ -92,50 +92,31 @@ use them if exposed, otherwise inspect files and use the CLI.
 - CMS rich-text body fields (e.g. an article `body`) are HTML, not Markdown;
   Markdown renders as literal text. See `references/cms.md`.
 
-## Reference Routing
+## References
 
-- `references/cli.md`: CLI install/use, discovery, pull/diff/push/resolve,
+Paths below are relative to this skill's `references/`. Read one only when you
+reach its topic; do not read the others.
+
+- `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
   platform data, backend commands, publish, asset upload.
-- `references/site-code.md`: routes, pages/components, SSR, imports, import
-  maps, `talizen.config.ts`, redirects, package types, `public/` static files.
-- `references/canvas.md`: `*.canvas.tsx` editor artboards, frame layout,
-  staging draft sections next to the page.
-- `references/css.md`: Tailwind v4 and `/index.css`.
-- `references/cms.md`: CMS schema types and fetch patterns.
-- `references/forms.md`: form schema and `talizen/form`.
-- `references/auth.md`: auth UI, current user, logout, OAuth, protected flows.
-- `references/func.md`: Func code, JSON tables, secrets, asset uploads, auth in
-  Func, CLI management, browser `invoke("file.method")`.
-- `references/seo.md`: `metadata`, viewport, OG, keywords, legacy migration.
-- `references/i18n.md`: multilingual routing, locale APIs, `_i18n`, messages.
-- `references/sitemap.md`: root-level sitemap.
-- `references/carousel.md`: carousel/slideshow setup.
-- `references/analytics.md`: visit analytics and custom event tracking.
-- `references/console-operations.md`: question-only editor guidance.
-- `references/error-handling.md`: bounded recovery for validation/runtime errors.
-
-## Read Before
-
-- General site-authoring: read `references/site-code.md`.
-- CLI pull/push/conflicts/assets/publish: read `references/cli.md`.
-- Auth UI or protected flows: read `references/auth.md`.
-- Func, JSON tables, backend actions, secrets, `invoke(...)`, or `/api/func`:
-  read `references/func.md`.
-- SEO, OG, keywords, favicon, viewport, or legacy SEO: read `references/seo.md`.
-- Multilingual work: read `references/i18n.md`.
-- Editing `*.canvas.tsx` or staging a draft for visual review: read
-  `references/canvas.md`.
-- Editor-navigation questions only: read `references/console-operations.md` and
-  answer directly without editing or running CLI.
-- A page renders wrong, empty, or not-found while the data exists: re-open it
-  with `?dev` for full render diagnostics, then read
-  `references/error-handling.md` before editing data code.
-
-## Common Patterns
-
-- Use SSR only for public or cookie-vary-safe first-render data; keep private
-  user data, auth state, writes, and Func calls in browser SDK/Func/API flows.
-- Password-gated pages should render a public gate, verify through Func/API, set
-  a signed access cookie, then fetch protected content from Func/API.
-- Article lists with fast-changing counters should SSR/cache the list and fetch
-  counters after hydration.
+- `site-code.md` — routes, pages/components, SSR data loading, imports,
+  importMap, `talizen.config.ts`, redirects, package types, `public/` static
+  files.
+- `cms.md` — CMS schema types and fetch patterns.
+- `css.md` — Tailwind v4 and `/index.css`.
+- `i18n.md` — multilingual routing, locale APIs, `_i18n`, messages.
+- `forms.md` — form schema and `talizen/form`.
+- `auth.md` — auth UI, current user, logout, OAuth, protected flows.
+- `func.md` — Func code, JSON tables, secrets, asset uploads, auth in Func, CLI
+  management, `invoke(...)`, `/api/func`.
+- `seo.md` — `metadata`, viewport, OG, keywords, favicon, legacy migration.
+- `carousel.md` — carousel/slideshow setup.
+- `sitemap.md` — root-level sitemap.
+- `analytics.md` — visit analytics and custom event tracking.
+- `canvas.md` — `*.canvas.tsx` artboards, frame layout, staging a draft next to
+  the page.
+- `console-operations.md` — editor navigation. Question-only: answer directly,
+  without editing or running CLI.
+- `error-handling.md` — any validation or runtime failure, and pages that render
+  wrong, empty, or not-found while the data exists (re-open with `?dev` for full
+  diagnostics first).
