@@ -66,6 +66,8 @@ use them if exposed, otherwise inspect files and use the CLI.
   data. Do not read auth, import browser SDKs, or call Func in SSR.
 - Do not create `*.canvas.ts(x)` files unless explicitly asked. When asked to
   stage or preview drafts on the editor canvas, read `references/canvas.md`.
+- For visual configuration, including multiple variants, use typed React
+  component props with defaults; the editor supports visual control of props.
 - Prefer Tailwind v4 utilities. Use `/index.css` only for tokens, keyframes,
   complex selectors, or custom utilities. No inline `style` or page `<style>`.
 - Use relative imports for local files; aliases such as `@/lib/utils` are
