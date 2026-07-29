@@ -1,100 +1,152 @@
 # Creght Func Usage
 
-Use Func for small project-level backend workflows: bookings, waitlists, RSVP,
-lead routing, profile updates, availability checks, protected user actions,
-third-party API calls with secrets, and simple JSON-table reads/writes. Func is
-project-scoped; user code must not receive, hard-code, read, or branch on
-`project_id`.
+Func is the project-scoped backend runtime for work that cannot be done safely
+in browser code: bookings, waitlists, RSVP, lead routing, profile updates,
+availability checks, protected user actions, third-party API calls with secrets,
+webhooks, payment, and simple JSON-table reads/writes.
 
-## When To Use
+This file is **not** the Func API reference. It holds the rules that must hold
+whether or not you read anything else. The API surface — `ctx` signatures,
+return shapes, integration options, defaults and limits — lives in the live
+documentation below and changes with each platform release.
 
-Use Func when CMS or `talizen/form` is insufficient and validation, secrets,
-persistence, or protected user logic must stay server-side. Do not use Func for
-normal CMS rendering, long-running jobs, heavy processing, custom identity,
-OAuth callbacks, or token exchange. For auth UI, read `references/auth.md`.
+## Live Documentation
 
-## Keys And Calls
+Single stable entry point; fetch it first, then the topic doc it lists:
 
-Func keys are extensionless paths: `booking`, `booking/admin`,
-`profile/settings`. Avoid `booking.js`, `user/auth.ts`, or `auth.login`.
-
-```ts
-invoke("booking.create", input)
-invoke("profile/settings.update", input)
-invoke("booking", input) // method main
+```
+https://www.creght.cn/api.md
 ```
 
-Use `main` only for a single-operation Func; otherwise export named methods.
+Any page path also serves markdown with a `.md` suffix.
 
-## Code Rules
+1. Before writing or editing Func code, open the index and read the doc for the
+   topic at hand. Do not answer from memory of a `ctx` signature, default,
+   limit, or config field — those are exactly what the docs update.
+2. For anything involving a **third-party service, an integration, payment,
+   email or verification codes, or any Func capability not stated below**: check
+   the index for a matching doc *before* writing provider HTTP calls. Only when
+   the index has no such doc is the capability genuinely unwrapped by the
+   platform — then it is ordinary Func code with the credential in
+   `process.env`.
+3. If the fetch fails, do not invent an API surface. Follow only the rules
+   below, and tell the user the documentation is unreachable.
 
-1. Export ESM functions: `export function method(input, ctx)`.
-2. Put platform access behind `ctx`.
-3. Import only TypeScript types from `talizen/func-runtime` when needed.
-4. Validate and normalize all input inside Func.
-5. Return structured JSON for expected business states; throw for invalid or
-   unexpected failures.
-6. Never hard-code secrets or project IDs.
-7. Do not use legacy globals (`data`, `db`, `auth`, `cache`) or CommonJS
-   exports.
-8. Func is not a full JavaScript runtime. Timer APIs such as `setTimeout` /
-   `setInterval` are unsupported — do not use them for delays, polling, or
-   retries inside Func.
+## Invariants
 
-```ts
-import type { TalizenFuncContext } from "talizen/func-runtime"
+Scope and structure
 
-export function create(input, ctx: TalizenFuncContext) {
-  return ctx.db.insert("appointments", input)
-}
-```
+- Confirm CMS or `talizen/form` is insufficient before reaching for Func. Func
+  is not for content rendering, static contact forms, detached background jobs,
+  heavy file processing, timer polling, unbounded streams, self-built
+  account/session systems, OAuth callbacks, or token exchange. Bounded SSE
+  streaming is supported.
+- Func is project-scoped. User code must not receive, hard-code, read, or branch
+  on `project_id`, `site_id`, internal tokens, or table IDs — and none of them
+  belong in a client payload.
+- Files live under `backend/func` in the workspace. The extensionless path is
+  the key (`backend/func/booking.ts` → `booking`,
+  `backend/func/profile/settings.ts` → `profile/settings`); dots are reserved
+  for methods (`invoke("booking.create", input)`). Export callable methods
+  directly — never hand-write a dispatcher. Use `main` only for a
+  single-operation Func.
+- The public HTTP path is `/func/<key>`. Do not create `/func/*` pages.
 
-Common helpers: `ctx.db.get/query/insert/update/delete`, `ctx.auth.currentUser`,
-`ctx.auth.requireUser`, `ctx.assets.upload`, `ctx.cache.*`, `ctx.request.*`,
-`ctx.cookies.*`, `ctx.response.status(code)`, `console.*`, `ctx.trace_id`.
+Runtime
 
-Request body readers follow Fetch semantics and can be consumed once. For
-webhook signatures, use `await ctx.request.arrayBuffer()`. Web Crypto is
-available as global `crypto`; `node:crypto` is not.
+- Reach every platform capability through `ctx`. Never use the legacy globals
+  `data`, `db`, `auth`, `cache`, or CommonJS exports.
+- Func is not a full Node.js runtime: no Node built-ins (including
+  `node:crypto`), and no `setTimeout` / `setInterval` — they cannot be used for
+  delays, polling, or retries.
+- Validate and normalize all input inside the Func. Return structured JSON for
+  expected business states; throw only for invalid requests or unexpected
+  failures.
+- Import types from `talizen/func-runtime` with `import type`. Func has no
+  module loader, so a runtime value import from it always fails.
 
-Func HTTP responses return `{ "result": ... }` or `{ "error": "..." }`.
-Browser `invoke()` unwraps successful results and throws `TalizenFuncError`.
+Secrets and integrations
 
-## Secrets, Payment, Assets
+- Never hard-code an API key, bearer token, password, webhook secret, or service
+  credential — not in Func files, `talizen.config.ts`, pages, components,
+  examples, comments, or generated output. Secrets come from `process.env`.
+- Env vars and integrations are configured by the **user** in
+  `panel/backend/env` and `panel/backend/integrations`. The CLI cannot manage
+  either; never claim to have set one up.
+- Where the platform has a managed integration, the credential stays server-side
+  and the capability is used through `ctx`. Never call the provider's HTTP API or
+  write an `Authorization` header for such a capability, and never work around a
+  "not configured / not verified / disabled" error by going direct — that is a
+  user action in the panel.
+- Email and email verification codes work this way, through `ctx.email`. The
+  platform already enforces code generation, expiry, single-use consumption,
+  constant-time comparison, the wrong-attempt cap, and rate limiting. Do not
+  reimplement any of it: no `Math.random()` codes, no `ctx.cache` code storage,
+  no hand-rolled attempt counters. A verified code proves mailbox control, not a
+  session.
+- There is **no managed payment integration and no `ctx.payment`**, and no
+  built-in payment SDK. A payment callback must verify the provider signature,
+  merchant identity, local order, amount, and paid state before an idempotent
+  update, then return the provider's exact acknowledgement.
 
-Read secrets from `process.env.NAME`. Users manually add env vars in Creght
-Backend / Env at `panel/backend/env`; the CLI cannot manage env vars.
+Data and identity
 
-Payment integrations are custom server-side Func work: use REST/webhooks,
-verify signatures over raw bytes, keep operations idempotent, and store order
-state in JSON tables.
+- A JSON table must exist before writes. Its definition is
+  `platform/table/<key>.json` in the workspace (file name = table key); the CLI
+  `creght table` commands manage the same definitions, and records go through
+  `creght table record`. Use JSON Schema only to describe record shape — no
+  dynamic SQL migrations or DDL.
+- Store the platform `user.id` as the ownership key. Never use an email as an
+  identity key, and never create account identity tables such as `users` or
+  `auth_users`.
+- Use `ctx.auth.requireUser()` for protected backend actions. Auth UI uses
+  `useAuth()` from `talizen/auth` (see `references/auth.md`); never build
+  passwords, sessions, login, registration, or OAuth callbacks in Func.
 
-Use `ctx.assets.upload({ filename, mimeType, base64 })` for runtime-generated
-large assets. Store returned URL/path/size metadata; do not store or return
-large base64 payloads. Use `creght upload` only for local build-time files.
+Boundaries
 
-## Auth And JSON Tables
+- Do not call Func from `getServerSideProps`. SSR intentionally exposes no
+  `ctx.auth`, `ctx.func`, `ctx.db`, or `ctx.cache`.
+- Call Func from browser event handlers for mutations, and keep persistent
+  writes in Func — never fake persistence in React state.
+- A browser-selected `File`/`Blob` uploads through `uploadAsset` from
+  `talizen/assets`. Do not base64-encode browser files through `invoke()` just
+  to reach `ctx.assets.upload`, which is only for bytes generated inside Func.
+  Never store or return large base64 payloads. Use `creght upload` only for
+  local build-time files.
 
-Use Func auth only for protected backend actions:
+Timeouts
 
-```ts
-export function create(input, ctx) {
-  const user = ctx.auth.requireUser()
-  return ctx.db.insert("orders", { ...input, userId: user.id })
-}
-```
+- `invoke` has a short default timeout; bounded long work (model image or video
+  generation, slow third-party calls) needs an explicit `timeoutMs` at the call
+  site. Detached background work is not an option.
+- For `context deadline exceeded` / `context timeout`: inspect the page's actual
+  `invoke(..., { timeoutMs })`, then re-run the same input and model with a
+  larger timeout. A timeout passed to `creght func run` / `run_func` affects
+  only that self-test and is never evidence of a platform hard limit. Never
+  "fix" a deadline by shortening the requested output, lowering `max_tokens`,
+  switching models or providers, creating tables, or faking a background job.
 
-React UI must use `talizen/auth` `useAuth()`. Do not implement passwords,
-sessions, login, registration, or OAuth callbacks in Func.
+## ctx Surface
 
-JSON tables must exist before writes. Use JSON Schema for record shape; do not
-design dynamic SQL migrations or DDL. For user-specific data, store platform
-`user.id`, not email identity keys. Do not create identity tables.
+Names only — read the live docs for signatures, return shapes and limits:
+
+- `ctx.db` — project JSON tables
+- `ctx.auth` — current / required user
+- `ctx.cache` — short-lived values, counters, expiry
+- `ctx.request`, `ctx.response`, `ctx.cookies` — request info, status, cookies
+- `ctx.assets` — upload bytes generated inside Func
+- `ctx.email` — transactional mail and verification codes (needs an integration)
+- `ctx.sse` — bounded incremental events
+- `console.*`, `ctx.trace_id` — logs correlated to one call
+
+`fetch`, `Response`, `TextDecoder` and Web Crypto (`crypto`) are globals; a
+returned `Response` bypasses the JSON envelope for webhooks and callbacks.
+Request body readers follow Fetch semantics and can be consumed once.
 
 ## CLI Management
 
 When native platform tools are unavailable, use the CLI for table and Func work.
-The CLI cannot manage env vars.
 
 ```bash
 creght table create --site_id=<project_id>/<site_id> --key=appointments --schema=./appointments.schema.json
@@ -105,57 +157,20 @@ creght push --site_id=<project_id>/<site_id> --dir=./mysite
 creght func run --site_id=<project_id>/<site_id> --key=booking.create --input=./input.json
 ```
 
-Path mapping: `backend/func/booking.ts` -> `booking`;
-`backend/func/profile/settings.ts` -> `profile/settings`. Deleting local Func
-files deletes remote Funcs only on `push --delete`.
-
-## Calling From Pages
-
-`invoke` defaults to a **5s** timeout (`timeoutMs: 5000`). Override it when the
-Func needs longer — for example model image or video generation often needs
-**60s+**. Errors such as `context deadline exceeded` or `context timeout`
-usually mean the default timeout is too short; raise `timeoutMs`.
-
-```tsx
-import { invoke, TalizenFuncError } from "talizen/func"
-
-try {
-  const result = await invoke("booking.create", input)
-} catch (error) {
-  const message = error instanceof TalizenFuncError ? error.message : "Unable to submit."
-}
-```
-
-Set a longer timeout when needed:
-
-```tsx
-import { invoke } from "talizen/func"
-
-try {
-  const result = await invoke("image.generate", input, {
-    timeoutMs: 60000, // e.g. model image / video generation
-  })
-} catch (error) {
-  // timeout or other Func errors
-}
-```
-
-Call Func from event handlers for mutations. Keep persistent writes inside Func.
-Do not include `project_id`, `site_id`, internal tokens, or table IDs in client
-payloads.
-
-## SSR Boundary
-
-Do not call Func from `getServerSideProps`. SSR exposes request/cookie helpers,
-but not `ctx.auth`, `ctx.func`, `ctx.db`, or `ctx.cache`. Auth/private
-data/writes/cache/db logic belongs in Func/browser flows.
+Deleting local Func files deletes remote Funcs only on `push --delete`.
 
 ## Checklist
 
-1. Confirm CMS or `talizen/form` is insufficient.
-2. Create/update required JSON tables.
-3. Add Func code under `backend/func`.
-4. Validate input and keep secrets in `process.env`.
-5. Call with `invoke("key.method", input)` from UI.
-6. Use `creght func run`/`run_func` for sample tests when useful.
-7. Run lint or preview validation after page/component edits.
+1. Confirm CMS or `talizen/form` cannot do it.
+2. Read the relevant doc from the index above.
+3. Create or verify the JSON tables.
+4. Write the Func under `backend/func`; validate input, secrets from
+   `process.env`.
+5. Call it with `invoke("key.method", input)`; native Fetch + SSE only for
+   streaming.
+6. Use `creght func run` / `run_func` with sample input for backend self-tests.
+7. Run lint or preview validation after page/component edits, then verify the
+   real path: success, expected business failure, signed-out, third-party
+   failure, timeout.
+
+On any runtime failure, read `references/error-handling.md`.
