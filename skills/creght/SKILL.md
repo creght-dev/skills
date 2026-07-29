@@ -38,6 +38,11 @@ use them if exposed, otherwise inspect files and use the CLI.
 
 ## Default Workflow
 
+For existing CMS content edits, first confirm the field exists and is already
+rendered. If so, skip this source workflow and use `creght content
+list/get/update`. Edit source only when the field or rendering binding is
+missing, such as an image `alt` binding.
+
 1. Locate the site directory. If given a rendered URL, fetch origin +
    `/.well-known/creght.json`, then pull if needed.
 2. Read local `AGENTS.md` if present.
@@ -78,6 +83,9 @@ use them if exposed, otherwise inspect files and use the CLI.
   See `references/site-code.md` "SSR Availability".
 - Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
   `creght upload`, or tiny `data:` URIs.
+- Never edit `/types/cms.d.ts` or `/types/form.d.ts`; they are platform-generated.
+  Change the CMS/Form schema through platform or CLI operations, then refresh
+  the generated files.
 - Static files, including a self-contained standalone HTML file, go under
   `public/` (served at the domain root); a project-root `index.html` is NOT
   served. For one-file artifacts (deck/poster/preview) read `references/site-code.md`.
@@ -104,13 +112,16 @@ reach its topic; do not read the others.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.
-- `cms.md` — CMS schema types and fetch patterns.
+- `cms.md` — CMS content operations, schema types, and fetch patterns.
 - `css.md` — Tailwind v4 and `/index.css`.
 - `i18n.md` — multilingual routing, locale APIs, `_i18n`, messages.
 - `forms.md` — form schema and `talizen/form`.
 - `auth.md` — auth UI, current user, logout, OAuth, protected flows.
-- `func.md` — Func code, JSON tables, secrets, asset uploads, auth in Func, CLI
-  management, `invoke(...)`, `/api/func`.
+- `func.md` — Func invariants: code and keys, JSON tables, secrets, integrations
+  (`ctx.email`), asset uploads, auth in Func, CLI management, `invoke(...)`,
+  `/func/<key>`. The Func API reference itself is live at
+  `https://www.creght.cn/api.md`; read the matching doc there before writing Func
+  code instead of relying on remembered signatures, defaults, or limits.
 - `seo.md` — `metadata`, viewport, OG, keywords, favicon, legacy migration.
 - `carousel.md` — carousel/slideshow setup.
 - `sitemap.md` — root-level sitemap.

@@ -19,6 +19,14 @@ of truth over these examples.
 Keep CMS requests in `getServerSideProps` unless the project has a clear
 alternative data-loading pattern.
 
+## Existing Content Operations
+
+For edits to existing CMS entries, use the CLI data path directly:
+`creght content list`, `get`, then `update`. Preserve unrelated fields and
+re-read the entry once to verify. If the field is missing or the page does not
+render it, make the minimal schema or source change instead. See
+`references/cli.md` for exact flags and payload format.
+
 ## List Content
 
 ```tsx
