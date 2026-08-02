@@ -5,9 +5,9 @@ title: Creght Analytics & Event Tracking
 # Creght Analytics & Event Tracking
 
 Creght sites get **visit analytics automatically** and support **custom event
-tracking** ("埋点") with almost no setup. Both are collected by the platform and
-shown in the site editor under **Settings → Analytics** (访问统计). You write code
-only for custom events.
+tracking** with almost no setup. Both are collected by the platform and shown in
+the site editor under **Settings → Analytics**. You write code only for custom
+events.
 
 ## Automatic visit analytics (no code)
 

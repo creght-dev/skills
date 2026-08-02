@@ -23,7 +23,8 @@ not counted. For custom event tracking changes, read `references/analytics.md`.
 ## Publishing
 
 A site has separate preview and production domains. The preview domain reflects
-editor changes in real time. The production domain updates only after selecting
+editor changes and `creght push` in real time — there is nothing to wait for
+between saving and seeing it. The production domain updates only after selecting
 **Publish**. Custom domains also serve published content, so their changes take
 effect only after publishing.
 
