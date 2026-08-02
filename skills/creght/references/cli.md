@@ -87,8 +87,8 @@ creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull
 creght diff
 creght push
 creght resolve --list
-creght preview --site_id=<project_id>/<site_id>
-creght publish --site_id=<project_id>/<site_id>
+creght preview --site_id=<project_id>/<site_id>   # preview URL; live right after push
+creght publish --site_id=<project_id>/<site_id>   # production only; run only when asked
 creght importmap   # print the site's effective importMap (platform built-ins + talizen.config)
 ```
 
@@ -181,8 +181,10 @@ Default safety rules:
 changes into local files. If remote changes should become local files, run
 `pull`; use `pull --force` only when overwriting local edits is intentional.
 
-Use `preview` when verification depends on platform rendering. Do not start a
-generic local renderer unless the project explicitly provides one.
+Use `preview` when verification depends on platform rendering: `push`, then
+reload the preview URL, which already serves the pushed code — see "Preview And
+Publish". Do not start a generic local renderer unless the project explicitly
+provides one.
 
 Operational gotchas:
 
@@ -196,13 +198,34 @@ Operational gotchas:
   `pull` before pushing; afterwards `push` works from the root or any child
   directory.
 
-## Publishing
+## Preview And Publish
 
-Changing project files does not publish them to the live site by default. Use
-`publish` to promote the latest remote site code to the live version after
-pushing or syncing changes.
+A site has two domains, updated by different triggers:
 
-Publishing requires a site ID:
+| Domain | Updates on | Audience |
+| --- | --- | --- |
+| Preview | every `push` and every editor edit, immediately | you, while working |
+| Production (incl. custom domains) | `publish` only | the public |
+
+**`push` is enough to see the change.** The preview domain serves the pushed
+code the moment `push` exits — no build queue, no propagation delay, no publish
+step in between. Reload the preview URL and the new version is there (the first
+load after a push can take a few seconds to compile, then it is instant). So a
+preview that still shows the old output is a bug in the code or an unpushed
+file, never lag — re-open it with `?dev` and read `references/error-handling.md`
+instead of waiting or re-pushing.
+
+`creght preview --site_id=<project_id>/<site_id>` prints the preview URL and
+opens it in a browser.
+
+**Do not run `creght publish` unless the user explicitly asks to go live.**
+Push-and-verify is the default loop;
+publishing is a separate decision that changes what the public sees. Finishing a
+task, passing verification, or "the site looks done" are not requests to
+publish. When work is complete but unpublished, report the preview URL and say
+production is unchanged.
+
+When the user does ask, `publish` requires an explicit site ID:
 
 ```bash
 creght publish --site_id=<project_id>/<site_id>

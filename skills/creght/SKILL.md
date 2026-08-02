@@ -32,6 +32,10 @@ use them if exposed, otherwise inspect files and use the CLI.
 - `push` uploads local changes relative to the last base. It does not delete
   remote files/functions unless `--delete` is passed, refuses conflict markers,
   and reports remote/local conflicts.
+- `push` puts the change on the **preview domain immediately** — no build queue
+  or propagation delay, so reloading the preview URL shows the new version. The
+  **production domain** changes only on `publish`, which is a separate,
+  user-requested step.
 - The CLI does not render sites locally; rendering, CMS, forms, Auth, Func,
   realtime preview, and publication are backend/web-app responsibilities.
 - If the user provides no actionable requirement, ask what to build or change.
@@ -52,15 +56,18 @@ missing, such as an image `alt` binding.
 5. Apply focused edits that preserve local conventions.
 6. Before upload, run `creght diff` inside a pulled workspace when remote/editor
    changes are possible. Pull to merge conflicts; resolve markers before push.
-7. Validate with local checks or Creght platform checks. Without a local
-   renderer, use `creght push` or `creght preview` as verification — lint and
-   typecheck are compile checks only, so confirm the real route renders (add
-   `?dev` if it looks wrong).
+7. Validate on the real preview URL: `creght push`, then reload it. Lint and
+   typecheck are compile checks only, so confirm the real route renders. The
+   preview serves the push instantly, so a stale or wrong page is a bug, not lag
+   — re-open it with `?dev`.
 8. On typecheck, build, lint/validate, runtime, or browser errors, immediately
    read `references/error-handling.md` before fixing.
 
 ## Hard Platform Rules
 
+- Never run `creght publish` unless the user explicitly asks to go live. Push
+  and verify on preview instead; finishing a task is not a request to publish.
+  Hand back the preview URL and state that production is unchanged.
 - Preserve existing `/pages` or `/page` route root and `/components` or
   `/component` UI root. Prefer plural roots only for new projects.
 - Do not add `react-router-dom`, `next/link`, `next/router`,
@@ -108,7 +115,7 @@ Paths below are relative to this skill's `references/`. Read one only when you
 reach its topic; do not read the others.
 
 - `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
-  platform data, backend commands, publish, asset upload.
+  platform data, backend commands, preview vs. publish, asset upload.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.
