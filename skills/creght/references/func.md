@@ -78,21 +78,14 @@ Secrets and integrations
   write an `Authorization` header for such a capability, and never work around a
   "not configured / not verified / disabled" error by going direct — that is a
   user action in the panel.
-- **Which capabilities are managed is answered by the index, not by this file.**
-  Email, verification codes and payment are; the list grows with each release.
-  Read the matching doc before writing anything for them — the platform already
-  enforces exactly the parts that go silently wrong when hand-rolled (code
-  generation, expiry, single-use consumption, constant-time comparison, attempt
-  caps, rate limiting; signature verification and merchant checks for payment),
-  and reimplementing any of it is a security regression, not a fallback. A verified
-  code proves mailbox control, **not** a session.
-- A callback the platform does **not** wrap for you — a payment provider it has no
-  integration for, or any third-party webhook — must verify the provider signature
-  **over the raw body**, then the merchant identity, your local order, the amount
-  and the paid state, before an idempotent update, and return the provider's exact
-  acknowledgement string. Re-serialising the body before verifying breaks the
-  signature; trusting a browser redirect parameter instead of the callback is how
-  free goods get shipped.
+- Which capabilities are managed changes every release: the index answers it, this
+  file does not. Read the matching doc first — the platform already enforces what
+  fails silently when hand-rolled, so reimplementing it is a regression, not a
+  fallback. A verified code proves mailbox control, not a session.
+- For a callback the platform does not wrap: verify the signature over the **raw**
+  body, then merchant identity, local order, amount and paid state, update
+  idempotently, return the provider's exact acknowledgement. Re-serialising the body
+  breaks the signature; a browser redirect parameter is not payment.
 
 Data and identity
 
@@ -134,24 +127,16 @@ Timeouts
 
 ## ctx Surface
 
-**Not listed here on purpose.** The set of `ctx` namespaces grows with each
-platform release, so any copy in this file goes stale silently — and a stale list
-is worse than none: it tells you a capability does not exist when it does, and you
-then write `fetch` against a provider the platform already wraps. Get the current
-set from the index above; `ctx` is also fully typed, so
-`import type { TalizenFuncContext } from 'talizen/func-runtime'` gives it to you in
-the editor.
+Deliberately not listed: a stale list is worse than none — it denies a capability
+that exists, and you hand-roll what the platform wraps. Take the current set from
+the index, or from `import type { TalizenFuncContext } from 'talizen/func-runtime'`.
 
-The runtime facts around `ctx` do belong here, because they hold whatever the
-surface looks like:
-
-- Reach capabilities only through `ctx` — never the legacy globals, never a
-  hand-rolled equivalent of something the platform wraps.
+- Reach capabilities only through `ctx`, never the legacy globals.
 - `fetch`, `Response`, `TextDecoder` and Web Crypto (`crypto`) are globals; a
-  returned `Response` bypasses the JSON envelope, which is what webhook and payment
-  callbacks need in order to answer with the provider's exact acknowledgement.
+  returned `Response` bypasses the JSON envelope — that is how a callback returns
+  the provider's exact acknowledgement.
 - Request body readers follow Fetch semantics and can be consumed once.
-- `console.*` and `ctx.trace_id` correlate one call across logs.
+- `console.*` / `ctx.trace_id` correlate one call across logs.
 
 ## CLI Management
 
