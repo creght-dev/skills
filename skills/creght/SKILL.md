@@ -124,11 +124,13 @@ reach its topic; do not read the others.
 - `i18n.md` — multilingual routing, locale APIs, `_i18n`, messages.
 - `forms.md` — form schema and `talizen/form`.
 - `auth.md` — auth UI, current user, logout, OAuth, protected flows.
-- `func.md` — Func invariants: code and keys, JSON tables, secrets, integrations
-  (`ctx.email`), asset uploads, auth in Func, CLI management, `invoke(...)`,
-  `/func/<key>`. The Func API reference itself is live at
-  `https://www.creght.cn/api.md`; read the matching doc there before writing Func
-  code instead of relying on remembered signatures, defaults, or limits.
+- `func.md` — Func invariants: code and keys, JSON tables, secrets, managed
+  integrations, asset uploads, auth in Func, CLI management, `invoke(...)`,
+  `/func/<key>`. It deliberately does **not** enumerate the `ctx` surface or which
+  capabilities are managed — that set changes with each release. The API reference
+  is live at `https://www.creght.cn/api.md`; read the matching doc there before
+  writing Func code instead of relying on remembered signatures, defaults, or
+  limits.
 - `seo.md` — `metadata`, viewport, OG, keywords, favicon, legacy migration.
 - `carousel.md` — carousel/slideshow setup.
 - `sitemap.md` — root-level sitemap.
