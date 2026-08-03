@@ -19,30 +19,26 @@ Create the file at the project root:
 Do not place sitemap files under `/pages`, `/page`, or `/app`. Sitemap
 generation is site-level configuration, not a route component.
 
+`/sitemap.ts` also shapes `/llms.txt`, which reuses this page enumeration. See
+`platform-endpoints.md` before writing `sitemap.xml` anywhere else.
+
 ## Return Shape
 
-Each sitemap entry follows this shape:
-
-```ts
-{
-  url: string
-  lastModified?: string | Date
-  changeFrequency?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
-  priority?: number
-}
-```
+An entry is `{ url, lastModified?, changeFrequency?, priority? }`, following the
+Next.js sitemap item shape. `url` may be absolute or an in-site path such as
+`/blog/hello`. Read `SitemapEntry` from the `talizen` package for the full
+shape, allowed values, and language alternates.
 
 Rules:
 
-1. `url` must be an absolute URL.
-2. Use the `TALIZEN_PUBLIC_SITE_URL` environment variable for the site URL.
-3. Include static routes such as the home page manually.
-4. Fetch CMS lists with `listContents` from `talizen/cms`.
-5. Read generated collection types from `/types/cms.d.ts` before referencing
+1. Include static routes such as the home page manually — this file replaces the
+   automatic page scan, it does not extend it.
+2. Fetch CMS lists with `listContents` from `talizen/cms`.
+3. Read generated collection types from `/types/cms.d.ts` before referencing
    CMS fields.
-6. Treat CMS fields as optional and skip entries that cannot produce a valid
+4. Treat CMS fields as optional and skip entries that cannot produce a valid
    URL.
-7. Keep sitemap data serializable; do not return React elements or page props.
+5. Keep sitemap data serializable; do not return React elements or page props.
 
 ## CMS Pages
 
