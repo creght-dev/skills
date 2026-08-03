@@ -132,6 +132,9 @@ reach its topic; do not read the others.
 - `seo.md` — `metadata`, viewport, OG, keywords, favicon, legacy migration.
 - `carousel.md` — carousel/slideshow setup.
 - `sitemap.md` — root-level sitemap.
+- `platform-endpoints.md` — `/robots.txt`, `/sitemap.xml`, `/llms.txt` and their
+  `/robots.ts`, `/llms.ts` customization files. Read before writing any of those
+  three filenames anywhere, including under `/public`.
 - `analytics.md` — visit analytics and custom event tracking.
 - `canvas.md` — `*.canvas.tsx` artboards, frame layout, staging a draft next to
   the page.
