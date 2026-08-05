@@ -149,9 +149,67 @@ Use `export default` with a plain object. Do not import packages except
 type-only imports such as `import type { Metadata } from "talizen"`. Do not use
 `defineConfig` from `talizen/config`.
 
-Common fields: `importMap.imports`, `metadata`, `viewport`, `redirects`, and
-`customCode.head/bodyStart/bodyEnd`. Prefer structured `metadata` over duplicate
-SEO in `customCode`.
+Common fields: `importMap.imports`, `metadata`, `viewport`, `redirects`, `html` /
+`body` (tag attributes) and `head` / `bodyEnd` (injected snippets) — both described
+below. Prefer structured `metadata` over duplicate SEO in raw snippets.
+
+## Site Shell (`talizen.config.ts`)
+
+Site-wide `<html>` / `<body>` attributes and injected HTML are config fields, not a
+component. **There is no `layout.tsx`** — do not create one, it is silently ignored.
+
+```ts
+// talizen.config.ts
+import type { TalizenConfig } from "talizen"
+
+export default {
+  html: { className: "dark scroll-smooth" },
+  body: { className: "antialiased bg-neutral-950 text-neutral-100" },
+  head: `<link rel="preconnect" href="https://fonts.gstatic.com" />`,
+  bodyEnd: `<script src="/widget.js" defer></script>`,
+} satisfies TalizenConfig
+```
+
+`className` and `class` are equivalent. Omit `lang` — the platform fills it from the
+current locale. `head` injects before `</head>`, `bodyEnd` before `</body>`; both
+supersede `customCode.head` / `customCode.body` and are injected after them.
+
+Shared header/footer stays a component that pages import: interactive chrome needs
+hydration, which a static shell cannot provide, and pages differ (landing pages,
+full-screen pages, embeds).
+
+## Per-Request Config Fields
+
+Fields that only shape the rendered HTML may be written as `(ctx) => value`, evaluated
+per request. This is how site config branches on locale or host:
+
+```ts
+import type { TalizenConfig, TalizenConfigContext } from "talizen"
+
+export default {
+  metadata: (ctx: TalizenConfigContext) => ({
+    title: { template: ctx.locale === "en" ? "%s | Acme" : "%s ｜ Acme", default: "Acme" },
+    description: ctx.locale === "en" ? "English description" : "中文描述",
+  }),
+  html: (ctx) => ({ className: "dark", "data-locale": ctx.locale }),
+  head: (ctx) =>
+    ctx.host.endsWith(".cn")
+      ? `<script async src="https://hm.baidu.com/hm.js?x"></script>`
+      : `<script async src="https://www.googletagmanager.com/gtag/js?id=G-X"></script>`,
+} satisfies TalizenConfig
+```
+
+- **Allowed as functions:** `metadata`, `html`, `body`, `head`, `bodyEnd`, `viewport`.
+- **Must be static values:** `importMap`, `i18n`, `redirects` — bundling and route
+  building happen before a request exists. Writing them as a function is a load-time
+  error (and `satisfies TalizenConfig` catches it while typing).
+- `ctx` has only `locale`, `locales`, `defaultLocale`, `routingDefaultLocale`, `host`,
+  `path`. No cookies, no `talizen/cms` — config must not fetch data.
+- If a function throws, the request fails rather than silently dropping site config.
+  Keep them simple and synchronous.
+
+Things that have their own URL are files, not config: `/robots.ts` → `/robots.txt`,
+`/sitemap.ts` → `/sitemap.xml`, `/llms.ts` → `/llms.txt`.
 
 ## Viewport
 

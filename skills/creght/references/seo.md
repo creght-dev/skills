@@ -1,7 +1,8 @@
 # Creght SEO And Metadata
 
 Use structured `metadata` for SEO. It applies at two levels: site defaults in
-`talizen.config.ts`, and page metadata exported from page components. Avoid
+`talizen.config.ts` (may be written as `metadata: (ctx) => ({…})` to branch on locale
+or host, see `site-code.md`), and page metadata exported from page components. Avoid
 custom `seo` objects and raw tags when `metadata` can express the same thing.
 
 ## Metadata
