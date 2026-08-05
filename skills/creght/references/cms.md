@@ -62,7 +62,18 @@ matching the CMS admin list.
 - Sort server-side; do not fetch a large `limit` and re-sort in JS.
 - To change the order editors see, set each entry's `sort` (bigger first). Never
   delete and recreate entries to reorder: ids change, and site versions do not
-  snapshot CMS content, so it cannot be undone.
+  snapshot CMS content, so it cannot be undone. Reorder in place with
+  `creght content update --collection=<key> --id=<id> --data=./content.json
+  --sort=<n>`; `--sort` works on `create` too, and `--sort=0` is a real value,
+  not "unset".
+- `sort` set only inside a `--data` file is honoured as long as `--sort` is not
+  passed; the flag wins when it is. Passing neither omits `sort` from the
+  request: `create` takes the platform default (appended last) and `update`
+  keeps the entry's current value.
+- Older CLI builds fail `content update --sort` with
+  `flag provided but not defined: -sort`, and drop a file-only `sort` on
+  `create` (entry lands at the end). If you hit either, upgrade the CLI rather
+  than working around it by deleting and recreating entries.
 
 ## Filter Content
 

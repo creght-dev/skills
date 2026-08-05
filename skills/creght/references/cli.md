@@ -248,6 +248,7 @@ creght cms collections --site_id=<project_id>/<site_id>
 creght content list --site_id=<project_id>/<site_id> --collection=<key>
 creght content get --site_id=<project_id>/<site_id> --collection=<key> --id=<content_id> --out=./content.json
 creght content create --site_id=<project_id>/<site_id> --collection=<key> --data=./content.json
+creght content update --site_id=<project_id>/<site_id> --collection=<key> --id=<content_id> --data=./content.json [--sort=<n>]
 creght form list --site_id=<project_id>/<site_id>
 creght table list --site_id=<project_id>/<site_id>
 creght table record get --site_id=<project_id>/<site_id> --table=<key> --id=<record_id> --out=./record.json
@@ -289,6 +290,14 @@ calling `talizen/func`.
 `creght content create/update --data` requires a specific payload format and
 `content update` treats "no field changed" as a non-zero error — see
 `creght content -h` for the format and semantics before building payloads.
+
+To reorder CMS entries, set `sort` (bigger shows first) with
+`creght content update --sort=<n>` or inside the `--data` file — never by
+deleting and recreating entries, which changes ids irreversibly. The flag wins
+over the file only when passed; passing neither omits `sort` so `create` takes
+the platform default and `update` keeps the current value. `--sort=0` is a real
+value. Same semantics for `creght table record create/update --sort`. See
+`references/cms.md` for the ordering model.
 
 Rich-text body fields (such as an article `body`) must be **HTML, not
 Markdown** — they render via `dangerouslySetInnerHTML`. Writing Markdown into
