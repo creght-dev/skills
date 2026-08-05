@@ -293,11 +293,14 @@ calling `talizen/func`.
 
 To reorder CMS entries, set `sort` (bigger shows first) with
 `creght content update --sort=<n>` or inside the `--data` file — never by
-deleting and recreating entries, which changes ids irreversibly. The flag wins
-over the file only when passed; passing neither omits `sort` so `create` takes
-the platform default and `update` keeps the current value. `--sort=0` is a real
-value. Same semantics for `creght table record create/update --sort`. See
-`references/cms.md` for the ordering model.
+deleting and recreating entries, which changes ids irreversibly. `content update`
+is a partial update, so `--data` is optional: `--slug`/`--sort` alone rename or
+reorder without re-submitting the body (`create` still requires `--data`). The
+flag wins over the file only when passed; passing neither omits `sort` so
+`create` appends last and `update` keeps the current value. A zero sort is
+asymmetric — only `update --sort=0` stores a real 0, `create --sort=0` appends
+last, and `table record` cannot store 0 at all. See `references/cms.md` for the
+ordering model.
 
 Rich-text body fields (such as an article `body`) must be **HTML, not
 Markdown** — they render via `dangerouslySetInnerHTML`. Writing Markdown into
