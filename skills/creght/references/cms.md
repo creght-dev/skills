@@ -63,13 +63,16 @@ matching the CMS admin list.
 - To change the order editors see, set each entry's `sort` (bigger first). Never
   delete and recreate entries to reorder: ids change, and site versions do not
   snapshot CMS content, so it cannot be undone. Reorder in place with
-  `creght content update --collection=<key> --id=<id> --data=./content.json
-  --sort=<n>`; `--sort` works on `create` too, and `--sort=0` is a real value,
-  not "unset".
+  `creght content update --collection=<key> --id=<id> --sort=<n>` — `update` is a
+  partial update, so `--data` is optional and you do not need to re-submit the
+  body just to change the order. `--sort` works on `create` too.
 - `sort` set only inside a `--data` file is honoured as long as `--sort` is not
   passed; the flag wins when it is. Passing neither omits `sort` from the
-  request: `create` takes the platform default (appended last) and `update`
-  keeps the entry's current value.
+  request: `create` appends the entry last and `update` keeps the current value.
+- A zero `sort` is asymmetric: the platform reads `sort=0` on **create** as
+  "auto-assign, append last", so a literal 0 cannot be created — only
+  `update --sort=0` stores a real 0. For `table record`, 0 cannot be set at all
+  and `--sort=0` on update is rejected.
 - Older CLI builds fail `content update --sort` with
   `flag provided but not defined: -sort`, and drop a file-only `sort` on
   `create` (entry lands at the end). If you hit either, upgrade the CLI rather
