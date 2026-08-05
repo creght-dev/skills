@@ -5,8 +5,9 @@ description: >
   code locally, pushing local changes, resolving sync conflicts, writing
   Creght-compatible React pages/components code, CMS, form, Auth, and Func
   backend integration, routing, styling, metadata, previewing, publishing,
-  domain binding, DNS/SSL, website analytics, environment variables, editor
-  operations, or debugging local-to-platform workflows.
+  site version snapshots and rollback, domain binding, DNS/SSL, website
+  analytics, environment variables, editor operations, or debugging
+  local-to-platform workflows.
 ---
 
 # Creght
@@ -38,8 +39,14 @@ use them if exposed, otherwise inspect files and use the CLI.
   `--delete`/`--force`.
 - `push` puts the change on the **preview domain immediately** — no build queue
   or propagation delay, so reloading the preview URL shows the new version. The
-  **production domain** changes only on `publish`, which is a separate,
-  user-requested step.
+  **production domain** changes only on `publish` or `version publish`, which are
+  separate, user-requested steps.
+- A site version is an immutable snapshot of site source, the platform
+  equivalent of a git commit. `version create` records one, `version list` shows
+  them and which is live, `version publish <version_no>` makes one live —
+  rolling production forward or back without touching local files. Snapshots
+  cover source only: CMS content and `/platform/**` definitions are live, so
+  publishing an older version does not roll those back.
 - The CLI does not render sites locally; rendering, CMS, forms, Auth, Func,
   realtime preview, and publication are backend/web-app responsibilities.
 - If the user provides no actionable requirement, ask what to build or change.
@@ -69,9 +76,11 @@ missing, such as an image `alt` binding.
 
 ## Hard Platform Rules
 
-- Never run `creght publish` unless the user explicitly asks to go live. Push
-  and verify on preview instead; finishing a task is not a request to publish.
-  Hand back the preview URL and state that production is unchanged.
+- Never run `creght publish` or `creght version publish` unless the user
+  explicitly asks to go live — both change what the public sees. Push and verify
+  on preview instead; finishing a task is not a request to publish. Hand back
+  the preview URL and state that production is unchanged. `creght version
+  create` is safe: it only snapshots source and never moves production.
 - Preserve existing `/pages` or `/page` route root and `/components` or
   `/component` UI root. Prefer plural roots only for new projects.
 - Do not add `react-router-dom`, `next/link`, `next/router`,
@@ -123,8 +132,8 @@ Paths below are relative to this skill's `references/`. Read one only when you
 reach its topic; do not read the others.
 
 - `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
-  `.creghtignore`, platform data, backend commands, preview vs. publish, asset
-  upload.
+  `.creghtignore`, platform data, backend commands, preview vs. publish, site
+  versions and rollback, asset upload.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.

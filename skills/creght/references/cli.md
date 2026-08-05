@@ -2,8 +2,8 @@
 
 The Creght CLI is a local bridge for Creght site code. It handles auth,
 project creation and discovery, file pull/push with three-way merge and
-conflict resolution, remote preview, publishing, platform data operations, and
-asset uploads.
+conflict resolution, remote preview, publishing, site version snapshots and
+rollback, platform data operations, and asset uploads.
 
 The CLI does not render sites locally. Rendering, CMS, assets, realtime preview,
 and publication are handled by the Creght backend and web app.
@@ -89,14 +89,18 @@ creght push
 creght resolve --list
 creght preview --site_id=<project_id>/<site_id>   # preview URL; live right after push
 creght publish --site_id=<project_id>/<site_id>   # production only; run only when asked
+creght version create --note=<note>   # snapshot source; does not touch production
+creght version list                   # versions, newest first; * marks the live one
+creght version publish <version_no>   # production only; run only when asked
 creght importmap   # print the site's effective importMap (platform built-ins + talizen.config)
 ```
 
 Only the first pull needs `--site_id` (and usually `--dir`). After that,
 `.creght/state.json` records the site reference; from the workspace root or
-any child directory, `pull`, `diff`, `push`, `cat`, and `resolve` discover it
-by walking upward, so ongoing usage passes neither `--site_id` nor `--dir`.
-Pass them explicitly only when targeting a different workspace or site.
+any child directory, `pull`, `diff`, `push`, `cat`, `resolve`, and the `version`
+subcommands discover it by walking upward, so ongoing usage passes neither
+`--site_id` nor `--dir`. Pass them explicitly only when targeting a different
+workspace or site.
 
 Single-file `<path>` arguments resolve from the current directory, git-style:
 `Index.tsx` run from inside `pages/` means `/pages/Index.tsx`. Paths starting
@@ -254,7 +258,7 @@ A site has two domains, updated by different triggers:
 | Domain | Updates on | Audience |
 | --- | --- | --- |
 | Preview | every `push` and every editor edit, immediately | you, while working |
-| Production (incl. custom domains) | `publish` only | the public |
+| Production (incl. custom domains) | `publish` or `version publish` only | the public |
 
 **`push` is enough to see the change.** The preview domain serves the pushed
 code the moment `push` exits — no build queue, no propagation delay, no publish
@@ -267,12 +271,12 @@ instead of waiting or re-pushing.
 `creght preview --site_id=<project_id>/<site_id>` prints the preview URL and
 opens it in a browser.
 
-**Do not run `creght publish` unless the user explicitly asks to go live.**
-Push-and-verify is the default loop;
-publishing is a separate decision that changes what the public sees. Finishing a
-task, passing verification, or "the site looks done" are not requests to
-publish. When work is complete but unpublished, report the preview URL and say
-production is unchanged.
+**Do not run `creght publish` or `creght version publish` unless the user
+explicitly asks to go live.** Push-and-verify is the default loop; publishing is
+a separate decision that changes what the public sees. Finishing a task, passing
+verification, or "the site looks done" are not requests to publish. When work is
+complete but unpublished, report the preview URL and say production is
+unchanged.
 
 When the user does ask, `publish` requires an explicit site ID:
 
@@ -281,7 +285,69 @@ creght publish --site_id=<project_id>/<site_id>
 creght publish --site_id=<project_id>/<site_id> --note=<note>
 ```
 
+`publish` snapshots the current remote source into a new version and makes it
+live in one step, then reports which version that is:
+
+```text
+Published <project_id>/<site_id>
+version 14 (id 458) is live on example.creght.cn
+```
+
 Run `creght publish --help` if you need to confirm current publish flags.
+
+## Site Versions
+
+A site version is an immutable snapshot of the site's source files — the
+platform equivalent of a git commit. Snapshots cover source only: CMS content
+and platform state under `/platform/**` (CMS/form/table/auth definitions) are
+live, so publishing an older version does not roll those back.
+
+Inside a pulled workspace `--site_id` is optional; the version subcommands
+discover `.creght/state.json` like `pull`/`push` do.
+
+Snapshot the current source without going live:
+
+```bash
+creght version create --note="Add pricing page"
+```
+
+A version records the **remote** files, so unpushed local edits would be missing
+from it. `create` therefore compares the workspace against the site first and
+refuses while anything is unpushed, listing what to push. Run `creght push`
+first; `--allow-dirty` snapshots the remote site as it is. The platform rejects
+a snapshot identical to the newest version, so repeated `create` calls never
+pile up duplicates.
+
+List versions, newest first:
+
+```bash
+creght version list            # * marks the version production serves
+creght version list --json     # raw state: versions, pinned domains, pending file changes
+```
+
+`VERSION` is the per-site number; `ID` is the platform-wide version id. The
+footer names the hostnames serving the live version, any domain pinned to a
+different version, and whether the site has changed since the newest version.
+
+Roll production forward or back to an existing version — **only when asked**:
+
+```bash
+creght version publish 12
+creght version publish 12 --note="Roll back nav change"
+creght version publish id:456   # select by version id, for versions older than the list window
+```
+
+This changes only what production serves. Publishing the version already live is
+a no-op that refreshes its caches.
+
+It does **not** restore source anywhere: the editable site workspace and local
+files are untouched, and `creght pull` afterwards still fetches the current
+editable workspace, not the published version's files. So after rolling
+production back to an older version, the workspace still holds the newer source
+and the next `publish` would ship it again. The CLI has no command to restore an
+old version's source — to actually revert the code, edit locally and push.
+
+Bare `creght version` still prints the installed CLI version.
 
 ## Platform Data And Backend
 
