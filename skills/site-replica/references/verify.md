@@ -19,8 +19,11 @@ Disable smooth scroll before scripted scrolling; with Lenis active use
 ## G2 + G3 — structural census and screenshot pairs
 
 ```bash
-node <skill>/scripts/structural-census.mjs <sourceURL> <previewURL> 1440 ./census-shots
+node <skill>/scripts/structural-census.mjs <sourceURL> <previewURL> 1440 ../study/census-shots
 ```
+
+Write the output outside the Creght workspace (or to an ignored path) — source
+screenshots inside it get pushed as site files.
 
 - Diffs rewrite-invariant properties per similarity-aligned section:
   height (±4%), img/link/button counts, font-size multisets, left-edge
@@ -151,6 +154,21 @@ reaches = wire it up. The diff must come back empty.
   rendered list title matches a CMS entry (proves the page reads the CMS);
   grep the repo for `export const posts`-style arrays duplicating any
   collection.
+
+## G11 — source containment
+
+Run before the first push, then again before publish:
+
+- `creght diff` (or `--json`) — the plan lists site files only. A `SPEC.md`,
+  `recon/`, `census-shots/`, or audit note in the create list means the study
+  artifacts sit inside the workspace with no `.creghtignore` covering them; fix
+  that before pushing, not after (a pushed file stays remote until it is deleted
+  remotely — see build.md).
+- Grep the workspace for the source host and brand strings, including
+  `talizen.config.ts`, `AGENTS.md`, `index.css`, and `public/`.
+- Check seeded CMS bodies too: `creght content list --collection=<key>` plus
+  `content get` on a few entries — source URLs hide in entry bodies and cover
+  fields where a repo grep never looks.
 
 ## Finish
 

@@ -14,8 +14,9 @@ pass the recognition test below.
 Run it as a **separate new project** derived from the replica (never mutate
 the study copy — clean provenance, and the study keeps its attribution).
 
-**Inputs to look for in the study's workspace** (a well-run replica leaves
-these; use them instead of re-probing the source from scratch):
+**Inputs to look for in the study's artifact directory** — the folder beside
+the pulled workspace, or the `.creghtignore`d paths inside it (a well-run
+replica leaves these; use them instead of re-probing the source from scratch):
 
 - `SPEC.md` — the measured source spec. Everything in it that is *expressive*
   (palette, type pairing, ornament, chrome behaviors, watermark motifs) is
@@ -27,6 +28,12 @@ these; use them instead of re-probing the source from scratch):
   project and re-seed; never point two projects at one collection.
 - The study's invented brand is disposable: it was made for attribution-safe
   study, not for shipping. Invent a fresh one for the template.
+
+All of it is *source material*, and so is this file's signature inventory and
+motion table: they stay in the study directory outside the new project's
+workspace (or `.creghtignore`d inside it). A de-identified template that ships a
+document naming the source template — in `AGENTS.md`, a comment, a stray
+`SPEC.md` — defeats the entire mode. See `build.md`.
 
 Then:
 
@@ -74,8 +81,11 @@ Then:
    copy the source's motion back; don't).
 6. **Brand & attribution hygiene**: invented brand name (never ® / ™ on
    marks you don't own), no source contact details or brand strings
-   anywhere (grep for them), and remove the design-study attribution only
-   after the design has genuinely diverged.
+   anywhere (grep for them, and run G11's containment check against the new
+   project too). The design-study attribution lives in the report to the user,
+   so there is nothing to strip from site files — but state in that report
+   whether the design has genuinely diverged, since that, not the wording of a
+   note, is what the attribution rested on.
 7. **Content truthfulness beats design risk in practice**: placeholder
    ratings, client counts, testimonials and prices are fabrications —
    shipping them is false-advertising exposure (under e.g. 中国《广告法》/

@@ -34,6 +34,11 @@ The skill does not copy the source site's code, images, videos, fonts, or long
 copy. It reproduces the design as a new implementation and replaces proprietary
 materials with license-safe alternatives.
 
+Research about the source stays out of the delivered site: measured specs,
+source screenshots, motion audits, and de-identification notes live in a local
+study folder that is never pushed (or is excluded via `.creghtignore`), so the
+Creght project contains site files only.
+
 ## Examples
 
 All examples below were created with **Fable 5**.
