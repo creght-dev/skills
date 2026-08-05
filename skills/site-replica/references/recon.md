@@ -116,4 +116,6 @@ chrome. Pricing/stat/timeline multi-column sections often break here.
 
 Write a spec note with route inventory, section inventory, token table,
 breakpoint cuts, per-section layout numbers at representative widths, and the
-reference screenshot set. Then move to motion audit.
+reference screenshot set. It goes in the study directory outside the Creght
+workspace (see `build.md`) — the spec and its screenshots are source material
+and must never be pushed. Then move to motion audit.

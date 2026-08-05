@@ -23,14 +23,20 @@ only the phase file needed for the current work.
 
 1. Original, license-safe implementation. Never copy source assets, videos,
    fonts, long copy, or code. Use slot-matched stock/generated assets and
-   rewritten copy. Note the source as a design study. If commercial
-   de-identification is requested, read `references/differentiated.md`.
-2. Coverage is mandatory. Recon produces route and section inventories; every
+   rewritten copy. Note the source as a design study in the report to the user,
+   not inside site files. If commercial de-identification is requested, read
+   `references/differentiated.md`.
+2. Source material never enters the Creght project. Recon specs, source
+   screenshots and recordings, motion audits, census output, differentiation
+   notes, source URLs and brand strings stay in a study directory outside the
+   pushed workspace (or `.creghtignore`d inside it) — everything in the
+   workspace becomes a site file. See `references/build.md`.
+3. Coverage is mandatory. Recon produces route and section inventories; every
    row must be built and verified.
-3. Collection content uses platform CMS. List + detail content is never a
+4. Collection content uses platform CMS. List + detail content is never a
    hardcoded array.
-4. The live source is the oracle. Re-measure the source before fixing mismatch.
-5. Work autonomously through preview verification. Publish only when asked.
+5. The live source is the oracle. Re-measure the source before fixing mismatch.
+6. Work autonomously through preview verification. Publish only when asked.
 
 ## Triage
 
@@ -76,6 +82,9 @@ Each gate ends as fixed or waived with a written reason.
 - G9 License: no source brand strings; assets/copy satisfy the contract.
 - G10 Asset delivery: production assets are Creght-hosted/generated locally; no
   source hotlinks. Runtime Func assets use `ctx.assets.upload`.
+- G11 Source containment: the pushed file set is site files only — no spec,
+  recon, audit, census, or study notes — and no source URL or brand string in
+  code, config, `AGENTS.md`, `public/`, or CMS entries.
 
 ## Tool Governance
 
@@ -93,9 +102,10 @@ Each gate ends as fixed or waived with a written reason.
   type, layout, chrome states, mobile/tablet audit.
 - `references/motion-audit.md`: recording, hover diffing, marquees, cold load,
   Framer parameters, scroll effects, carousels, Lenis.
-- `references/build.md`: project setup, width/type systems, stock imagery, CMS,
-  motion primitives, platform gotchas, functional controls.
+- `references/build.md`: project setup, study-artifact containment and
+  `.creghtignore`, width/type systems, stock imagery, CMS, motion primitives,
+  platform gotchas, functional controls.
 - `references/verify.md`: push-compare loop, structural census, crawl diff,
-  overflow scan, interaction checks.
+  overflow scan, interaction checks, source-containment check.
 - `references/differentiated.md`: commercial de-identification mode.
 - `scripts/structural-census.mjs`: structural differ and paired screenshots.

@@ -20,6 +20,49 @@ talizen.config.ts
 
 Collection content belongs in CMS, not code arrays.
 
+## Study Artifacts Stay Out Of The Project
+
+Everything in the pulled workspace is a site file: `creght push` uploads it, the
+editor shows it, and anything under `public/` is publicly fetchable. Source
+research must never land there — recon specs, source screenshots and
+recordings, motion audits, structural census output, crawl dumps,
+differentiation notes, downloaded source assets, and any file naming the source
+host or brand.
+
+Keep the study beside the workspace, not inside it:
+
+```text
+work/
+  study/     recon shots, SPEC.md, census output, audit notes — never pushed
+  site/      the pulled Creght workspace — site files only
+```
+
+When artifacts must live inside the workspace, write a workspace-root
+`.creghtignore` **before the first push**:
+
+```gitignore
+/study/
+/recon/
+/census-shots/
+SPEC.md
+*.audit.md
+```
+
+Then run `creght diff` and read the create list: site files only.
+`.creghtignore` semantics (negation, anchoring, what is already skipped) are in
+the base skill's `references/cli.md`. Ignoring a path does not delete a copy
+already pushed — delete that remotely first, then ignore it.
+
+Keep source identity out of the files that do ship:
+
+- No source URL, brand, or template name in code, comments, `talizen.config.ts`,
+  `AGENTS.md`, CMS entries, `public/`, or asset filenames. Grep for the host and
+  brand before the first push, not only at G9.
+- Placeholder copy uses the invented brand, never the source's.
+- Provenance comments name the asset's own license/source (the stock provider),
+  not the replicated site.
+- The design-study attribution goes in the report to the user.
+
 ## Dependencies And Assets
 
 - For `framer-motion`, use import map URL with `?external=react`.
