@@ -32,6 +32,10 @@ use them if exposed, otherwise inspect files and use the CLI.
 - `push` uploads local changes relative to the last base. It does not delete
   remote files/functions unless `--delete` is passed, refuses conflict markers,
   and reports remote/local conflicts.
+- Every file in the workspace is a site file; `push` uploads whatever it walks.
+  A workspace-root `.creghtignore` (gitignore syntax) excludes paths from
+  `pull`, `diff`, and `push`, and ignored remote files stay untouched even under
+  `--delete`/`--force`.
 - `push` puts the change on the **preview domain immediately** — no build queue
   or propagation delay, so reloading the preview URL shows the new version. The
   **production domain** changes only on `publish`, which is a separate,
@@ -90,6 +94,10 @@ missing, such as an image `alt` binding.
   See `references/site-code.md` "SSR Availability".
 - Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
   `creght upload`, or tiny `data:` URIs.
+- Never push local-only working files — specs, notes, screenshots, scratch
+  scripts, research or reference material about other sites. Keep them outside
+  the workspace or list them in `.creghtignore` before the first push; the
+  workspace's contents are the site's contents.
 - Never edit `/types/cms.d.ts` or `/types/form.d.ts`; they are platform-generated.
   Change the CMS/Form schema through platform or CLI operations, then refresh
   the generated files.
@@ -115,7 +123,8 @@ Paths below are relative to this skill's `references/`. Read one only when you
 reach its topic; do not read the others.
 
 - `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
-  platform data, backend commands, preview vs. publish, asset upload.
+  `.creghtignore`, platform data, backend commands, preview vs. publish, asset
+  upload.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.

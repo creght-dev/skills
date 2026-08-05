@@ -104,6 +104,9 @@ with `/` are always workspace-root paths. When the discovered workspace root
 differs from the current directory, commands print `workspace: <root>` first —
 if that path looks unexpected, stop and check before pushing.
 
+Paths matched by a workspace-root `.creghtignore` are excluded from `pull`,
+`diff`, and `push` — see "Ignoring Local-Only Files".
+
 `project list` lists available projects and sites. `project create` creates a
 new project and prints the created project ID.
 
@@ -198,6 +201,52 @@ Operational gotchas:
   `pull` before pushing; afterwards `push` works from the root or any child
   directory.
 
+## Ignoring Local-Only Files
+
+Every file in the workspace is a site file. `push` uploads whatever it walks, so
+notes, specs, screenshots, scratch scripts, research output, and downloaded
+reference material dropped inside the workspace become part of the site. Keep
+such files outside the workspace, or list them in `.creghtignore`.
+
+A `.creghtignore` at the **workspace root** (nested ones are not read) excludes
+paths from `pull`, `diff`, and `push`:
+
+```gitignore
+# local-only working files
+notes/
+SPEC.md
+*.local.ts
+/scratch/
+
+# keep one file inside an otherwise ignored directory
+generated/*
+!generated/keep.ts
+```
+
+Syntax follows gitignore conventions: blank lines, `#` comments, `!` negation,
+leading `/` for root-anchored patterns, trailing `/` for directories, and `*`,
+`?`, `**` wildcards. A pattern with no `/` matches at any depth; a matched
+directory also excludes everything under it. The last matching rule wins, so `!`
+can re-include a file under an ignored directory.
+
+Semantics:
+
+- Ignored local files are never uploaded. Ignored remote files are never written
+  locally and never recorded in `.creght/state.json`.
+- Ignored remote files stay untouched, including under `push --delete` and
+  `push --force`; `pull --force` will not overwrite an ignored local file.
+- `.creghtignore` itself is always local and is never synced.
+- Ignoring `/AGENTS.md` stops `pull` from generating it.
+- Dot-prefixed paths (`.creght/`, `.git/`, `.env`) plus `node_modules/`,
+  `bower_components/`, `vendor/`, `dist/`, `build/`, and `coverage/` are already
+  skipped and need no rule.
+- Ignoring a path only stops syncing it. A remote copy that already exists stays
+  on the site; to remove it, delete it remotely first (`push --delete` while the
+  path is still unignored, or delete it in the editor), then add the rule.
+
+Write `.creghtignore` before the first push when local-only files already exist,
+and check `creght diff` — its create list must contain site files only.
+
 ## Preview And Publish
 
 A site has two domains, updated by different triggers:
@@ -270,15 +319,14 @@ For backend features:
 - Use `creght table` to manage project JSON tables used by Func `ctx.db.*`.
 - Use `creght table record` for seed data or user-requested operational data.
 - Use `backend/func/**/*.ts` files to create, update, rename, and delete Func
-  code. `creght push` and `creght dev` diff these files and apply Func CRUD
-  through the backend.
+  code. `creght push` diffs these files and applies Func CRUD through the
+  backend.
 - Func keys are extensionless paths such as `booking` or `profile/settings`,
   derived from file paths under `backend/func/`.
 - Invoke methods with `key.method`, for example `booking.create`.
 - Use `creght func run` only to self-test a Func method with sample input.
 - The CLI intentionally does not expose `creght func list/get/create/update/delete`.
-  Func CRUD must go through `backend/func` files plus `creght push` or
-  `creght dev`.
+  Func CRUD must go through `backend/func` files plus `creght push`.
 - Use `talizen/auth` for auth UI. React components should use `useAuth()` for
   login/register/logout/current-user state; do not implement passwords,
   sessions, or OAuth callbacks in Func.
