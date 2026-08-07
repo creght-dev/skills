@@ -47,6 +47,13 @@ use them if exposed, otherwise inspect files and use the CLI.
   rolling production forward or back without touching local files. Snapshots
   cover source only: CMS content and `/platform/**` definitions are live, so
   publishing an older version does not roll those back.
+- That version history is also readable as a **read-only git remote**, and for
+  AI-site projects it is the only way to read history at all. `creght git clone`
+  gives a repository whose `main` is the newest version, `refs/tags/v<no>` is each
+  version, and `published` is what production serves — so `git log`, `git show
+  v195:page/Price.tsx` and `git diff published..main` all work, none of which the
+  CLI can do. Writes still go through `creght push`; `git push` is refused. git
+  reads, creght writes. See `references/git.md`.
 - The CLI does not render sites locally; rendering, CMS, forms, Auth, Func,
   realtime preview, and publication are backend/web-app responsibilities.
 - If the user provides no actionable requirement, ask what to build or change.
@@ -134,6 +141,10 @@ reach its topic; do not read the others.
 - `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
   `.creghtignore`, platform data, backend commands, preview vs. publish, site
   versions and rollback, asset upload.
+- `git.md` — the site's version history as a read-only git remote: `creght git
+  clone`, the `main`/`v<no>`/`published` refs, why clones are shallow, rolling back
+  by reading old content out of history, and running git and creght in one
+  directory.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.
