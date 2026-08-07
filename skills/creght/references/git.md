@@ -57,12 +57,16 @@ Mapping commits onto versions was built and then removed. It made a version per
 commit, which buries the history in noise, and interleaving it with `creght push`
 cost a rejected push and a rebase on every alternation. One write path is enough.
 
-To undo something, read the old content out of history and push it the normal way:
+To undo one file, read the old content out of history and push it the normal way
+(from a throwaway clone — see below):
 
 ```
-git show v190:page/Price.tsx > page/Price.tsx
-creght push
+git show v190:page/Price.tsx > ~/work/site/page/Price.tsx
+cd ~/work/site && creght push
 ```
+
+To roll **production** back to an earlier version, git is not involved at all:
+`creght version publish <version_no>`.
 
 ## Which tool
 
@@ -79,17 +83,25 @@ record a version, and `publish` / `version publish` to go live. Also for everyth
 git does not carry at all: CMS content (content is live and is not part of a version
 snapshot), forms, JSON tables, Func env vars, and asset uploads.
 
-## One directory, both tools
+## Keep it in a throwaway directory
 
-A git clone and a creght workspace can be the same directory — the file walker skips
-any path part starting with `.`, so `.git/` is never uploaded:
+Do **not** clone into your creght workspace, and do not run `creght pull` inside a
+git clone. Tested, and it goes wrong in two ways:
+
+- `git add -A` sweeps `.creght/` into git history. A later `git checkout <version>`
+  then restores a stale `.creght/state.json`, and the next `creght push` computes
+  its diff against the wrong base.
+- The two tools mean different things by "remote". `creght pull` merges the **live
+  files**; git's history only moves when a **version** is created. So a `creght push`
+  from elsewhere changes the site while `git pull` reports "Already up to date" —
+  and each tool runs its own three-way merge, against its own base, unaware of the
+  other.
+
+Clone somewhere disposable, read what you need, copy it across, delete it:
 
 ```
-creght git clone --site_id=<project_id>/<site_id> site
-cd site
-creght pull        # adds .creght/ alongside .git/
+creght git clone --site_id=<project_id>/<site_id> /tmp/look
+cd /tmp/look && git show v190:page/Price.tsx > ~/work/site/page/Price.tsx
+rm -rf /tmp/look
+cd ~/work/site && creght push
 ```
-
-`creght pull` fetches the **live** files while git's HEAD is the newest **version**,
-so if the editor has unsaved work it shows up as a dirty working tree. That is
-information, not a problem.
