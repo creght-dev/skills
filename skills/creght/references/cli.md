@@ -305,11 +305,26 @@ what the site used to look like. `version list` gives numbers and notes; these
 give content.
 
 ```bash
-creght version cat 190 page/Price.tsx          # read a past file
-creght version cat 190 page/Price.tsx > page/Price.tsx   # take one file back
-creght version diff 190                        # what changed since v190
-creght version diff 190 195                    # between two versions
+creght version cat 190 page/Price.tsx    # print a past file to stdout
+creght version diff 190                  # what changed since v190
+creght version diff 190 195              # between two versions
 ```
+
+### Taking one file back
+
+`version rollback` restores the whole site. For a single file, read it out of the
+version and push it like any other edit — four steps, from inside a pulled
+workspace:
+
+```bash
+creght version cat 190 page/Price.tsx > page/Price.tsx
+creght diff          # confirm only that file changed
+creght push
+creght version diff 190   # optional: check what still differs
+```
+
+The redirect writes the local file; nothing reaches the site until `push`. Run it
+from a workspace (`creght pull` first) — `version cat` alone only prints.
 
 `version rollback` restores the whole site source to a version: files whose
 content changed are reverted, files added since are deleted, files deleted since
