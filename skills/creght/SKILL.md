@@ -44,9 +44,18 @@ use them if exposed, otherwise inspect files and use the CLI.
 - A site version is an immutable snapshot of site source, the platform
   equivalent of a git commit. `version create` records one, `version list` shows
   them and which is live, `version publish <version_no>` makes one live —
-  rolling production forward or back without touching local files. Snapshots
+  rolling production forward or back without touching the editable files. Snapshots
   cover source only: CMS content and `/platform/**` definitions are live, so
   publishing an older version does not roll those back.
+- Rolling back is two separate things, and picking the wrong one is the usual
+  mistake. `version publish <no>` moves **production** and leaves the editable
+  files at the newest state; `version rollback <no>` moves the **editable files**
+  (landing on preview immediately) and leaves production alone. Undoing a bad edit
+  usually means both. To take back a single file instead of the whole site, read it
+  out of the version and push it: `creght version cat <no> <path> > <path>` then
+  `creght push`. `version cat` and `version diff` are also the only way to see a
+  past file's content at all — `version list` gives numbers and notes, nothing more.
+  See `references/cli.md`.
 - The CLI does not render sites locally; rendering, CMS, forms, Auth, Func,
   realtime preview, and publication are backend/web-app responsibilities.
 - If the user provides no actionable requirement, ask what to build or change.
