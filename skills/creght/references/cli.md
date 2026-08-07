@@ -92,6 +92,9 @@ creght publish --site_id=<project_id>/<site_id>   # production only; run only wh
 creght version create --note=<note>   # snapshot source; does not touch production
 creght version list                   # versions, newest first; * marks the live one
 creght version publish <version_no>   # production only; run only when asked
+creght version cat <no> <path>        # a file as it was at that version
+creght version diff <no> [<no>]       # compare two versions, or one against live
+creght version rollback <no>          # put the live files back to that version
 creght importmap   # print the site's effective importMap (platform built-ins + talizen.config)
 ```
 
@@ -294,6 +297,39 @@ version 14 (id 458) is live on example.creght.cn
 ```
 
 Run `creght publish --help` if you need to confirm current publish flags.
+
+## Reading history and rolling back
+
+The live files carry no history of their own, so these are the only way to see
+what the site used to look like. `version list` gives numbers and notes; these
+give content.
+
+```bash
+creght version cat 190 page/Price.tsx          # read a past file
+creght version cat 190 page/Price.tsx > page/Price.tsx   # take one file back
+creght version diff 190                        # what changed since v190
+creght version diff 190 195                    # between two versions
+```
+
+`version rollback` restores the whole site source to a version: files whose
+content changed are reverted, files added since are deleted, files deleted since
+are restored. It is the counterpart to `version publish` — publishing rolls
+**production** back but leaves the editable files at the newest state, while
+rollback does the opposite. Use both to undo a bad edit completely.
+
+```bash
+creght version rollback 190 --dry_run   # always look first
+creght version rollback 190
+```
+
+Rollback lands on the preview domain immediately, like `push`, and **does not
+touch production**. It is not destructive to history: the rollback is an ordinary
+write on top of the current state, so every version in between still exists.
+Record the result with `version create`, and ship it with `version publish`.
+
+Platform-generated files (`/types/cms.d.ts`, `/types/form.d.ts`) are skipped by
+all three: the server synthesizes them for the live listing only, so they belong
+to no version.
 
 ## Site Versions
 
