@@ -54,6 +54,16 @@ bunx skills add creght-dev/skills -g -y
 
 After installation, supported Codex/agent environments will automatically load the corresponding skill guidance when working with Creght projects.
 
+### DeepSeek Harness (dsh)
+
+This repository is also a dsh bundle, so it installs into a dsh profile directly (requires `pnpm` on `PATH`):
+
+```bash
+npx @deepseek-ai/dsh plugin --profile web add github:creght-dev/skills
+```
+
+Pin a tag or commit with `github:creght-dev/skills#v1.0.0`. Remove it with `... plugin --profile web remove creght-skills`, update with `... plugin --profile web update creght-skills`.
+
 ## Update
 
 Update to the latest version with `npx`:

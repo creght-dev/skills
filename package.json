@@ -1,0 +1,38 @@
+{
+  "name": "creght-skills",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness bundle that registers the Creght skill pack on ctx.skills.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "skills"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/creght-dev/skills",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creght-dev/skills.git"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "creght",
+    "agent-skills",
+    "website",
+    "site-replica"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "dependencies": {
+    "yaml": "^2.4.2"
+  }
+}
