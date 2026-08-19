@@ -18,13 +18,27 @@ creght version
 ```
 
 Use the production endpoint by default. Omit `--web` unless the user explicitly
-provides another Creght environment. For a non-default API host, use
-`CREGHT_API_HOST`.
+provides another Creght environment.
 
 ```text
 API: https://creght.cn
 Web: https://creght.cn
 ```
+
+The CLI talks to one saved default API host, and keeps one token per host:
+
+```bash
+creght config get                              # print the saved default
+creght config set api_host=https://creght.cn   # move the default; value must be an absolute URL
+CREGHT_API_HOST=http://localhost:8433 creght project list   # override for this command only
+```
+
+`CREGHT_API_HOST` applies to the command it prefixes and nothing else,
+including `creght login`, which saves a token for that host without repointing
+the default. Use `creght config set` when the user wants every later command on
+another environment, and the variable for a one-off. Because tokens are kept per
+API host, switching between hosts already logged in to needs no new login.
+`api_host` is the only settable key.
 
 `creght -h` and `creght <command> -h` are the authoritative, always-current
 command reference: exact flags, arguments, output formats, and examples. This
@@ -79,6 +93,8 @@ Discovery details:
 ## Core Workflow
 
 ```bash
+creght config get                      # which API host commands talk to
+creght config set api_host=<url>       # move the default to another environment
 creght login
 creght logout
 creght project list
