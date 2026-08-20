@@ -13,9 +13,14 @@ and publication are handled by the Creght backend and web app.
 Install and verify:
 
 ```bash
-npm install -g creght-cli
+npm install -g creght-cli   # or: bun add -g creght-cli
 creght version
 ```
+
+Install it yourself when it is missing, and upgrade it with
+`npm i -g creght-cli@latest` when a command fails against a newer backend.
+Only `creght login` needs the user: it binds the machine to their Creght
+account, so an agent cannot complete it.
 
 Use the production endpoint by default. Omit `--web` unless the user explicitly
 provides another Creght environment.
