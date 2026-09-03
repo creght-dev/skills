@@ -9,7 +9,15 @@ custom `seo` objects and raw tags when `metadata` can express the same thing.
 
 Supported fields mirror common Next.js `Metadata`: `title`, `description`,
 `keywords`, `creator`, `publisher`, `applicationName`, `generator`,
-`referrer`, `formatDetection`, `openGraph`, and `icons`.
+`referrer`, `formatDetection`, `openGraph`, `twitter`, `icons`, and
+`alternates.canonical`.
+
+Never hand-write `<link rel="canonical">` in a component: the engine already emits a
+self-referencing canonical in `<head>` for indexable 200 pages (dropping tracking params
+and any query the page never reads), and a component-rendered tag lands in `<body>` where
+crawlers ignore it. Override only for a genuinely different primary URL, page-level only:
+`alternates: { canonical: "/products/matcha-powder" }` — relative paths resolve against the
+request origin. A canonical declared in site config / root layout is ignored on purpose.
 
 Put OG values under `metadata.openGraph`; use absolute URLs for OG media.
 Keywords are a string array.
