@@ -104,6 +104,8 @@ creght login
 creght logout
 creght project list
 creght project create --name="My Project"
+creght tpl list                        # browse project templates; see "Site Templates"
+creght tpl use <id> --name="My Project"   # create a project from a template
 creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull
 creght diff
 creght push
@@ -145,6 +147,10 @@ allows it:
 creght project create --name="My Project" --from_id=<project_id>
 creght project create --name="My Project" --tpl_id=<template_id>
 ```
+
+For discovering templates and the recommend-confirm-create flow, see
+"Site Templates" below — `creght tpl use` is the same create-from-template but
+also prints the new sites ready to pull.
 
 `pull` downloads a local workspace whose paths mirror remote site paths
 exactly:
@@ -228,6 +234,41 @@ Operational gotchas:
   workspace (this guards against uploading an unrelated repo). Run the first
   `pull` before pushing; afterwards `push` works from the root or any child
   directory.
+
+## Site Templates
+
+The platform ships whole-project templates: a complete starter project with
+pages, components, and CMS content. When the user wants a new site and asks
+which template fits ("哪个模板适合做开源软件的官网"), recommend from the real
+list — never invent template names or ids:
+
+```bash
+creght tpl list                       # id, name, description, categories, preview URL
+creght tpl list --category_id=<id>    # filter; ids from creght tpl categories
+creght tpl list --recommend           # the platform's featured templates
+creght tpl categories                 # two-level category tree
+creght tpl get <id>                   # one template: its sites, CMS collections, preview URL
+```
+
+Every `tpl` command accepts `--json`. Judge fit by name, description, and
+category, and hand the user each candidate's `preview:` URL so they can open
+the rendered template. Fetching a preview URL is also how to inspect a
+template's actual look and content beyond its description.
+
+Creating a project from a template copies the template's sites and CMS content
+into a fresh project the user owns; it never touches existing projects. Still,
+create only the template the user has confirmed — picking one on their behalf
+strands a wrong-template project they cannot delete via the CLI:
+
+```bash
+creght tpl use <id> --name="<project name>"
+```
+
+`tpl use` prints the new project's sites as `project_id/site_id` plus the
+`creght pull` command to run next — continue with the core workflow: pull,
+adapt pages and content to the user's requirements, push, and hand back the
+preview URL. An `unknown command "tpl"` error means an old CLI; upgrade with
+`npm i -g creght-cli@latest`.
 
 ## Ignoring Local-Only Files
 

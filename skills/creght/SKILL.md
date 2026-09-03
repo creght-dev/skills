@@ -5,9 +5,10 @@ description: >
   code locally, pushing local changes, resolving sync conflicts, writing
   Creght-compatible React pages/components code, CMS, form, Auth, and Func
   backend integration, routing, styling, metadata, previewing, publishing,
-  site version snapshots and rollback, domain binding, DNS/SSL, website
-  analytics, environment variables, editor operations, or debugging
-  local-to-platform workflows.
+  site templates (recommending one, starting a site from one), site version
+  snapshots and rollback, domain binding, DNS/SSL, website analytics,
+  environment variables, editor operations, or debugging local-to-platform
+  workflows.
 ---
 
 # Creght
@@ -20,7 +21,12 @@ use them if exposed, otherwise inspect files and use the CLI.
 ## Core Model
 
 - The CLI handles login, project/site discovery, pull, push, diff, conflict
-  resolution, preview, publish, platform data, and asset operations.
+  resolution, preview, publish, platform data, asset operations, and site
+  templates.
+- To start a new site from a platform template — the user asks which template
+  fits, or names one — use `creght tpl`: `list`/`get` to recommend candidates
+  with their preview URLs, then `tpl use` to create the project, only after the
+  user confirms the template. Read `references/cli.md` "Site Templates" first.
 - Public rendered origins may expose `/.well-known/creght.json`; use it to
   discover `project_id` and `site_id` from a page URL.
 - `pull` mirrors remote paths locally, records `.creght/state.json`, and keeps
@@ -141,8 +147,8 @@ Paths below are relative to this skill's `references/`. Read one only when you
 reach its topic; do not read the others.
 
 - `cli.md` — CLI install/use, discovery, pull/diff/push/resolve, conflicts,
-  `.creghtignore`, platform data, backend commands, preview vs. publish, site
-  versions and rollback, asset upload.
+  `.creghtignore`, site templates, platform data, backend commands, preview vs.
+  publish, site versions and rollback, asset upload.
 - `site-code.md` — routes, pages/components, SSR data loading, imports,
   importMap, `talizen.config.ts`, redirects, package types, `public/` static
   files.
