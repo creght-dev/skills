@@ -21,6 +21,20 @@ When adding color transitions, drive the color from one source to avoid double
 hover transitions. Either let children inherit the parent color or control the
 child color with a single hover or `group-hover` rule.
 
+## Responsive
+
+Reach for the built-in breakpoints (`sm` `md` `lg` `xl` `2xl`) first: the visual
+editor's per-breakpoint style controls read those and only those, so a layout
+built on them stays editable on the canvas, while a custom cut (`min-[700px]:`,
+or a `--breakpoint-*` token in `@theme`) can only be changed in code. Take the
+custom cut when the design lands nowhere near a built-in.
+
+Drive width-dependent layout from CSS. The canvas renders several breakpoints as
+sibling artboards inside one iframe, so `window.innerWidth`,
+`matchMedia('(max-width: …)')`, and resize listeners all measure the iframe
+rather than the artboard, and at most one artboard can come out right. Non-width
+media queries (`prefers-reduced-motion`, `prefers-color-scheme`) are unaffected.
+
 ## Site-Level `index.css`
 
 Use `/index.css` only for `@theme` tokens, `@utility` definitions (applied back
