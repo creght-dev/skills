@@ -1,9 +1,79 @@
 # Creght Sitemap
 
+A site gets `/sitemap.xml` in one of two ways, and **the default is not
+"nothing"** (this is where Creght differs from Next.js, which emits no sitemap
+at all unless you write `sitemap.ts`):
+
+1. **Automatic page scan (default).** Creght walks the page files and emits one
+   URL per static route. For a **dynamic route** (`[param]` in the filename) it
+   calls that page's exported `generateStaticParams()` to expand it into real
+   URLs.
+2. **`/sitemap.ts` (override).** When this file exists it **replaces** the scan
+   entirely; nothing is added automatically.
+
+Read the next section before writing any page with `[param]` in its filename.
+
+## Dynamic routes must export `generateStaticParams`
+
+**Every page file with `[param]` in its name must export
+`generateStaticParams`**, unless the site uses `/sitemap.ts`.
+
+Skipping it fails silently. `page/blog/[slug].tsx` without it means **not one
+`/blog/*` URL exists in the sitemap**, while `sitemap.xml` still returns 200 with
+the home page and the static routes in it. Nothing errors, nothing logs, and the
+site owner has no way to notice. Two things break:
+
+- Search engines never discover the detail pages.
+- **Static HTML export produces a package with no detail pages**, because the
+  export decides what to render from the sitemap's `<loc>` list.
+
+```ts
+// page/blog/[slug].tsx
+import { listContents } from "talizen/cms";
+import type { GenerateStaticParams } from "talizen";
+import type { Blogs } from "../../types/cms";
+
+export const generateStaticParams: GenerateStaticParams = async () => {
+  const res = await listContents<Blogs>("blogs", { limit: 100, offset: 0 });
+  return (res?.list ?? [])
+    .filter((item) => item.slug)
+    .map((item) => ({
+      slug: item.slug,
+      // Use the content's own timestamp. Without it every URL from this route
+      // shares one lastmod: the page file's own date, to the day. Editing an
+      // article then never changes it, so crawlers are not told to come back.
+      lastModified: item.updated_at,
+    }));
+};
+```
+
+Rules for the returned array:
+
+- One key per `[param]` in the path. `page/docs/[category]/[slug].tsx` needs both
+  `category` and `slug`; an entry missing one is dropped without an error.
+- `lastModified` is strongly recommended and takes a CMS timestamp or a `Date`.
+  `changeFrequency` and `priority` are optional. `lastmod` / `changefreq` are
+  accepted as aliases, but write the camelCase names: they match `sitemap.ts`.
+- Paginate when a collection has more items than one request returns. Items you
+  do not fetch are not reported as missing, they are simply absent.
+- Filter out items that should not be indexed (drafts, deprecated, untranslated).
+  Every entry returned here is submitted to search engines, so an entry whose
+  page 404s costs more than a missing one.
+
+Import the type from the `talizen` package: `GenerateStaticParams` and
+`StaticParamsEntry` carry the full shape.
+
+## Writing `/sitemap.ts` instead
+
 Creght supports a root-level `/sitemap.ts` file for generating XML sitemap
 entries. Its authoring rules follow Next.js `sitemap.ts`: export a default
 function that returns an array of sitemap entries, or a promise resolving to
 that array.
+
+Prefer `generateStaticParams` for ordinary sites: it keeps each route's URL list
+next to that route. Reach for `/sitemap.ts` when the sitemap needs something the
+per-route expansion cannot express, such as cross-domain language alternates or
+URLs that belong to no page file.
 
 Use `talizen/cms` inside `/sitemap.ts` when sitemap entries depend on CMS list
 pages or CMS detail pages.

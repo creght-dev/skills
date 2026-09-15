@@ -63,6 +63,24 @@ Fields: `params`, `searchParams`, `request` (`host` / `headers.get()`), `cookies
 (`get`/`has`/`set`/`delete`), and `locale` / `locales` / `defaultLocale` /
 `routingDefaultLocale`. `req`, `query`, and `request.cookies` are deprecated aliases.
 
+A page whose filename contains `[param]` must **also** export
+`generateStaticParams`, or none of its URLs reach `sitemap.xml` and static
+export, silently. `getServerSideProps` renders one URL on request;
+`generateStaticParams` is what tells the platform those URLs exist at all. See
+`sitemap.md`.
+
+```tsx
+import { listContents } from "talizen/cms"
+import type { GenerateStaticParams } from "talizen"
+
+export const generateStaticParams: GenerateStaticParams = async () => {
+  const res = await listContents("blogs", { limit: 100, offset: 0 })
+  return (res?.list ?? [])
+    .filter((item) => item.slug)
+    .map((item) => ({ slug: item.slug, lastModified: item.updated_at }))
+}
+```
+
 Do not read auth or call Func in SSR. Use `useAuth()` in React UI and Func
 `ctx.auth` for protected backend actions.
 
