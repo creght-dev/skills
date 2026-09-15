@@ -7,6 +7,11 @@ same-named file under `/public` is never reached, and nothing warns you.
 | --- | --- | --- |
 | `/robots.txt` | platform defaults | `/robots.ts` |
 | `/sitemap.xml` | page scan + `generateStaticParams` | `/sitemap.ts` |
+
+A page whose filename contains `[param]` **must** export `generateStaticParams`,
+or none of its URLs reach `sitemap.xml` and static export, silently. See
+`sitemap.md`.
+
 | `/llms.txt` | sitemap's page list + `metadata` | `/llms.ts` |
 | `/<page>.md` | the page itself | — |
 
