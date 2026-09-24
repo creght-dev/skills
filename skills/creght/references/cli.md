@@ -110,7 +110,7 @@ creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull
 creght diff
 creght push
 creght resolve --list
-creght preview --site_id=<project_id>/<site_id>   # preview URL; live right after push
+creght url --site_id=<project_id>/<site_id>   # preview / live / editor addresses
 creght publish --site_id=<project_id>/<site_id>   # production only; run only when asked
 creght version create --note=<note>   # snapshot source; does not touch production
 creght version list                   # versions, newest first; * marks the live one
@@ -333,8 +333,12 @@ preview that still shows the old output is a bug in the code or an unpushed
 file, never lag — re-open it with `?dev` and read `references/error-handling.md`
 instead of waiting or re-pushing.
 
-`creght preview --site_id=<project_id>/<site_id>` prints the preview URL and
-opens it in a browser.
+`creght url` prints every address the site answers on — the preview host, each
+published domain with the version it serves, and the editor — and opens
+nothing, so it is safe to run at any point. Pass `--open` to also open the
+preview in a browser (only when the user asked for a browser), or `--json` to
+parse the addresses. `creght preview` is an alias of it. Inside a pulled
+workspace `--site_id` is optional.
 
 **Do not run `creght publish` or `creght version publish` unless the user
 explicitly asks to go live.** Push-and-verify is the default loop; publishing is
