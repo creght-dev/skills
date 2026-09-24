@@ -119,9 +119,15 @@ Package/platform imports keep normal specifiers, such as `react`,
 
 ## Import Map
 
-The platform provides common packages such as `react`, `react-dom`, and
-`talizen`; do not add them manually. Add third-party dependencies in
-`talizen.config.ts` `importMap.imports`.
+`creght runtime packages` lists every specifier the site can import, each with
+its `url`, `source` (`builtin` or the config file that added it), and `ssr`.
+The built-in set is broad and changes over time, so look it up rather than
+assuming — e.g. `three`, `gsap` (with `gsap/*` plugins), `lenis`, and `motion`
+are built in today. Import a built-in by its specifier with no config entry.
+
+Add a dependency in `talizen.config.ts` `importMap.imports` only when the
+lookup lacks it. Leave built-in specifiers out of the config: an override
+changes only the browser's copy, while SSR keeps the platform's version.
 
 ```ts
 export default {
@@ -137,14 +143,21 @@ Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
 upload tools, or tiny `data:` URIs. Runtime Func assets use
 `ctx.assets.upload(...)` and store returned metadata.
 
+### Text Imports (`?raw`)
+
+Append `?raw` to import any site file as a string, in SSR and the browser alike:
+
+```ts
+import vertexShader from "../components/scene/shaders/particles.vert.glsl?raw"
+```
+
+Keep shaders, SVG markup, and other text sources as their own files this way.
+
 ### SSR Availability
 
 The browser resolves importMap entries from their CDN URLs. SSR resolves bare
-imports from the render server's `node_modules`, which holds only the packages
-the platform provides. Read the project's `talizen.config.ts` to tell the two
-apart: entries declared there were added by the project and do not exist on the
-render server. Do not assume a fixed built-in list — the platform updates its
-own set independently.
+imports from the render server's `node_modules`, which holds only the platform
+built-ins — the entries `creght runtime packages` marks `ssr: true`.
 
 Importing a project-added package anywhere in a page's module graph therefore
 breaks that page's SSR. The page falls back to client-only rendering, losing SSR
@@ -152,8 +165,10 @@ and SEO, and may also lose its `getServerSideProps` props and render its own
 empty or not-found branch while route and data are fine. Lint only checks that
 the specifier is declared, so it still passes.
 
-No directive keeps SSR for such a page. Write the logic in project code, or use
-a package the platform already provides.
+To use a project-added package and keep SSR, load it only in the browser: put
+the code that imports it in its own module and pull that module in with
+`await import()` inside `useEffect` (effects never run during SSR). Otherwise
+write the logic in project code, or use a built-in.
 
 Browser globals cause a softer version of the same downgrade: keep `window`,
 `document`, and `navigator` out of module scope and render (including
@@ -263,6 +278,26 @@ A `public/*.html` file is not part of routing, SSR, `metadata`/SEO, i18n, CMS,
 or the component system; do not use it for real site pages. Never write a
 project-root `index.html` to satisfy a "single HTML file" request — it is not
 served; put it in `public/`.
+
+`public/` files are site source: stored in the database and copied into every
+version. Each file has a small size cap — read it with `creght runtime limits`
+(`public_file_max_bytes`); push rejects a file over it. Keep `public/` to small
+text files, and put images, bundles, models, and other large files on the CDN
+with `creght upload`, referencing the returned URL.
+
+## Porting A Bundler Project
+
+To bring an existing Vite/webpack app into a Creght site, port its source, not
+its build output — the platform bundles site code itself:
+
+1. Move the modules under `components/` and turn the entry into a page.
+2. Replace dependencies with built-ins where `creght runtime packages` has
+   them; load the rest per "SSR Availability".
+3. Move module-scope `window` / `document` work into a function the page calls
+   from `useEffect`.
+4. Keep `?raw` imports; replace `import.meta.env` with constants.
+5. Upload large binary assets (models, point clouds, videos) with
+   `creght upload`.
 
 ## Package Types
 

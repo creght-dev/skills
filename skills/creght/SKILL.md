@@ -112,10 +112,12 @@ missing, such as an image `alt` binding.
   complex selectors, or custom utilities. No inline `style` or page `<style>`.
 - Use relative imports for local files; aliases such as `@/lib/utils` are
   unsupported.
-- Only platform built-in importMap packages may appear in a page's module graph.
-  A dependency added to `talizen.config.ts` resolves in the browser but not in
-  SSR, silently dropping the page to client-only rendering; lint misses it.
-  See `references/site-code.md` "SSR Availability".
+- Run `creght runtime packages` before adding a dependency: the platform
+  already ships many (three, gsap, motion, ...). Packages with `ssr: true`
+  import anywhere; an `ssr: false` package (added in `talizen.config.ts`) loads
+  only via `await import()` inside `useEffect` — a static import silently drops
+  the page to client-only rendering, and lint misses it. See
+  `references/site-code.md` "SSR Availability".
 - Do not commit/import local binaries. Use absolute URLs, Creght CDN URLs from
   `creght upload`, or tiny `data:` URIs.
 - Never push local-only working files — specs, notes, screenshots, scratch
@@ -127,7 +129,9 @@ missing, such as an image `alt` binding.
   the generated files.
 - Static files, including a self-contained standalone HTML file, go under
   `public/` (served at the domain root); a project-root `index.html` is NOT
-  served. For one-file artifacts (deck/poster/preview) read `references/site-code.md`.
+  served. `public/` is versioned site source with a small per-file cap
+  (`creght runtime limits`); large files go to the CDN via `creght upload`.
+  For one-file artifacts (deck/poster/preview) read `references/site-code.md`.
 - Use structured `metadata`, not custom `seo` fields or duplicate raw SEO tags.
 - Use Func for backend workflows and persistent writes. Do not fake persistence
   in React state, expose project IDs, or create `/func/*` pages.
