@@ -118,7 +118,7 @@ creght version publish <version_no>   # production only; run only when asked
 creght version cat <no> <path>        # a file as it was at that version
 creght version diff <no> [<no>]       # compare two versions, or one against live
 creght version rollback <no>          # put the live files back to that version
-creght importmap   # print the site's effective importMap (platform built-ins + talizen.config)
+creght runtime     # what the site's runtime provides: packages (with ssr) and limits
 ```
 
 Only the first pull needs `--site_id` (and usually `--dir`). After that,
