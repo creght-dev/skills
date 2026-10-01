@@ -27,6 +27,9 @@ use them if exposed, otherwise inspect files and use the CLI.
   fits, or names one — use `creght tpl`: `list`/`get` to recommend candidates
   with their preview URLs, then `tpl use` to create the project, only after the
   user confirms the template. Read `references/cli.md` "Site Templates" first.
+- Before deciding a new site's look (its theme, first page, a new homepage or a
+  redesign), look at real references with `creght refs search`, unless the user
+  gave references. Read `references/cli.md` "UI References" first.
 - Public rendered origins may expose `/.well-known/creght.json`; use it to
   discover `project_id` and `site_id` from a page URL.
 - `pull` mirrors remote paths locally, records `.creght/state.json`, and keeps

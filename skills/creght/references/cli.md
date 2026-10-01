@@ -106,6 +106,7 @@ creght project list
 creght project create --name="My Project"
 creght tpl list                        # browse project templates; see "Site Templates"
 creght tpl use <id> --name="My Project"   # create a project from a template
+creght refs search --industry=<industry> --save=./refs   # visual references; see "UI References"
 creght pull --site_id=<project_id>/<site_id> --dir=./mysite   # first pull
 creght diff
 creght push
@@ -263,6 +264,29 @@ strands a wrong-template project they cannot delete via the CLI:
 ```bash
 creght tpl use <id> --name="<project name>"
 ```
+
+## UI References
+
+A curated library of well-designed real sites, EDMs, A+ modules and KVs, tagged
+by industry, site type and page type. Search it before writing the theme or the
+first page of a new site, a new homepage or a visual redesign, unless the user
+already gave reference images or sites to imitate. No login needed:
+
+```bash
+creght refs vocab                     # valid --industry / --site_type / --page_type values
+creght refs search --industry="家居 / 家具 / 生活方式" --site_type=商城 --save=./refs
+creght refs search --industry="家居 / 家具 / 生活方式" --page_type="EDM 邮件" --limit=4 --save=./refs
+```
+
+- Values must match `creght refs vocab` exactly. Give `--page_type` only when
+  designing one specific page or asset; omit it to get whole-site references.
+- `--save` downloads each image (1200px wide) as `<dir>/<id>.jpg` so you can
+  open it. Keep that directory outside the site workspace, or `push` uploads it.
+- Results are shuffled and spread across styles. Open the 2-3 closest to the
+  user's own words and take palette, layout rhythm, hero treatment and type
+  mood from them; never copy their text, logos or photos.
+- `dropped:` in the output means nothing matched exactly and those conditions
+  were relaxed; weigh such results accordingly.
 
 `tpl use` prints the new project's sites as `project_id/site_id` plus the
 `creght pull` command to run next — continue with the core workflow: pull,
