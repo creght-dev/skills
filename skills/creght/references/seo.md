@@ -112,6 +112,17 @@ tags in `customCode.head`. Supported fields: `width`, `height`, `initialScale`,
 `minimumScale`, `maximumScale`, `userScalable`, `interactiveWidget`,
 `themeColor`, and `colorScheme`.
 
+## Structured Data (JSON-LD)
+
+`metadata` cannot express schema.org, so render an `application/ld+json`
+script: site-wide facts (`Organization`, `WebSite`) from `head` in
+`talizen.config.ts`, page facts (`Product`, `BlogPosting`, `BreadcrumbList`,
+`FAQPage`) inside the page. Every fact must be visible on the page. Never
+hard-code the domain in `url` / `@id` — the free or preview domain the site is
+built on stops being canonical once a custom domain is bound. Use
+`head: (ctx) => …` with `ctx.host`, or `context.request.host` in
+`getServerSideProps`.
+
 ## Legacy SEO Migration
 
 1. Move `seo.title` and `seo.description` to `metadata.title` and
