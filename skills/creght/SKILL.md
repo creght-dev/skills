@@ -127,6 +127,16 @@ missing, such as an image `alt` binding.
   scripts, research or reference material about other sites. Keep them outside
   the workspace or list them in `.creghtignore` before the first push; the
   workspace's contents are the site's contents.
+- Forms that collect visitor input (contact, booking, signup, inquiry) must be
+  Creght forms (`references/forms.md`): submissions land where the site owner
+  manages them. Never ship a `mailto:` link, a fake submit that only shows
+  "sent", or a third-party form service instead.
+- A site started from a template inherits the template's forms, CMS
+  collections, and sample components, written for the template's own business.
+  Before handing the site back, go through each one: rewrite form fields and
+  options to fit this site (`creght form update`, then refresh the generated
+  types), restyle borrowed components to the new look, and delete what the site
+  does not need. A yoga studio must not ask "corporate training / age bracket".
 - Never edit `/types/cms.d.ts` or `/types/form.d.ts`; they are platform-generated.
   Change the CMS/Form schema through platform or CLI operations, then refresh
   the generated files.
