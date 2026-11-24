@@ -335,6 +335,25 @@ version. Each file has a small size cap — read it with `creght runtime limits`
 text files, and put images, bundles, models, and other large files on the CDN
 with `creght upload`, referencing the returned URL.
 
+## Images
+
+The platform optimizes images hosted on its own CDN (the URLs `creght upload`
+and the asset library return). For any element or component whose `src` is
+such a URL, rendering rewrites it to `?w=…&fmt=webp` and adds a `srcSet` with
+fixed width steps (256w … 3072w). CSS `backgroundImage` in an inline `style` and
+rich-text HTML get the same `src` rewrite. Other hosts are left alone.
+
+- Write the plain upload URL; don't add `?w=` / `fmt=` yourself.
+- The `srcSet` widths are fixed steps, not the image's real width. An 800px
+  image is still offered as 1536w / 3072w, so `naturalWidth` can come out
+  smaller than the real image. Don't size things from `naturalWidth` (lightboxes,
+  zoom); fit to the container, or pass the size you know.
+- Add `sizes` when you know the slot width; without it the browser assumes the
+  full viewport width.
+- Opt out per element: `data-tz-img="original"` leaves `src`, `srcSet`, `style`
+  and HTML on that element untouched. If you write your own `srcSet`, the
+  platform leaves that image alone too.
+
 ## Porting A Bundler Project
 
 To bring an existing Vite/webpack app into a Creght site, port its source, not
